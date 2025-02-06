@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .footer { margin-top: 20px; font-size: 12px; color: #555; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Alert: Threshold Messages</h2>
+    <p>The following messages have been triggered based on the thresholds:</p>
+    <table>
+        <tr>
+            <th>Flag</th>
+            <th>Content</th>
+            <th>Group</th>
+        </tr>
+        {{ range . }}
+        <tr>
+            <td>{{ .FLAG }}</td>
+            <td>{{ .Content }}</td>
+            <td>{{ .Group }}</td>
+        </tr>
+        {{ end }}
+    </table>
+    <p class="footer">This is an automated message. Please do not reply.</p>
+</div>
+</body>
+</html>
