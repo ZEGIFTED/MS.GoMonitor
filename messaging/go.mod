@@ -1,7 +1,7 @@
-module github.com/CalebBoluwade/messaging
+module github.com/CalebBoluwade/ZEGIFTED/messaging
 
 go 1.23.5
 
-require github.com/CalebBoluwade/ms.monitor v0.0.0
+//require github.com/CalebBoluwade/ZEGIFTED/MS.GoMonitor v0.0.0
 
-replace github.com/CalebBoluwade/ms.monitor => ../messaging
+//replace github.com/CalebBoluwade/ZEGIFTED/MS.GoMonitor => ../messaging

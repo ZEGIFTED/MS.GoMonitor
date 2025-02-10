@@ -3,7 +3,6 @@ package messaging
 import (
 	"bytes"
 	"fmt"
-	"github.com/CalebBoluwade/ms.monitor"
 	"html/template"
 	"log"
 	"net/smtp"

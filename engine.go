@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sort"
+	"time"
 )
 
 var taskItems = []string{"hello", "world"}
@@ -35,15 +36,57 @@ func MetricEngine(metrics ...[][]ServiceMonitorStatus) []ServiceMonitorStatus {
 	return allMessageList
 }
 
-func Run() ([]string, int) {
-	for index, taskItem := range taskItems {
+type TimeSeriesData struct {
+	Timestamp int64
+	Value     float64
+}
 
-		fmt.Printf("%d: %s \n", index+1, taskItem)
+func checkTSDataAboveThreshold(metricName string, entity string, tsData []TimeSeriesData, threshold float64, arrSequenceLength int) []struct {
+	Timestamp string
+	Values    []float64
+} {
+	var timestampArr []int64
+	var valueArr []float64
+	var thresholds []struct {
+		Timestamp string
+		Values    []float64
+	}
+	var sequenceData [][]float64
+
+	// Populate timestampArr and valueArr
+	for _, val := range tsData {
+		timestampArr = append(timestampArr, val.Timestamp)
+		valueArr = append(valueArr, val.Value)
 	}
 
-	v := len(taskItems)
+	// Group values into sequences
+	for i := 0; i < len(valueArr); i += arrSequenceLength {
+		if i+arrSequenceLength <= len(valueArr) {
+			sequence := valueArr[i : i+arrSequenceLength]
+			sequenceData = append(sequenceData, sequence)
+		}
+	}
 
-	var x = append(taskItems, "test")
+	// Check for sequences above threshold
+	for i, arr := range sequenceData {
+		if allAboveThreshold(arr, threshold) && len(arr) >= arrSequenceLength {
+			timestamp := timestampArr[i*arrSequenceLength]
+			formattedTime := time.UnixMilli(timestamp).Format("2006-01-02 15:04:05")
+			thresholds = append(thresholds, struct {
+				Timestamp string
+				Values    []float64
+			}{Timestamp: formattedTime, Values: arr})
+		}
+	}
 
-	return x, v
+	return thresholds
+}
+
+func allAboveThreshold(arr []float64, threshold float64) bool {
+	for _, num := range arr {
+		if num <= threshold {
+			return false
+		}
+	}
+	return true
 }
