@@ -1,17 +1,20 @@
-package main
+package monitors
 
 import (
 	"fmt"
+	"github.com/ZEGIFTED/MS.GoMonitor/utils"
 	"sort"
 	"time"
 )
 
-var taskItems = []string{"hello", "world"}
+type AgentServiceChecker struct{}
+type WebModulesServiceChecker struct{}
+type SNMPServiceChecker struct{}
 
-//test_dict := make(map[string]string)
+// MetricEngine Aggregates all metric sources by AppId and metric
+func MetricEngine(metrics ...[][]utils.ServiceMonitorStatus) []utils.ServiceMonitorStatus {
 
-func MetricEngine(metrics ...[][]ServiceMonitorStatus) []ServiceMonitorStatus {
-	var allMessageList []ServiceMonitorStatus
+	var allMessageList []utils.ServiceMonitorStatus
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -41,7 +44,7 @@ type TimeSeriesData struct {
 	Value     float64
 }
 
-func checkTSDataAboveThreshold(metricName string, entity string, tsData []TimeSeriesData, threshold float64, arrSequenceLength int) []struct {
+func CheckTSDataAboveThreshold(metricName string, entity string, tsData []TimeSeriesData, threshold float64, arrSequenceLength int) []struct {
 	Timestamp string
 	Values    []float64
 } {
@@ -90,3 +93,39 @@ func allAboveThreshold(arr []float64, threshold float64) bool {
 	}
 	return true
 }
+
+//func Run() {
+//	//
+//	sendTo := []string{"calebb.jnr@gmail.com"}
+//	//
+//	//	messages := MetricEngine()
+//	//
+//	//	// Construct the email subject
+//	//	//subject := fmt.Sprintf("Alert: %d Threshold Messages for %s", len(groupMessages), group)
+//	//	subject := fmt.Sprintf("Alert Threshold Messages")
+//	//
+//	actionURL := ""
+//	//
+//	err_ := messaging.SendEmail(sendTo, "Test Subject", "Hello World from Go")
+//	if err_ != nil {
+//		return
+//	}
+//
+//	emailBody := messaging.FormatEmailMessageToSend("Hello World from Go", actionURL)
+//	// Send the email
+//	if err := messaging.SendEmail(sendTo, subject, emailBody); err != nil {
+//		log.Printf("Failed to send email to %s: %v", group, err)
+//	} else {
+//		log.Printf("Alert sent to %s", group)
+//	}
+//
+//	extraInfo := map[string]string{}
+//
+//	slackClient := messaging.SlackBotClient()
+//	slackMessage := messaging.FormatSlackMessageToSend("Test Notification", "Hello World from Go", "critical", actionURL, extraInfo)
+//
+//	_, err := slackClient.SendSlackMessage("admin_x", slackMessage)
+//	if err != nil {
+//		return
+//	}
+//}
