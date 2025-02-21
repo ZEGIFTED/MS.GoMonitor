@@ -118,8 +118,8 @@ func Header(pdf *gofpdf.Fpdf, reportTime string) {
 	// Add logo placeholder
 	pdf.SetFillColor(headerBg[0], headerBg[1], headerBg[2])
 	pdf.Rect(0, 0, 210, 25, "F")
-	logoPath := "public/work2.png"
-	orgCompanyPath := "public/nibsslogo.png"
+	logoPath := "pkg/public/work2.png"
+	orgCompanyPath := "pkg/public/nibsslogo.png"
 
 	// Company Logo placeholder
 	//imageOptions := gofpdf.ImageOptions{

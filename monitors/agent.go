@@ -3,14 +3,15 @@ package monitors
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/utils"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 	"io"
 	"log"
 	"net/http"
 	"time"
 )
 
-func (service *AgentServiceChecker) Check(config utils.ServiceMonitorConfig) (bool, utils.ServiceMonitorStatus) {
+func (service *AgentServiceChecker) Check(config ServiceMonitorConfig) (bool, ServiceMonitorStatus) {
 	// Get the URL from configuration
 	host := config.Host
 	protocol, ok := config.Configuration["protocol"]
@@ -24,11 +25,10 @@ func (service *AgentServiceChecker) Check(config utils.ServiceMonitorConfig) (bo
 	protocol = protocol.(string)
 
 	if host == "" {
-		return false, utils.ServiceMonitorStatus{
-			Id:            0,
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Degraded,
+			LiveCheckFlag: constants.Degraded,
 			Status:        "Unknown",
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
@@ -47,10 +47,10 @@ func (service *AgentServiceChecker) Check(config utils.ServiceMonitorConfig) (bo
 	resp, err := client.Get(agentAddress)
 
 	if err != nil {
-		return false, utils.ServiceMonitorStatus{
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Degraded,
+			LiveCheckFlag: constants.Degraded,
 			Status:        "Agent Status Unknown",
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
@@ -68,11 +68,10 @@ func (service *AgentServiceChecker) Check(config utils.ServiceMonitorConfig) (bo
 	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		return false, utils.ServiceMonitorStatus{
-			Id:            0,
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Escalation,
+			LiveCheckFlag: constants.Escalation,
 			Status:        "OK",
 			LastCheckTime: time.Now(),
 			//LastServiceUpTime: time.Now(),
@@ -82,11 +81,10 @@ func (service *AgentServiceChecker) Check(config utils.ServiceMonitorConfig) (bo
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return false, utils.ServiceMonitorStatus{
-			Id:            0,
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Escalation,
+			LiveCheckFlag: constants.Escalation,
 			Status:        "OK",
 			LastCheckTime: time.Now(),
 			//LastServiceUpTime: time.Now(),
@@ -101,12 +99,11 @@ func (service *AgentServiceChecker) Check(config utils.ServiceMonitorConfig) (bo
 	//log.Println("Agent API response", apiResponse, err)
 
 	if err != nil {
-		return false, utils.ServiceMonitorStatus{
-			Id:            0,
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Escalation,
-			Status:        "OK",
+			LiveCheckFlag: constants.Escalation,
+			Status:        "Unable to Sync Agent Metrics",
 			LastCheckTime: time.Now(),
 			//LastServiceUpTime: time.Now(),
 			FailureCount: 0,
@@ -170,22 +167,21 @@ func (service *AgentServiceChecker) Check(config utils.ServiceMonitorConfig) (bo
 		err := SyncMetrics(db, agents, agentSyncURL)
 
 		if err != nil {
-			return false, utils.ServiceMonitorStatus{
+			return false, ServiceMonitorStatus{
 				Name:          config.Name,
 				Device:        config.Device,
 				Status:        "Error while syncing metrics " + err.Error(),
-				LiveCheckFlag: utils.Escalation,
+				LiveCheckFlag: constants.Escalation,
 				LastCheckTime: time.Now(),
 				FailureCount:  1,
 			}
 		}
 	}
 
-	return true, utils.ServiceMonitorStatus{
-		Id:                0,
+	return true, ServiceMonitorStatus{
 		Name:              config.Name,
 		Device:            config.Device,
-		LiveCheckFlag:     utils.Healthy,
+		LiveCheckFlag:     constants.Healthy,
 		Status:            "OK",
 		LastCheckTime:     time.Now(),
 		LastServiceUpTime: time.Now(),

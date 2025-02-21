@@ -2,23 +2,23 @@ package monitors
 
 import (
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/utils"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/gosnmp/gosnmp"
 	"log"
 	"net"
 	"time"
 )
 
-func (service *SNMPServiceChecker) Check(config utils.ServiceMonitorConfig) (bool, utils.ServiceMonitorStatus) {
+func (service *SNMPServiceChecker) Check(config ServiceMonitorConfig) (bool, ServiceMonitorStatus) {
 	host := config.Host
 	port := config.Port
 
 	if host == "" {
-		return false, utils.ServiceMonitorStatus{
-			Id:            0,
+		return false, ServiceMonitorStatus{
+
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Degraded,
+			LiveCheckFlag: constants.Degraded,
 			Status:        "Unknown",
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
@@ -39,7 +39,16 @@ func (service *SNMPServiceChecker) Check(config utils.ServiceMonitorConfig) (boo
 		{".1.3.6.1.2.1.1.5.0", "System Name"},
 		{".1.3.6.1.2.1.2.1.0", "Number of Interfaces"},
 		{".1.3.6.1.2.1.25.2.2.0", "Memory"},
+		{".1.3.6.1.2.1.31.1.1.1.6.1", "Inbound traffic"},
+		{".1.3.6.1.2.1.31.1.1.1.10.1", "Outbound traffic"},
 	}
+
+	//ifInOctetsOID  = "1.3.6.1.2.1.2.2.1.10.1" // Incoming traffic (Replace 1 with your interface index)
+	//ifOutOctetsOID = "1.3.6.1.2.1.2.2.1.16.1" // Outgoing traffic
+
+	//".1.3.6.1.2.1.2.2.1.10", // ifInOctets
+	//	".1.3.6.1.2.1.2.2.1.16", // ifOutOctets
+	//	".1.3.6.1.2.1.2.2.1.5",  // ifSpeed
 
 	CommunityString, ok := config.Configuration["communityString"]
 
@@ -69,11 +78,10 @@ func (service *SNMPServiceChecker) Check(config utils.ServiceMonitorConfig) (boo
 	// Connect to the device
 	err := snmp.Connect()
 	if err != nil {
-		return false, utils.ServiceMonitorStatus{
-			Id:            0,
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Escalation,
+			LiveCheckFlag: constants.Escalation,
 			Status:        "Error getting SNMP interfaces",
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
@@ -107,6 +115,8 @@ func (service *SNMPServiceChecker) Check(config utils.ServiceMonitorConfig) (boo
 				fmt.Printf("Value: %s\n", string(variable.Value.([]byte)))
 			case gosnmp.TimeTicks:
 				fmt.Printf("TimeTicks: %d\n", gosnmp.ToBigInt(variable.Value))
+			case gosnmp.Counter64:
+				fmt.Printf("Counter: %d\n", variable.Value.(uint64))
 			default:
 				fmt.Printf("Value: %v\n", variable.Value)
 			}
@@ -116,11 +126,10 @@ func (service *SNMPServiceChecker) Check(config utils.ServiceMonitorConfig) (boo
 	// Get interface information
 	interfaces, err := getInterfaces(snmp)
 	if err != nil {
-		return false, utils.ServiceMonitorStatus{
-			Id:            0,
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Escalation,
+			LiveCheckFlag: constants.Escalation,
 			Status:        "Error getting SNMP interfaces",
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
@@ -134,16 +143,15 @@ func (service *SNMPServiceChecker) Check(config utils.ServiceMonitorConfig) (boo
 		fmt.Printf("Interface: %s\n", iface)
 	}
 
-	return true, utils.ServiceMonitorStatus{
-		Id:                0,
+	return true, ServiceMonitorStatus{
 		Name:              config.Name,
 		Device:            config.Device,
-		LiveCheckFlag:     utils.Healthy,
+		LiveCheckFlag:     constants.Healthy,
 		Status:            "OK",
 		LastCheckTime:     time.Now(),
 		LastServiceUpTime: time.Now(),
 		FailureCount:      0,
-		//LastErrorLog:      fmt.Sprintf("SNMP Error: %v", err),
+		LastErrorLog:      "",
 	}
 }
 

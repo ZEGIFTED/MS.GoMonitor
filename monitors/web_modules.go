@@ -3,17 +3,17 @@ package monitors
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/utils"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"io"
 	"log"
 	"net/http"
 	"time"
 )
 
-func (service *WebModulesServiceChecker) Check(config utils.ServiceMonitorConfig) (bool, utils.ServiceMonitorStatus) {
+func (service *WebModulesServiceChecker) Check(config ServiceMonitorConfig) (bool, ServiceMonitorStatus) {
 	// Create a custom HTTP client with disabled SSL verification
 	httpClient := &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: constants.HTTPRequestTimeout,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
@@ -32,11 +32,10 @@ func (service *WebModulesServiceChecker) Check(config utils.ServiceMonitorConfig
 	protocol = protocol.(string)
 
 	if host == "" {
-		return false, utils.ServiceMonitorStatus{
-			Id:            0,
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Degraded,
+			LiveCheckFlag: constants.Degraded,
 			Status:        "Unknown",
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
@@ -48,11 +47,10 @@ func (service *WebModulesServiceChecker) Check(config utils.ServiceMonitorConfig
 	resp, err := httpClient.Get(webURL)
 
 	if err != nil {
-		return false, utils.ServiceMonitorStatus{
-			//Id:            0,
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Degraded,
+			LiveCheckFlag: constants.Degraded,
 			Status:        "Agent Status Unknown",
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
@@ -63,11 +61,10 @@ func (service *WebModulesServiceChecker) Check(config utils.ServiceMonitorConfig
 	bodyBytes, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		return false, utils.ServiceMonitorStatus{
-			Id:            0,
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Escalation,
+			LiveCheckFlag: constants.Escalation,
 			Status:        "OK",
 			LastCheckTime: time.Now(),
 			//LastServiceUpTime: time.Now(),
@@ -77,11 +74,10 @@ func (service *WebModulesServiceChecker) Check(config utils.ServiceMonitorConfig
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return false, utils.ServiceMonitorStatus{
-			Id:            0,
+		return false, ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
-			LiveCheckFlag: utils.Escalation,
+			LiveCheckFlag: constants.Escalation,
 			Status:        "OK",
 			LastCheckTime: time.Now(),
 			//LastServiceUpTime: time.Now(),
@@ -90,11 +86,10 @@ func (service *WebModulesServiceChecker) Check(config utils.ServiceMonitorConfig
 		}
 	}
 
-	return true, utils.ServiceMonitorStatus{
-		Id:                0,
+	return true, ServiceMonitorStatus{
 		Name:              config.Name,
 		Device:            config.Device,
-		LiveCheckFlag:     utils.Healthy,
+		LiveCheckFlag:     constants.Healthy,
 		Status:            "OK",
 		LastCheckTime:     time.Now(),
 		LastServiceUpTime: time.Now(),

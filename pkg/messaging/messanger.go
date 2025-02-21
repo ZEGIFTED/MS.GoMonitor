@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/utils"
+	"github.com/ZEGIFTED/MS.GoMonitor/monitors"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/go-mail/mail/v2"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
@@ -175,33 +176,29 @@ func SendDowntimeServiceNotification(message, alertLevel, actionURL string, extr
 
 // SendReportEmail Notification Method
 func SendReportEmail(to []string, attachmentFilePath string) {
-	smtpHost := os.Getenv("MAIL_HOST")
-	smtpPort := os.Getenv("MAIL_PORT")
-	smtpUser := os.Getenv("MAIL_USER")
-	smtpPass := os.Getenv("MAIL_PASS")
 	//recipient := os.Getenv("EMAIL_RECIPIENT")
 
-	fmt.Println(smtpHost, smtpPort, smtpUser, smtpPass)
+	fmt.Println(constants.SMTPHost, constants.SMTPPort, constants.SMTPUser, constants.SMTPPass)
 
 	subject := "Hourly IT Infrastructure Report"
 	body := "Please find the attached IT infrastructure report for the last hour. If you're receiving this notification, either you or a group you're part has been profiled for this notification.\n\nBest regards,\nIT Monitoring System"
 
-	if smtpHost == "" || smtpUser == "" || smtpPass == "" || len(to) < 1 {
+	if constants.SMTPHost == "" || constants.SMTPUser == "" || constants.SMTPPass == "" || len(to) < 1 {
 		log.Println("Email notifications are not configured properly.")
 	}
 
 	// Connect to the SMTP server
-	port, err := strconv.Atoi(smtpPort)
+	port, err := strconv.Atoi(constants.SMTPPort)
 	if err != nil {
-		fmt.Println("Invalid port:", smtpPort, err)
+		fmt.Println("Invalid port:", constants.SMTPPort, err)
 		return
 	}
 
-	d := mail.NewDialer(smtpHost, port, smtpUser, smtpPass)
+	d := mail.NewDialer(constants.SMTPHost, port, constants.SMTPUser, constants.SMTPPass)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	m := mail.NewMessage()
-	m.SetHeader("From", smtpUser)
+	m.SetHeader("From", constants.SMTPUser)
 	m.SetHeader("To", to...)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", body)
@@ -277,7 +274,7 @@ func (s *SlackClient) HandleMessageEvent(event *slackevents.MessageEvent) {
 }
 
 // Load the HTML template from file
-func loadTemplate(filePath string, data []utils.ServiceMonitorStatus) (string, error) {
+func loadTemplate(filePath string, data []monitors.ServiceMonitorStatus) (string, error) {
 	// Read the file content
 	templateContent, err := os.ReadFile(filePath)
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/ZEGIFTED/MS.GoMonitor/monitors"
-	"github.com/ZEGIFTED/MS.GoMonitor/utils"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 	"github.com/joho/godotenv"
 	_ "github.com/microsoft/go-mssqldb" // SQL Server driver
 	"github.com/robfig/cron/v3"
@@ -25,7 +25,6 @@ type EnvConfig struct {
 	APISecret string
 	GoEnv     string
 	Debug     bool
-	DB        utils.DBConfig
 }
 
 // LoadConfig loads environment variables from .env file
@@ -49,30 +48,30 @@ func LoadConfig() (*EnvConfig, error) {
 }
 
 // NewServiceMonitor creates a new service monitor instance
-func NewServiceMonitor(db *sql.DB) *utils.ServiceMonitor {
+func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	logger := cron.PrintfLogger(log.New(os.Stdout, "MS-CRON_SVC_MONITOR: ", log.Ldate|log.Ltime|log.Lshortfile))
+	logger := cron.PrintfLogger(utils.CronLogger)
 
-	monitor := &utils.ServiceMonitor{
+	monitor := &monitors.ServiceMonitor{
 		Db:             db,
-		StatusTracking: make(map[string]*utils.ServiceMonitorStatus),
-		Logger:         log.New(os.Stdout, "MS-SVC_MONITOR: ", log.Ldate|log.Ltime|log.Lshortfile),
-		Checkers:       make(map[utils.ServiceType]utils.ServiceChecker),
+		StatusTracking: make(map[string]*monitors.ServiceMonitorStatus),
+		Logger:         utils.Logger,
+		Checkers:       make(map[monitors.ServiceType]monitors.ServiceChecker),
 		Ctx:            ctx,
 		Cancel:         cancel,
 		Cron: cron.New(
-			//	cron.WithChain(
-			//	cron.SkipIfStillRunning(cron.DefaultLogger),
-			//),
+			cron.WithChain(
+				cron.SkipIfStillRunning(cron.DefaultLogger),
+			),
 			cron.WithLogger(logger),
 		),
 	}
 
 	// Register service type checkers
-	monitor.Checkers[utils.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
-	monitor.Checkers[utils.ServiceMonitorWebModules] = &monitors.WebModulesServiceChecker{}
-	//monitor.Checkers[utils.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
+	monitor.Checkers[monitors.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
+	monitor.Checkers[monitors.ServiceMonitorWebModules] = &monitors.WebModulesServiceChecker{}
+	//monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
 
 	//// Example usage
 	//tsData := []TimeSeriesData{

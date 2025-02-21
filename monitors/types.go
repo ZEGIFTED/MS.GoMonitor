@@ -1,4 +1,4 @@
-package utils
+package monitors
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 	"log"
-	"os"
 	"sync"
 	"time"
 )
@@ -26,14 +25,6 @@ type ServiceMonitorConfig struct {
 	SnoozeUntil    sql.NullTime           `json:"snooze_until"`
 }
 
-const (
-	Healthy = iota
-	Escalation
-	Acknowledged
-	Degraded
-	UnknownStatus
-)
-
 type ServiceType string
 
 const (
@@ -44,7 +35,6 @@ const (
 
 // ServiceMonitorStatus represents the current status of a monitored service
 type ServiceMonitorStatus struct {
-	Id                int         `json:"service_id"`
 	Name              string      `json:"name"`
 	Device            ServiceType `json:"device"`
 	LiveCheckFlag     int
@@ -71,16 +61,72 @@ type ServiceChecker interface {
 	Check(config ServiceMonitorConfig) (bool, ServiceMonitorStatus)
 }
 
-// GetEnvWithDefault retrieves an environment variable with a fallback default value
-func GetEnvWithDefault(key, defaultValue string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return defaultValue
+// AgentInfo represents the complete metrics information for an agent
+type AgentInfo struct {
+	Version    string       `json:"version"`
+	AgentID    string       `json:"agent_id"`
+	IPAddress  string       `json:"IPAddress"`
+	Name       string       `json:"name"`
+	OS         string       `json:"os"`
+	LastSync   sql.NullTime `json:"lastSync"`
+	SDKVersion string       `json:"SDKVersion"`
+	Metrics    []Metric
+	Disks      []DiskMetric
 }
 
-// isValidCron checks if a given string is a valid cron expression
-func isValidCron(expr string) bool {
-	_, err := cron.ParseStandard(expr) // Uses the standard 5-field cron format
-	return err == nil
+// AgentMetricResponse represents the complete metrics data for an agent
+type AgentMetricResponse struct {
+	Status     string     `json:"status"`
+	SystemInfo SystemInfo `json:"systemInfo"`
+	Uptime     string     `json:"uptime"`
+	AgentInfo  AgentInfo  `json:"agent_info"`
+}
+
+type DiskMetric struct {
+	Drive      string `json:"drive"`
+	Size       int64  `json:"size"`
+	Free       int64  `json:"free"`
+	Used       int64  `json:"used"`
+	FormatSize string `json:"formatSize"`
+	FormatFree string `json:"formatFree"`
+}
+
+// SystemInfo represents system metrics (CPU, memory, disk)
+type SystemInfo struct {
+	CPU    [][]float64  `json:"cpu"`    // Each entry is [timestamp, usage]
+	Memory [][]float64  `json:"memory"` // Each entry is [timestamp, usage]
+	Disk   []DiskMetric `json:"disk"`
+}
+
+type Metric struct {
+	Timestamp    int64
+	TimestampMem int64
+	CPUUsage     float64
+	MemoryUsage  float64
+}
+
+type AgentEscalation struct {
+	AppId   uuid.UUID `json:"appId"`
+	AgentId string    `json:"agentId"`
+	Metric  string    `json:"metric"`
+	Cause   string    `json:"cause"`
+}
+
+// ServerResource represents the server resource utilization data
+type ServerResource struct {
+	ServerName        string
+	CPUUtilization    float64
+	MemoryUtilization float64
+	DiskUtilization   float64
+}
+
+// NetworkDevice represents the network device bandwidth utilization data
+type NetworkDevice struct {
+	DeviceName           string
+	BandwidthUtilization float64
+}
+
+// FastAPIResponse represents the response from the FastAPI agent
+type FastAPIResponse struct {
+	Context string `json:"context"`
 }
