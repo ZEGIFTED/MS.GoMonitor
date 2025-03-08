@@ -2,7 +2,10 @@ package utils
 
 import (
 	"database/sql"
+	"encoding/csv"
 	"fmt"
+	"github.com/ZEGIFTED/MS.GoMonitor/internal"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/jung-kurt/gofpdf"
 	"log"
 	"os"
@@ -11,113 +14,31 @@ import (
 	"time"
 )
 
-type Metric struct {
-	ServerName             string
-	AgentId                string
-	IPAddress              string
-	CpuUsage               float64
-	MemoryUsage            float64
-	CurrentDiskUtilization float64
-	TotalDiskSpace         float64
-	RecordedAt             time.Time
-}
-
 type SystemCount struct {
 	Status string // Active, Inactive, Scheduled
 	Count  int
 }
 
-// Colors for the PDF
-var (
-	headerBg    = []int{0, 32, 96}     // Deep Navy Blue
-	titleBg     = []int{0, 51, 153}    // Royal Blue
-	tableBg     = []int{240, 244, 248} // Light Blue-Gray
-	alertColor  = []int{231, 76, 60}   // Red
-	normalColor = []int{46, 204, 113}  // Green
-)
+func GenerateReport(db *sql.DB) (string, string) {
+	var metrics, tableHeaders, err = internal.FetchMetricsReport(db)
 
-func GenerateReport(db *sql.DB) string {
-	//Query data
-	//query := "\n\t\tSELECT ServerName, CpuUsage, MemoryUsage, CurrentDiskUtilization, RecordedAt \n\t\tFROM ITInfrastructureMetrics \n\t\tWHERE RecordedAt >= DATEADD(HOUR, -1, GETDATE())"
-	//
-	//rows, err := db.Query(query)
-	//if err != nil {
-	//	log.Fatalf("Query failed: %s", err.Error())
-	//}
-	//
-	//defer func(rows *sql.Rows) {
-	//	err := rows.Close()
-	//	if err != nil {
-	//		log.Fatalf("DB Closure failed: %s", err.Error())
-	//	}
-	//}(rows)
-
-	var metrics []Metric
-
-	metrics = append(metrics, Metric{
-		ServerName:             "Test Server",
-		IPAddress:              "127.0.0.1",
-		CpuUsage:               50,
-		MemoryUsage:            1024,
-		CurrentDiskUtilization: 2048,
-		RecordedAt:             time.Now(),
-	})
-
-	metrics = append(metrics, Metric{
-		ServerName:             "Test Server 2",
-		IPAddress:              "127.0.0.2",
-		CpuUsage:               40,
-		MemoryUsage:            1024,
-		CurrentDiskUtilization: 2048,
-		RecordedAt:             time.Now(),
-	})
-
-	metrics = append(metrics, Metric{
-		ServerName:             "Test Server 3",
-		IPAddress:              "127.0.0.3",
-		CpuUsage:               40,
-		MemoryUsage:            1024,
-		CurrentDiskUtilization: 2048,
-		RecordedAt:             time.Now(),
-	})
-
-	metrics = append(metrics, Metric{
-		ServerName:             "Test Server 4",
-		IPAddress:              "127.0.0.4",
-		CpuUsage:               40,
-		MemoryUsage:            1024,
-		CurrentDiskUtilization: 2048,
-		RecordedAt:             time.Now(),
-	})
-
-	//var headers []string
-	//for rows.Next() {
-	//	cols, err_ := rows.Columns()
-	//	if err_ != nil {
-	//		log.Fatalf("Error scanning cols: %s", err)
-	//	}
-	//
-	//	headers = append(headers, cols...)
-	//
-	//	var m Metric
-	//	if err := rows.Scan(&m.ServerName, &m.CpuUsage, &m.MemoryUsage, &m.CurrentDiskUtilization, &m.RecordedAt); err != nil {
-	//		log.Fatalf("Error scanning row: %s", err.Error())
-	//	}
-	//	metrics = append(metrics, m)
-	//}
-
-	tableHeaders := []string{"ServerName", "CpuUsage", "MemoryUsage", "CurrentDiskUtilization"}
+	if err != nil {
+		log.Println("Error fetching metrics report", err)
+	}
 
 	// Generate PDF
 	var filePath = GeneratePDF(metrics, tableHeaders)
+	var csvFilePath = GenerateCSV(metrics, tableHeaders)
 
-	return filePath
+	return filePath, csvFilePath
 }
 
 func Header(pdf *gofpdf.Fpdf, reportTime string) {
 	// Add logo placeholder
-	pdf.SetFillColor(headerBg[0], headerBg[1], headerBg[2])
-	pdf.Rect(0, 0, 210, 25, "F")
+	pageWidth, _ := pdf.GetPageSize()
+
+	pdf.SetFillColor(constants.HeaderBg[0], constants.HeaderBg[1], constants.HeaderBg[2])
+	pdf.Rect(0, 0, pageWidth, 25, "F")
 	logoPath := "pkg/public/work2.png"
 	orgCompanyPath := "pkg/public/nibsslogo.png"
 
@@ -144,16 +65,15 @@ func Header(pdf *gofpdf.Fpdf, reportTime string) {
 	pdf.SetFont("Arial", "B", 7)
 	pdf.Text(25, 15, fmt.Sprintf("Generated at %s", reportTime))
 
-	// Or Top Right (uncomment this line to switch)
-	pdf.Image(logoPath, 170, 5, 35, 0, false, "", 0, "")
-
+	//fmt.Println(pageWidth, pageWidth/3, pageWidth*.75, pageWidth-50)
+	pdf.Image(logoPath, pageWidth-50, 5, 35, 0, false, "", 0, "")
 }
 
-func ChartSection(pdf *gofpdf.Fpdf, metrics []Metric) {
+func ChartSection(pdf *gofpdf.Fpdf, metrics []internal.Metric) {
 	pdf.AddPage()
 
 	// Section Title
-	pdf.SetFillColor(titleBg[0], titleBg[1], titleBg[2])
+	pdf.SetFillColor(constants.TitleBg[0], constants.TitleBg[1], constants.TitleBg[2])
 	pdf.Rect(10, 50, 190, 10, "F")
 	pdf.SetTextColor(255, 255, 255)
 	pdf.SetFont("Arial", "B", 10)
@@ -165,7 +85,7 @@ func ChartSection(pdf *gofpdf.Fpdf, metrics []Metric) {
 		// Server name
 		pdf.SetTextColor(0, 0, 0)
 		pdf.SetFont("Arial", "B", 7)
-		pdf.Text(15, float64(startY), metric.ServerName)
+		pdf.Text(15, float64(startY), metric.AgentHostName)
 
 		// CPU Usage Bar
 		UsageBar(pdf, 60, float64(startY)-3, metric.CpuUsage)
@@ -181,141 +101,361 @@ func UsageBar(pdf *gofpdf.Fpdf, x, y, percentage float64) {
 	height := 5.0
 
 	// Background bar
-	pdf.SetFillColor(tableBg[0], tableBg[1], tableBg[2])
+	pdf.SetFillColor(constants.TableBg[0], constants.TableBg[1], constants.TableBg[2])
 	pdf.Rect(x, y, width, height, "F")
 
 	// Usage bar
 	if percentage > 80 {
-		pdf.SetFillColor(alertColor[0], alertColor[1], alertColor[2])
+		pdf.SetFillColor(constants.AlertColor[0], constants.AlertColor[1], constants.AlertColor[2])
 	} else {
-		pdf.SetFillColor(normalColor[0], normalColor[1], normalColor[2])
+		pdf.SetFillColor(constants.NormalColor[0], constants.NormalColor[1], constants.NormalColor[2])
 	}
 	pdf.Rect(x, y, width*(percentage/100), height, "F")
 }
 
-func MetricsTable(pdf *gofpdf.Fpdf, metrics []Metric, tableHeaders []string) {
-	pageWidth, _ := pdf.GetPageSize()
-	marginLeft, _, marginRight, _ := pdf.GetMargins()
-	tableWidth := pageWidth - marginLeft - marginRight
+//
+//func MetricsTable(pdf *gofpdf.Fpdf, metrics []internal.Metric, tableHeaders []string) {
+//	pageWidth, _ := pdf.GetPageSize()
+//	marginLeft, _, marginRight, _ := pdf.GetMargins()
+//	tableWidth := pageWidth - marginLeft - marginRight
+//
+//	pdf.SetFont("Arial", "B", 10)
+//	pdf.SetTextColor(0, 0, 0)
+//	pdf.Text(pdf.GetX()+5, pdf.GetY(), "Infrastructure Report")
+//
+//	colWidth := 60.0
+//	lineHeight := 10.0
+//
+//	// Table headers
+//	for _, header := range tableHeaders {
+//		pdf.CellFormat(colWidth, lineHeight, header, "1", 0, "C", false, 0, "")
+//	}
+//	//pdf.Ln(-1)
+//
+//	startX := pdf.GetX()
+//	startY := pdf.GetY()
+//
+//	// Calculate wrapped text height
+//	pdf.MultiCell(colWidth, lineHeight, longText, "1", "", false)
+//	endY := pdf.GetY()
+//
+//	// Reset position and draw the second column
+//	pdf.SetXY(startX+colWidth, startY)
+//
+//	// Draw table header
+//	pdf.SetFillColor(constants.HeaderBg[0], constants.HeaderBg[1], constants.HeaderBg[2])
+//	pdf.SetTextColor(255, 255, 255)
+//	pdf.SetFont("Arial", "B", 10)
+//
+//	x := marginLeft
+//	//for i, header := range tableHeaders {
+//	//	pdf.Rect(x, pdf.GetY(), colWidths[i], 10, "DF")
+//	//	pdf.Text(x+2, pdf.GetY()+5, header)
+//	//	x += colWidths[i]
+//	//}
+//	//pdf.Ln(10)
+//
+//	// Add some content below the logo
+//	//pdf.SetFont("Arial", "", 10)
+//	//for _, m := range metrics {
+//	//	pdf.Cell(colWidths[0], 10, m.ServerName)
+//	//	pdf.Cell(colWidths[1], 10, m.IPAddress)
+//	//	pdf.Cell(colWidths[2], 10, fmt.Sprintf("%.1f", m.CpuUsage))
+//	//	pdf.Cell(colWidths[3], 10, fmt.Sprintf("%.1f", m.MemoryUsage))
+//	//	pdf.Cell(colWidths[4], 10, fmt.Sprintf("%.1f", m.CurrentDiskUtilization))
+//	//	//pdf.Cell(colWidths[5], 10, fmt.Sprintf("%.2f MB", m.CurrentDiskUtilization))
+//	//	//pdf.Cell(colWidths[6], 10, fmt.Sprintf("%.2f MB", m.NetworkOut))
+//	//	//pdf.Cell(colWidths[7], 10, fmt.Sprintf("%d", m.ActiveUsers))
+//	//	//pdf.Cell(colWidths[8], 10, fmt.Sprintf("%d", m.AlertCount))
+//	//	pdf.Ln(-1)
+//	//}
+//
+//	// Table content
+//	//pdf.SetTextColor(0, 0, 0)
+//	pdf.SetFont("Arial", "", 7)
+//	rowColor := false
+//
+//	for _, m := range metrics {
+//		x = marginLeft
+//		if rowColor {
+//			pdf.SetFillColor(constants.TableBg[0], constants.TableBg[1], constants.TableBg[2])
+//		} else {
+//			pdf.SetFillColor(255, 255, 255)
+//		}
+//
+//		if m.CpuUsage > 80 || m.MemoryUsage > 80 || m.CurrentDiskUtilization > 80 {
+//			pdf.SetTextColor(constants.AlertColor[0], constants.AlertColor[1], constants.AlertColor[2])
+//		} else {
+//			pdf.SetTextColor(0, 32, 96) // Deep blue for normal values
+//		}
+//
+//		// Draw row background
+//		pdf.Rect(x, pdf.GetY(), tableWidth, 8, "F")
+//
+//		pdf.Rect(pdf.GetX(), pdf.GetY(), colWidth, cellHeight, "D")
+//
+//		// Helper function to format values
+//		formatValue := func(value float64) string {
+//			if value < 0 { // Check for invalid values
+//				return "N/A"
+//			}
+//			return fmt.Sprintf("%.1f", value)
+//		}
+//
+//		// Draw cell content
+//		pdf.Text(x+2, pdf.GetY()+5, m.AgentHostName)
+//		x += colWidths[0]
+//		pdf.Text(x+2, pdf.GetY()+5, m.AgentHostAddress)
+//		x += colWidths[0]
+//		pdf.Text(x+2, pdf.GetY()+5, formatValue(m.CpuUsage))
+//		x += colWidths[1]
+//		pdf.Text(x+2, pdf.GetY()+5, formatValue(m.MemoryUsage))
+//		x += colWidths[2]
+//		pdf.Text(x+2, pdf.GetY()+5, formatValue(m.CurrentDiskUtilization))
+//		//x += colWidths[3]
+//		//pdf.Text(x+2, pdf.GetY()+5, fmt.Sprintf("%.2f MB", m.NetworkIn))
+//		//x += colWidths[4]
+//		//pdf.Text(x+2, pdf.GetY()+7, fmt.Sprintf("%.2f MB", m.NetworkOut))
+//		//x += colWidths[5]
+//		//pdf.Text(x+2, pdf.GetY()+7, fmt.Sprintf("%d", m.ActiveUsers))
+//		//x += colWidths[6]
+//		//pdf.Text(x+2, pdf.GetY()+7, fmt.Sprintf("%d", m.AlertCount))
+//
+//		pdf.Ln(10)
+//		rowColor = !rowColor
+//	}
+//
+//	// Fetch process details via Agent API.
+//	for _, mx := range metrics {
+//		processes, err := internal.ServerResourceDetails(mx.AgentAPIBaseURL, 10)
+//
+//		if err != nil {
+//			log.Printf("Error fetching process details: %v", err)
+//			pdf.SetFont("Arial", "", 12)
+//			pdf.Cell(190, 10, "Failed to fetch process details")
+//		} else {
+//			ProcessTable(pdf, processes)
+//		}
+//	}
+//}
 
+func MetricsTable(pdf *gofpdf.Fpdf, metrics []internal.Metric, tableHeaders []string) {
+	// Define column widths for each column.
+	//colWidths := []float64{30, 50, 20, 40, 30, 30, 30}
+	colWidths := []float64{30, 50, 30, 30, 50, 40, 20}
+
+	// Set header font.
 	pdf.SetFont("Arial", "B", 10)
-	pdf.SetTextColor(0, 0, 0)
-	pdf.Text(pdf.GetX()+5, pdf.GetY(), "Infrastructure Report")
-
-	// Table headers
-	for _, header := range tableHeaders {
-		pdf.CellFormat(40, 10, header, "1", 0, "C", false, 0, "")
+	// Table header.
+	for i, header := range tableHeaders {
+		pdf.CellFormat(colWidths[i], 7, header, "1", 0, "C", false, 0, "")
 	}
 	pdf.Ln(-1)
 
-	// Calculate column widths
-	colWidths := []float64{40, 20, 20, 25, 25, 20}
-
-	// Calculate proportional column widths based on full width
-	//colWidths := []float64{
-	//	tableWidth * 0.15, // Server name gets more space
-	//	tableWidth * 0.15, // Server IP gets more space
-	//	tableWidth * 0.12, // CPU
-	//	tableWidth * 0.12, // Memory
-	//	tableWidth * 0.12, // Memory
-	//	tableWidth * 0.12, // Disk
-	//	//tableWidth * 0.125, // Network In
-	//	//tableWidth * 0.125, // Network Out
-	//	//tableWidth * 0.1,  // Users
-	//	//tableWidth * 0.1,  // Alerts
-	//}
-
-	// Draw table header
-	pdf.SetFillColor(headerBg[0], headerBg[1], headerBg[2])
-	pdf.SetTextColor(255, 255, 255)
-	pdf.SetFont("Arial", "B", 10)
-
-	x := marginLeft
-	for i, header := range tableHeaders {
-		pdf.Rect(x, pdf.GetY(), colWidths[i], 10, "DF")
-		pdf.Text(x+2, pdf.GetY()+5, header)
-		x += colWidths[i]
-	}
-	pdf.Ln(10)
-
-	// Add some content below the logo
-	//pdf.SetFont("Arial", "", 10)
-	//for _, m := range metrics {
-	//	pdf.Cell(colWidths[0], 10, m.ServerName)
-	//	pdf.Cell(colWidths[1], 10, m.IPAddress)
-	//	pdf.Cell(colWidths[2], 10, fmt.Sprintf("%.1f", m.CpuUsage))
-	//	pdf.Cell(colWidths[3], 10, fmt.Sprintf("%.1f", m.MemoryUsage))
-	//	pdf.Cell(colWidths[4], 10, fmt.Sprintf("%.1f", m.CurrentDiskUtilization))
-	//	//pdf.Cell(colWidths[5], 10, fmt.Sprintf("%.2f MB", m.CurrentDiskUtilization))
-	//	//pdf.Cell(colWidths[6], 10, fmt.Sprintf("%.2f MB", m.NetworkOut))
-	//	//pdf.Cell(colWidths[7], 10, fmt.Sprintf("%d", m.ActiveUsers))
-	//	//pdf.Cell(colWidths[8], 10, fmt.Sprintf("%d", m.AlertCount))
-	//	pdf.Ln(-1)
-	//}
-
-	// Table content
-	//pdf.SetTextColor(0, 0, 0)
-	pdf.SetFont("Arial", "", 7)
+	// Set normal font for table rows.
+	pdf.SetFont("Arial", "", 9)
+	pdf.SetTextColor(0, 32, 96)
 	rowColor := false
 
 	for _, m := range metrics {
-		x = marginLeft
 		if rowColor {
-			pdf.SetFillColor(tableBg[0], tableBg[1], tableBg[2])
+			pdf.SetFillColor(constants.TableBg[0], constants.TableBg[1], constants.TableBg[2])
 		} else {
 			pdf.SetFillColor(255, 255, 255)
 		}
 
-		if m.CpuUsage > 80 || m.MemoryUsage > 80 || m.CurrentDiskUtilization > 80 {
-			pdf.SetTextColor(alertColor[0], alertColor[1], alertColor[2])
-		} else {
-			pdf.SetTextColor(0, 32, 96) // Deep blue for normal values
+		row := []string{
+			m.AgentHostName,
+			m.AgentHostAddress,
+			fmt.Sprintf("%.2f%%", m.CpuUsage),
+			fmt.Sprintf("%.2f%%", m.MemoryUsage),
+			fmt.Sprintf("%.2f%%", m.CurrentDiskUtilization),
+			m.TotalStorageCapacity,
 		}
 
-		// Draw row background
-		pdf.Rect(x, pdf.GetY(), tableWidth, 8, "F")
+		for i, cell := range row {
+			//pdf.CellFormat(colWidths[i], 7, cell, "1", 0, "C", false, 0, "")
 
-		// Helper function to format values
-		formatValue := func(value float64) string {
-			if value < 0 { // Check for invalid values
-				return "N/A"
-			}
-			return fmt.Sprintf("%.1f", value)
+			WrappedTextCell(pdf, colWidths[i], 7, cell)
 		}
 
-		// Draw cell content
-		pdf.Text(x+2, pdf.GetY()+5, m.ServerName)
-		x += colWidths[0]
-		pdf.Text(x+2, pdf.GetY()+5, m.IPAddress)
-		x += colWidths[0]
-		pdf.Text(x+2, pdf.GetY()+5, formatValue(m.CpuUsage))
-		x += colWidths[1]
-		pdf.Text(x+2, pdf.GetY()+5, formatValue(m.MemoryUsage))
-		x += colWidths[2]
-		pdf.Text(x+2, pdf.GetY()+5, formatValue(m.CurrentDiskUtilization))
-		//x += colWidths[3]
-		//pdf.Text(x+2, pdf.GetY()+5, fmt.Sprintf("%.2f MB", m.NetworkIn))
-		//x += colWidths[4]
-		//pdf.Text(x+2, pdf.GetY()+7, fmt.Sprintf("%.2f MB", m.NetworkOut))
-		//x += colWidths[5]
-		//pdf.Text(x+2, pdf.GetY()+7, fmt.Sprintf("%d", m.ActiveUsers))
-		//x += colWidths[6]
-		//pdf.Text(x+2, pdf.GetY()+7, fmt.Sprintf("%d", m.AlertCount))
-
-		pdf.Ln(10)
 		rowColor = !rowColor
+		pdf.Ln(-1)
+	}
+
+	pdf.Ln(15)
+
+	// Fetch process details via Agent API.
+	for _, mx := range metrics {
+		processes, err := internal.ServerResourceDetails(mx.AgentAPI, 10)
+
+		if err != nil {
+			log.Printf("Error fetching process details: %v", err)
+			pdf.SetFont("Arial", "", 12)
+			pdf.Cell(190, 10, "Failed to fetch process details.")
+		} else {
+			ProcessTable(pdf, processes)
+		}
+	}
+
+	pdf.SetFooterFunc(func() {
+		pdf.SetY(-10)
+		pdf.SetFont("Arial", "", 7)
+		pdf.CellFormat(0, 10, fmt.Sprintf("All Rights Reserved. Company Name. Page %d", pdf.PageNo()), "0", 0, "C", false, 0, "")
+	})
+}
+
+func NetworkMetricsTable(pdf *gofpdf.Fpdf, metrics []internal.Metric, tableHeaders []string) {
+	// Define column widths for each column.
+	colWidths := []float64{30, 80, 30, 50, 40, 20, 20}
+
+	// Set header font.
+	pdf.SetFont("Arial", "B", 10)
+	// Table header.
+	for i, header := range tableHeaders {
+		pdf.CellFormat(colWidths[i], 7, header, "1", 0, "C", false, 0, "")
+	}
+	pdf.Ln(-1)
+
+	// Set normal font for table rows.
+	pdf.SetFont("Arial", "", 10)
+	pdf.SetTextColor(0, 32, 96)
+	rowColor := false
+
+	for _, m := range metrics {
+		if rowColor {
+			pdf.SetFillColor(constants.TableBg[0], constants.TableBg[1], constants.TableBg[2])
+		} else {
+			pdf.SetFillColor(255, 255, 255)
+		}
+
+		row := []string{
+			m.AgentHostAddress,
+			m.AgentHostName,
+			fmt.Sprintf("%.2f%%", m.CpuUsage),
+			fmt.Sprintf("%.2f%%", m.MemoryUsage),
+			fmt.Sprintf("%.2f%%", m.CurrentDiskUtilization),
+			m.TotalStorageCapacity,
+		}
+
+		for i, cell := range row {
+			pdf.CellFormat(colWidths[i], 7, cell, "1", 0, "C", false, 0, "")
+		}
+
+		rowColor = !rowColor
+		pdf.Ln(-1)
 	}
 }
 
+func WrappedTextCell(pdf *gofpdf.Fpdf, width float64, height float64, text string) {
+	// Save current X and Y
+	x := pdf.GetX()
+	y := pdf.GetY()
+
+	// Draw border manually if needed
+	pdf.MultiCell(width, height, text, "1", "L", false)
+
+	// Move cursor to the right of the cell (simulate single cell width)
+	pdf.SetXY(x+width, y)
+}
+
+// ProcessTable adds a table to the PDF for a given server's process list.
+func ProcessTable(pdf *gofpdf.Fpdf, processes []internal.ProcessResourceUsage) {
+	// Define column widths for each column.
+	colWidths := []float64{20, 80, 20, 40, 30, 20, 20}
+	// Table header.
+	headers := []string{"PID", "Process Name", "Status", "Create Time", "Username", "CPU %", "Memory %"}
+
+	// Set header font.
+	pdf.SetFont("Arial", "B", 10)
+	for i, header := range headers {
+		//pdf.CellFormat(colWidths[i], 7, header, "1", 0, "C", false, 0, "")
+		WrappedTextCell(pdf, colWidths[i], 10, header)
+	}
+	pdf.Ln(-1)
+
+	// Set normal font for table rows.
+	pdf.SetFont("Arial", "", 10)
+	for _, proc := range processes {
+		// Format the Unix timestamp to a readable date.
+
+		row := []string{
+			fmt.Sprintf("%d", proc.PID),
+			proc.Name,
+			strings.ToUpper(proc.Status),
+			time.Unix(int64(proc.CreateTime), 0).Format("2006-01-02 15:04:05"),
+			proc.Username,
+			fmt.Sprintf("%.2f%%", proc.CPUPercent),
+			fmt.Sprintf("%.2f%%", proc.MemoryPercent),
+		}
+
+		for i, cell := range row {
+			//pdf.CellFormat(colWidths[i], 7, cell, "1", 0, "C", false, 0, "")
+			WrappedTextCell(pdf, colWidths[i], 7, cell)
+		}
+		pdf.Ln(-1)
+	}
+}
+
+func GenerateCSV(metrics []internal.Metric, tableHeaders []string) string {
+	// Construct the filename and path
+	if err := os.MkdirAll(constants.ReportsDir, os.ModePerm); err != nil {
+		log.Fatalf("Error creating reports directory: %s", err.Error())
+	}
+
+	currentTime := time.Now()
+	formattedTime := currentTime.Format("January 2, 2006 15:04:05")
+
+	// Create the CSV file
+	fileName := "Hourly_IT_Report_" + formattedTime + ".csv"
+	filePath := filepath.Join(constants.ReportsDir, fileName)
+
+	csvFile, err := os.Create(filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer csvFile.Close()
+
+	writer := csv.NewWriter(csvFile)
+	defer writer.Flush()
+
+	if writerErr := writer.Write(tableHeaders); writerErr != nil {
+		log.Panic(writerErr)
+	}
+
+	// Write data rows
+	// Write each process as a row in the CSV file
+	for _, mx := range metrics {
+		row := []string{
+			mx.AgentHostName,
+			mx.AgentHostAddress,
+			fmt.Sprintf("%.2f%%", mx.CpuUsage),
+			fmt.Sprintf("%.2f%%", mx.MemoryUsage),
+			fmt.Sprintf("%.2f%%", mx.CurrentDiskUtilization),
+			mx.TotalStorageCapacity,
+		}
+
+		if err_ := writer.Write(row); err_ != nil {
+			log.Panic(err_)
+		}
+	}
+
+	fmt.Printf("Writing CSV Report to %s", filePath)
+
+	log.Printf("Writing CSV Report to %s", filePath)
+
+	return filePath
+}
+
 // GeneratePDF metrics ServiceMonitorStatus
-func GeneratePDF(metrics []Metric, headers []string) string {
+func GeneratePDF(metrics []internal.Metric, headers []string) string {
 	// Get current time and format it
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("January 2, 2006 15:04:05")
 	//.Format("2006-01-02 15:04:05")
 
 	// Initialize a new PDF document (A4 size, portrait orientation)
-	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf := gofpdf.New("L", "mm", "A4", "")
 
 	// First page - Overview
 	pdf.AddPage()
@@ -323,13 +463,7 @@ func GeneratePDF(metrics []Metric, headers []string) string {
 
 	pdf.SetY(30)
 	pdf.SetFont("Arial", "", 21)
-	// Active / Inactive System / Scheduled for maintainance
-
-	//sections := map[string]string{
-	//	"Active":    "Active Systems",
-	//	"Inactive":  "Inactive Systems",
-	//	"Scheduled": "Scheduled for Maintenance",
-	//}
+	// Active / Inactive System / Scheduled for maintenance
 
 	//var counts []SystemCount
 	counts := []SystemCount{
@@ -340,7 +474,7 @@ func GeneratePDF(metrics []Metric, headers []string) string {
 	}
 
 	pdf.SetFont("Arial", "B", 14)
-	pdf.SetTextColor(titleBg[0], titleBg[1], titleBg[2])
+	pdf.SetTextColor(constants.TitleBg[0], constants.TitleBg[1], constants.TitleBg[2])
 	pdf.Cell(190, 8, "System Status Summary")
 	pdf.Ln(10)
 
@@ -387,8 +521,19 @@ func GeneratePDF(metrics []Metric, headers []string) string {
 
 	//pdf.AddPage()
 	// Table section
-	pdf.SetY(70)
+	pdf.SetY(60)
 	MetricsTable(pdf, metrics, headers)
+
+	// Network Devices Section
+	pdf.AddPage()
+	pdf.SetFont("Arial", "B", 14)
+	pdf.Cell(190, 10, "Top 10 Network Devices by Bandwidth Utilization")
+	pdf.Ln(10)
+
+	// Table headers
+	pdf.SetFont("Arial", "B", 10)
+	netHeaders := []string{"Device Name", "Interface", "Bandwidth (Mbps)", "Utilization %", "Last Updated"}
+	NetworkMetricsTable(pdf, metrics, netHeaders)
 
 	// Chart section on new page
 	pdf.SetY(30)
@@ -405,15 +550,14 @@ func GeneratePDF(metrics []Metric, headers []string) string {
 	//safeFilename := strings.ReplaceAll(formattedTime, ":", "-")
 
 	// Construct the filename and path
-	reportsDir := "reports"
-	if err := os.MkdirAll(reportsDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(constants.ReportsDir, os.ModePerm); err != nil {
 		log.Fatalf("Error creating reports directory: %s", err.Error())
 	}
 
-	fileName := "Hourly_IT_Report.pdf"
-	//fileName := "Hourly_IT_Report_" + formattedTime + ".pdf"
+	//fileName := "Hourly_IT_Report.pdf"
+	fileName := "Hourly_IT_Report_" + formattedTime + ".pdf"
 
-	filePath := filepath.Join(reportsDir, fileName)
+	filePath := filepath.Join(constants.ReportsDir, fileName)
 	log.Printf("Writing report to %s", filePath)
 
 	// Output the PDF to a file

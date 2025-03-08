@@ -3,27 +3,13 @@ package monitors
 import (
 	"context"
 	"database/sql"
+	"github.com/ZEGIFTED/MS.GoMonitor/internal"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/messaging"
 	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
-	"log"
 	"sync"
 	"time"
 )
-
-type ServiceMonitorConfig struct {
-	Id             uuid.UUID `json:"AppID"`
-	Name           string
-	Host           string
-	Port           int
-	VP             bool // Is monitoring active?
-	IsAcknowledged bool // Is failing service monitoring acknowledged?
-	Device         ServiceType
-	RetryCount     int
-	Configuration  map[string]interface{} // Settings for this service
-	CheckInterval  string                 `json:"check_interval"`
-	HealthCheckURL string                 `json:"health_check_url"`
-	SnoozeUntil    sql.NullTime           `json:"snooze_until"`
-}
 
 type ServiceType string
 
@@ -31,7 +17,31 @@ const (
 	ServiceMonitorAgent      ServiceType = "AGENT"
 	ServiceMonitorWebModules ServiceType = "Web Modules"
 	ServiceMonitorSNMP       ServiceType = "Network"
+	ServiceMonitorServer     ServiceType = "Server"
 )
+
+type AgentServiceChecker struct{}
+type WebModulesServiceChecker struct{}
+type SNMPServiceChecker struct{}
+type ServerHealthChecker struct{}
+
+type ServiceMonitorData struct {
+	//Id              uuid.UUID `json:"AppID"`
+	SystemMonitorId uuid.UUID `json:"system_monitor_id"`
+	Name            string
+	Host            string
+	Port            int
+	VP              bool // Is monitoring active?
+	IsAcknowledged  bool // Is failing service acknowledged?
+	Device          ServiceType
+	FailureCount    int
+	RetryCount      int
+	Configuration   map[string]interface{} // Settings for this service
+	CheckInterval   string                 `json:"check_interval"`
+	SnoozeUntil     sql.NullTime           `json:"snooze_until"`
+	AgentAPIBaseURL string                 `json:"agent_api"`
+	AgentRepository internal.AgentRepository
+}
 
 // ServiceMonitorStatus represents the current status of a monitored service
 type ServiceMonitorStatus struct {
@@ -42,34 +52,40 @@ type ServiceMonitorStatus struct {
 	LastCheckTime     time.Time `json:"last_checked"`
 	LastServiceUpTime time.Time `json:"last_service_up_time"`
 	FailureCount      int       `json:"failure_count"`
-	LastErrorLog      string    `json:"last_error_log"`
+	//LastFailure       time.Time `json:"last_failure"`
+	//LastErrorLog string `json:"last_error_log"`
 }
 
 type ServiceMonitor struct {
-	Db             *sql.DB                          // Database connection
-	Services       []ServiceMonitorConfig           // List of services to monitor
-	StatusTracking map[string]*ServiceMonitorStatus // Current status of each service
-	MU             sync.RWMutex                     // For thread safety
-	Logger         *log.Logger                      // For logging
-	Checkers       map[ServiceType]ServiceChecker   // Different types of checks
-	Cron           *cron.Cron
-	Ctx            context.Context
-	Cancel         context.CancelFunc
+	Db       *sql.DB              // Database connection
+	Services []ServiceMonitorData // List of services to monitor
+	//StatusTracking map[string]*ServiceMonitorStatus // Current status of each service
+	StatusTracking sync.Map     // Concurrency-safe map for service statuses
+	MU             sync.RWMutex // For thread safety
+
+	Checkers            map[ServiceType]ServiceChecker // Different types of checks
+	NotificationHandler *messaging.NotificationManager
+	Cron                *cron.Cron
+	Ctx                 context.Context
+	Cancel              context.CancelFunc
+
+	AlertCache sync.Map                        // Stores last alert timestamps per service
+	Alerts     chan internal.ServiceAlertEvent // Buffered channel for processing alerts
 }
 
 type ServiceChecker interface {
-	Check(config ServiceMonitorConfig) (bool, ServiceMonitorStatus)
+	Check(config ServiceMonitorData, ctx context.Context, Db *sql.DB) (ServiceMonitorStatus, bool)
 }
 
 // AgentInfo represents the complete metrics information for an agent
 type AgentInfo struct {
-	Version    string       `json:"version"`
-	AgentID    string       `json:"agent_id"`
-	IPAddress  string       `json:"IPAddress"`
-	Name       string       `json:"name"`
-	OS         string       `json:"os"`
-	LastSync   sql.NullTime `json:"lastSync"`
-	SDKVersion string       `json:"SDKVersion"`
+	Version   string `json:"version"`
+	AgentID   string `json:"agent_id"`
+	IPAddress string `json:"IPAddress"`
+	Name      string `json:"name"`
+	OS        string `json:"os"`
+	//LastSync   sql.NullTime `json:"lastSync"`
+	SDKVersion string `json:"SDKVersion"`
 	Metrics    []Metric
 	Disks      []DiskMetric
 }
@@ -103,6 +119,7 @@ type Metric struct {
 	TimestampMem int64
 	CPUUsage     float64
 	MemoryUsage  float64
+	AgentID      string
 }
 
 type AgentEscalation struct {
@@ -124,9 +141,4 @@ type ServerResource struct {
 type NetworkDevice struct {
 	DeviceName           string
 	BandwidthUtilization float64
-}
-
-// FastAPIResponse represents the response from the FastAPI agent
-type FastAPIResponse struct {
-	Context string `json:"context"`
 }

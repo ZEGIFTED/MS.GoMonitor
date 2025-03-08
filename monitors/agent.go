@@ -1,96 +1,94 @@
 package monitors
 
 import (
+	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 )
 
-func (service *AgentServiceChecker) Check(config ServiceMonitorConfig) (bool, ServiceMonitorStatus) {
+func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
 	// Get the URL from configuration
-	host := config.Host
-	protocol, ok := config.Configuration["protocol"]
+	//host := agent.Host
+	//protocol, ok := agent.Configuration["protocol"]
 
-	if !ok || (protocol != "https" && protocol != "http") {
-		log.Println("invalid agent protocol in configuration... Using default")
+	//if !ok || (protocol != "https" && protocol != "http") {
+	//	log.Println("invalid agent protocol in configuration... Using default")
+	//
+	//	protocol = "http"
+	//}
+	//
+	//protocol = protocol.(string)
 
-		protocol = "http"
-	}
+	agentAddress, err := agent.AgentRepository.ValidateAgentURL(agent.AgentAPIBaseURL, "/api/v1/agent/health")
 
-	protocol = protocol.(string)
-
-	if host == "" {
-		return false, ServiceMonitorStatus{
-			Name:          config.Name,
-			Device:        config.Device,
+	if err != nil {
+		return ServiceMonitorStatus{
+			Name:          agent.Name,
+			Device:        agent.Device,
 			LiveCheckFlag: constants.Degraded,
-			Status:        "Unknown",
+			Status:        "Invalid URL configuration " + err.Error(),
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
-			LastErrorLog:  "Invalid URL configuration",
-		}
+		}, false
 	}
 
-	port := config.Port
-	agentAddress := fmt.Sprintf("%v://%s:%d/api/v1/agent/health", protocol, host, port)
+	//agentAddress := fmt.Sprintf("%v://%s:%d", protocol, host, port)
 
 	client := &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: constants.HTTPRequestTimeout,
 	}
 
-	log.Println("Calling Agent API", agentAddress)
+	slog.Debug("Calling Agent API", agentAddress)
 	resp, err := client.Get(agentAddress)
 
 	if err != nil {
-		return false, ServiceMonitorStatus{
-			Name:          config.Name,
-			Device:        config.Device,
+		return ServiceMonitorStatus{
+			Name:          agent.Name,
+			Device:        agent.Device,
 			LiveCheckFlag: constants.Degraded,
-			Status:        "Agent Status Unknown",
+			Status:        "Agent Status Unknown " + err.Error(),
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
-			LastErrorLog:  fmt.Sprintf("HTTP check failed: %v", err),
-		}
+		}, false
 	}
 
 	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Printf("Error closing response body: %v", err)
+		__err := Body.Close()
+		if __err != nil {
+			slog.Error("Error closing response body: %v", __err)
 		}
 	}(resp.Body)
 
 	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		return false, ServiceMonitorStatus{
-			Name:          config.Name,
-			Device:        config.Device,
+		return ServiceMonitorStatus{
+			Name:          agent.Name,
+			Device:        agent.Device,
 			LiveCheckFlag: constants.Escalation,
-			Status:        "OK",
+			Status:        "Unable to Sync Agent Metrics",
 			LastCheckTime: time.Now(),
-			//LastServiceUpTime: time.Now(),
-			FailureCount: 0,
-			LastErrorLog: fmt.Sprintf("Unable to read HTTP Content: %d. %s", resp.StatusCode, err),
-		}
+			FailureCount:  1,
+			//LastErrorLog: fmt.Sprintf("Unable to read HTTP Content: %d. %s", resp.StatusCode, err.Error()),
+		}, false
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return false, ServiceMonitorStatus{
-			Name:          config.Name,
-			Device:        config.Device,
+		return ServiceMonitorStatus{
+			Name:          agent.Name,
+			Device:        agent.Device,
 			LiveCheckFlag: constants.Escalation,
-			Status:        "OK",
+			Status:        fmt.Sprintf("Unsuccessful Agent Call: %d", resp.StatusCode),
 			LastCheckTime: time.Now(),
-			//LastServiceUpTime: time.Now(),
-			FailureCount: 0,
-			LastErrorLog: fmt.Sprintf("Unsuccessful Agent Call: %d. %s", resp.StatusCode, string(body)),
-		}
+			FailureCount:  1,
+		}, false
 	}
 
 	var apiResponse AgentMetricResponse
@@ -99,20 +97,18 @@ func (service *AgentServiceChecker) Check(config ServiceMonitorConfig) (bool, Se
 	//log.Println("Agent API response", apiResponse, err)
 
 	if err != nil {
-		return false, ServiceMonitorStatus{
-			Name:          config.Name,
-			Device:        config.Device,
+		return ServiceMonitorStatus{
+			Name:          agent.Name,
+			Device:        agent.Device,
 			LiveCheckFlag: constants.Escalation,
 			Status:        "Unable to Sync Agent Metrics",
 			LastCheckTime: time.Now(),
-			//LastServiceUpTime: time.Now(),
-			FailureCount: 0,
-			LastErrorLog: fmt.Sprintf("Error parsing Agent JSON response: %d. %s", resp.StatusCode, err),
-		}
+			FailureCount:  1,
+		}, false
 	}
 
 	// Convert data to our Agent struct
-	agent := AgentInfo{
+	agentData := AgentInfo{
 		AgentID:    apiResponse.AgentInfo.AgentID,
 		Name:       apiResponse.AgentInfo.Name,
 		IPAddress:  apiResponse.AgentInfo.IPAddress,
@@ -132,7 +128,7 @@ func (service *AgentServiceChecker) Check(config ServiceMonitorConfig) (bool, Se
 		//}
 
 		// Append metric with properly converted types'
-		agent.Metrics = append(agent.Metrics, Metric{
+		agentData.Metrics = append(agentData.Metrics, Metric{
 			Timestamp:    int64(apiResponse.SystemInfo.CPU[i][0]), // Convert to int64
 			TimestampMem: int64(apiResponse.SystemInfo.Memory[i][0]),
 			CPUUsage:     apiResponse.SystemInfo.CPU[i][1],
@@ -142,7 +138,7 @@ func (service *AgentServiceChecker) Check(config ServiceMonitorConfig) (bool, Se
 
 	// Convert Disk metrics
 	for _, disk := range apiResponse.SystemInfo.Disk {
-		agent.Disks = append(agent.Disks, DiskMetric{
+		agentData.Disks = append(agentData.Disks, DiskMetric{
 			Drive:      disk.Drive,
 			Size:       disk.Size,
 			Free:       disk.Free,
@@ -158,34 +154,45 @@ func (service *AgentServiceChecker) Check(config ServiceMonitorConfig) (bool, Se
 	//check.LastCheckTime = time.Now()
 	//service.Check()
 	//log.Println("Agent API", apiResponse.AgentInfo.AgentID, "code", agent)
-	agents = append(agents, agent)
+	agents = append(agents, agentData)
 
 	if len(agents) > 0 {
 		db := utils.DatabaseConnection()
 
-		agentSyncURL := fmt.Sprintf("%v://%s:%d/api/v1/agent/sync_complete", protocol, host, port)
-		err := SyncMetrics(db, agents, agentSyncURL)
+		agentSyncURL, err_ := agent.AgentRepository.ValidateAgentURL(agent.AgentAPIBaseURL, "/api/v1/agent/sync_complete")
 
-		if err != nil {
-			return false, ServiceMonitorStatus{
-				Name:          config.Name,
-				Device:        config.Device,
-				Status:        "Error while syncing metrics " + err.Error(),
+		if err_ != nil {
+			return ServiceMonitorStatus{
+				Name:          agent.Name,
+				Device:        agent.Device,
+				LiveCheckFlag: constants.Degraded,
+				Status:        err_.Error(),
+				LastCheckTime: time.Now(),
+				FailureCount:  0,
+				//LastErrorLog:  "Invalid URL configuration",
+			}, false
+		}
+
+		//agentSyncURL := fmt.Sprintf("%v://%s:%d", protocol, host, port)
+		if syncErr := SyncMetrics(db, agents, agentSyncURL); syncErr != nil {
+			return ServiceMonitorStatus{
+				Name:          agent.Name,
+				Device:        agent.Device,
+				Status:        "Error while syncing metrics " + syncErr.Error(),
 				LiveCheckFlag: constants.Escalation,
 				LastCheckTime: time.Now(),
 				FailureCount:  1,
-			}
+			}, false
 		}
 	}
 
-	return true, ServiceMonitorStatus{
-		Name:              config.Name,
-		Device:            config.Device,
+	return ServiceMonitorStatus{
+		Name:              agent.Name,
+		Device:            agent.Device,
 		LiveCheckFlag:     constants.Healthy,
-		Status:            "OK",
+		Status:            "Healthy",
 		LastCheckTime:     time.Now(),
 		LastServiceUpTime: time.Now(),
 		FailureCount:      0,
-		LastErrorLog:      "",
-	}
+	}, true
 }

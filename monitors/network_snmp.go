@@ -9,21 +9,19 @@ import (
 	"time"
 )
 
-func (service *SNMPServiceChecker) Check(config ServiceMonitorConfig) (bool, ServiceMonitorStatus) {
+func (service *SNMPServiceChecker) Check(config ServiceMonitorData) (ServiceMonitorStatus, bool) {
 	host := config.Host
 	port := config.Port
 
 	if host == "" {
-		return false, ServiceMonitorStatus{
-
+		return ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
 			LiveCheckFlag: constants.Degraded,
-			Status:        "Unknown",
+			Status:        "Invalid SNMP configuration",
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
-			LastErrorLog:  "Invalid URL configuration",
-		}
+		}, false
 	}
 
 	// SNMPMetric represents an SNMP OID and its description
@@ -72,21 +70,21 @@ func (service *SNMPServiceChecker) Check(config ServiceMonitorConfig) (bool, Ser
 		Community: community,
 		Version:   gosnmp.Version2c,
 		Timeout:   time.Duration(10) * time.Second,
-		Retries:   3,
+		Retries:   constants.MaxRetries,
 	}
 
 	// Connect to the device
 	err := snmp.Connect()
 	if err != nil {
-		return false, ServiceMonitorStatus{
+		return ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
 			LiveCheckFlag: constants.Escalation,
-			Status:        "Error getting SNMP interfaces",
+			Status:        "Error getting SNMP interfaces " + err.Error(),
 			LastCheckTime: time.Now(),
 			FailureCount:  0,
-			LastErrorLog:  fmt.Sprintf("Error connecting to device: %v", err),
-		}
+			//LastErrorLog:  fmt.Sprintf("Error connecting to device: %v", err),
+		}, false
 	}
 
 	defer func(Conn net.Conn) {
@@ -126,15 +124,15 @@ func (service *SNMPServiceChecker) Check(config ServiceMonitorConfig) (bool, Ser
 	// Get interface information
 	interfaces, err := getInterfaces(snmp)
 	if err != nil {
-		return false, ServiceMonitorStatus{
+		return ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
 			LiveCheckFlag: constants.Escalation,
-			Status:        "Error getting SNMP interfaces",
+			//Status:        "Error getting SNMP interfaces",
+			Status:        "Error getting SNMP interfaces " + err.Error(),
 			LastCheckTime: time.Now(),
-			FailureCount:  0,
-			LastErrorLog:  fmt.Sprintf("SNMP Error: %v", err),
-		}
+			FailureCount:  1,
+		}, false
 	}
 
 	fmt.Println("\nInterface Information:")
@@ -143,16 +141,15 @@ func (service *SNMPServiceChecker) Check(config ServiceMonitorConfig) (bool, Ser
 		fmt.Printf("Interface: %s\n", iface)
 	}
 
-	return true, ServiceMonitorStatus{
+	return ServiceMonitorStatus{
 		Name:              config.Name,
 		Device:            config.Device,
 		LiveCheckFlag:     constants.Healthy,
-		Status:            "OK",
+		Status:            "Healthy",
 		LastCheckTime:     time.Now(),
 		LastServiceUpTime: time.Now(),
 		FailureCount:      0,
-		LastErrorLog:      "",
-	}
+	}, true
 }
 
 func getInterfaces(snmp *gosnmp.GoSNMP) ([]string, error) {

@@ -18,7 +18,7 @@ func DatabaseConnection() *sql.DB {
 	// Check if the database is open and can be pinged
 	err = db.Ping()
 	if err != nil {
-		log.Fatal("Error connecting to the database: ", err.Error())
+		log.Fatalf("Error connecting to the database with Connection String %s. Error: %s", connString, err.Error())
 	}
 
 	return db

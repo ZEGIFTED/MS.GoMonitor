@@ -12,7 +12,7 @@ CREATE TABLE ServiceMonitorConfigs (
     UpdatedAt DATETIME DEFAULT GETDATE()
 );
 
--- Create ServiceMonitorLogs table to track service status and failures
+-- Create ServiceMonitorLogs table to track service currentStatus and failures
 CREATE TABLE ServiceMonitorLogs (
     LogID INT IDENTITY(1,1) PRIMARY KEY,
     ServiceID INT NOT NULL,

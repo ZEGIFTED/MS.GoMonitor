@@ -1,30 +1,92 @@
 package monitors
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/ZEGIFTED/MS.GoMonitor/internal"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 	_ "github.com/microsoft/go-mssqldb"
-	"sort"
+	"log"
+	"sync"
 	"time"
 )
 
-type AgentServiceChecker struct{}
-type WebModulesServiceChecker struct{}
-type SNMPServiceChecker struct{}
+func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
+	log.Println("Fetching Services...")
+	query := `EXEC ServiceReport @SERVICE_LEVEL = 'MONITOR', @VP = 1;`
+
+	//rows, err := sm.db.Query(query)
+	rows, err := sm.Db.QueryContext(sm.Ctx, query)
+	if err != nil {
+		return fmt.Errorf("error querying services: %v", err)
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+
+		}
+	}(rows)
+
+	var services []ServiceMonitorData
+
+	for rows.Next() {
+		var service ServiceMonitorData
+		var Configuration string
+
+		err := rows.Scan(
+			&service.SystemMonitorId,
+			&service.Name,
+			&service.Host,
+			&service.Port,
+			&service.VP,
+			&service.Device,
+			&service.FailureCount,
+			&service.RetryCount,
+			&Configuration,
+			&service.CheckInterval,
+			&service.IsAcknowledged,
+			&service.SnoozeUntil,
+			&service.AgentAPIBaseURL,
+		)
+
+		if err != nil {
+			return fmt.Errorf("error scanning service row: %v", err)
+		}
+
+		if Configuration == "" {
+			Configuration = "{}"
+		}
+
+		//Parse configuration JSON
+		if err := json.Unmarshal([]byte(Configuration), &service.Configuration); err != nil {
+			log.Printf("Warning: could not parse configuration for service %s: %v", service.Name, err)
+			continue
+		}
+
+		//service.AgentRepository = internal.AgentRepository{}
+		services = append(services, service)
+	}
+
+	sm.MU.Lock()
+	sm.Services = services
+	sm.MU.Unlock()
+
+	log.Printf("Loaded %d active services", len(services))
+	return nil
+}
 
 // StartService begins the monitoring process
 func (sm *ServiceMonitor) StartService() error {
+	log.Println("Starting Up MS Monitoring Service...")
+
 	// Load initial services
 	if err := sm.LoadServicesFromDatabase(); err != nil {
-		sm.Logger.Fatalf("Failed to load initial services: %v", err)
+		log.Fatalf("Failed to load initial services: %v", err)
 	}
 
-	// Schedule checks for each service
-	// Schedule service checks
+	// Schedule service checks for each service
 	for _, service := range sm.Services {
 		serviceCopy := service
 		interval := serviceCopy.CheckInterval
@@ -42,11 +104,12 @@ func (sm *ServiceMonitor) StartService() error {
 		})
 
 		if err != nil {
-			sm.Logger.Printf("Failed to schedule service %s: %v", serviceCopy.Name, err)
+			log.Printf("Failed to schedule service %s: %v", serviceCopy.Name, err)
 		}
 	}
 
 	sm.Cron.Start()
+	sm.StartAlertHandler()
 	return nil
 }
 
@@ -54,217 +117,389 @@ func (sm *ServiceMonitor) StartService() error {
 func (sm *ServiceMonitor) StopService() {
 	sm.Cancel() // Cancel context
 
+	log.Printf("Stopping MS-SVC_MONITOR")
+	close(sm.Alerts)
+
 	// Stop the cron scheduler
 	ctx := sm.Cron.Stop()
 
 	// Wait for running jobs to complete (with timeout)
 	select {
 	case <-ctx.Done():
-		sm.Logger.Println("All jobs completed")
+		log.Println("All jobs completed")
 	case <-time.After(30 * time.Second):
-		sm.Logger.Println("Shutdown timed out waiting for jobs")
+		log.Println("Shutdown timed out waiting for jobs")
 	}
 }
 
-// sendAlert sends an alert to a configured webhook
-func (sm *ServiceMonitor) sendAlert(service ServiceMonitorConfig, status *ServiceMonitorStatus) {
+// SendAlert sends an alert to a configured webhook
+func (sm *ServiceMonitor) SendAlert(services []ServiceMonitorStatus) {
 	// Implement alert sending logic (e.g., HTTP POST to webhook)
-	sm.Logger.Printf("ALERT: Service %s failed. Type: %s, Failure count: %d",
-		service.Name, service.Device, status.FailureCount)
+
+	//filePath := utils.GenerateServiceDowntimeAlert()
+
+	//messaging.
+	//slackClient := messaging.SlackBotClient()
+	//slackMessage := messaging.FormatSlackMessageToSend("Test Notification", "Hello World from Go", "", "actionURL", extraInfo)
+	//
+	//_, err_ := slackClient.SendSlackMessage("admin_x", slackMessage)
+	//if err_ != nil {
+	//	return
+	//}
+
+	//sendTo := []string{"calebb.jnr@gmail.com", "cboluwade@nibss-plc.com.ng"}
+	//messaging.SendReportEmail(sendTo, filePath)
 }
 
-func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
-	query := `EXEC ServiceReport @SERVICE_LEVEL = 'MONITOR', @VP = 1;`
-
-	//rows, err := sm.db.Query(query)
-	rows, err := sm.Db.QueryContext(context.Background(), query)
-	if err != nil {
-		return fmt.Errorf("error querying services: %v", err)
-	}
-	defer func(rows *sql.Rows) {
-		err := rows.Close()
-		if err != nil {
-
-		}
-	}(rows)
-
-	var services []ServiceMonitorConfig
-
-	for rows.Next() {
-		var service ServiceMonitorConfig
-		var Configuration string
-
-		err := rows.Scan(
-			&service.Id,
-			&service.Name,
-			&service.Host,
-			&service.Port,
-			&service.VP,
-			&service.Device,
-			&service.RetryCount,
-			&Configuration,
-			&service.CheckInterval,
-			&service.IsAcknowledged,
-			&service.SnoozeUntil,
-		)
-
-		if err != nil {
-			return fmt.Errorf("error scanning service row: %v", err)
-		}
-
-		if Configuration == "" {
-			Configuration = "{}"
-		}
-
-		//Parse configuration JSON
-		if err := json.Unmarshal([]byte(Configuration), &service.Configuration); err != nil {
-			sm.Logger.Printf("Warning: could not parse configuration for service %s: %v", service.Name, err)
-			continue
-		}
-
-		sm.Logger.Println(service)
-		services = append(services, service)
-	}
-
-	sm.MU.Lock()
-	sm.Services = services
-	sm.MU.Unlock()
-
-	sm.Logger.Printf("Loaded %d active services", len(services))
-	return nil
-}
+// Example: Thread-safe iteration with RWMutex
+//func (sm *ServiceMonitor) GetAllStatuses() []ServiceMonitorStatus {
+//	sm.MU.RLock()
+//	defer sm.MU.RUnlock()
+//
+//	var statuses []ServiceMonitorStatus
+//	for _, status := range sm.StatusTracking {
+//		statuses = append(statuses, *status)
+//	}
+//	return statuses
+//}
 
 // CheckService monitors a single service
-func (sm *ServiceMonitor) CheckService(service ServiceMonitorConfig) {
-	sm.MU.Lock()
-	status, exists := sm.StatusTracking[service.Name]
-	if !exists {
-		status = &ServiceMonitorStatus{
-			Name:          service.Name,
-			Device:        service.Device,
-			LiveCheckFlag: constants.UnknownStatus,
-			LastCheckTime: time.Now(),
-			FailureCount:  0,
-		}
-		sm.StatusTracking[service.Name] = status
-	}
-	sm.MU.Unlock()
-
+func (sm *ServiceMonitor) CheckService(service ServiceMonitorData) {
 	// Get the appropriate checker for this service type
-	checker, ok := sm.Checkers[service.Device]
+	checker, exists := sm.Checkers[service.Device]
 
-	if !ok {
-		status.Status = "Failed Monitor Check; No Monitor Impl found for Service type"
-		status.LiveCheckFlag = constants.UnknownStatus
-		//status.FailureCount++
-		status.LastCheckTime = time.Now()
-		status.LastErrorLog = "No Monitor Impl found for service type"
-
-		sm.Logger.Printf("No checker found for service type: %s", service.Device)
+	if !exists {
+		sm.handleUnknownServiceType(service)
 		return
 	}
 
+	// Load or initialize service status atomically
+	statusIface, _ := sm.StatusTracking.LoadOrStore(service.Name, &ServiceMonitorStatus{
+		Name:          service.Name,
+		Device:        service.Device,
+		LiveCheckFlag: constants.UnknownStatus,
+		LastCheckTime: time.Now(),
+		FailureCount:  service.FailureCount,
+	})
+	currentStatus := statusIface.(*ServiceMonitorStatus)
+
 	// Perform the service check
-	isHealthy, message := checker.Check(service)
+	message, isHealthy := checker.Check(service, sm.Ctx, sm.Db)
+	//currentStatus.LastCheckTime = time.Now()
 
-	sm.MU.Lock()
-	defer sm.MU.Unlock()
+	//currentStatus, exists := sm.StatusTracking[service.Name]
 
-	status.LastCheckTime = time.Now()
-
+	// Handle service health status
 	if !isHealthy {
-		// Log service failure
-		fmt.Println(message.LastErrorLog)
-		status.LastErrorLog = message.LastErrorLog
-		status.Status = "Failed Monitor Check; " + message.LastErrorLog
-		status.FailureCount++
-
-		if status.FailureCount > 1 {
-			status.LiveCheckFlag = constants.Escalation
-		} else if status.FailureCount > 3 {
-			status.LiveCheckFlag = constants.Degraded
-		}
-
-		if service.VP && !service.IsAcknowledged {
-			sm.LogServiceFailure(service, status)
-
-			// Send alert if configured
-			sm.sendAlert(service, status)
-		}
-
-		sm.Logger.Printf("Service %s failed. Reason::: %s", service.Name, message.Status)
+		sm.handleServiceFailure(service, currentStatus, message)
 	} else {
-		status.LiveCheckFlag = constants.Healthy
-		status.Status = "Service is healthy."
-		status.FailureCount = 0
-		status.LastErrorLog = ""
-		status.LastServiceUpTime = time.Now()
-
-		sm.Logger.Printf("Service %s is healthy. Message::: > %s", service.Name, message.Status)
+		sm.handleServiceRecovery(service, currentStatus)
 	}
 
-	// Implement database logging logic
-	_, err := sm.Db.Exec(`
-	UPDATE [dbo].[SystemMonitor] 
-	SET 
-		Status = @Status, 
-		LiveCheckFlag = @LiveCheckFlag, 
-		LastServiceUpTime = @LastServiceUpTime, 
-		LastCheckTime = @LastCheckTime, 
-		FailureCount = @FailureCount
-		-- RetryCount = @RetryCount 
-	WHERE 
-		ServiceName = @Name`,
-		sql.Named("Status", status.Status),
-		sql.Named("LiveCheckFlag", status.LiveCheckFlag),
-		sql.Named("LastServiceUpTime", status.LastServiceUpTime),
-		sql.Named("LastCheckTime", status.LastCheckTime),
-		sql.Named("FailureCount", status.FailureCount),
-		// sql.Named("RetryCount", status.RetryCount),
-		sql.Named("Name", service.Name),
-	)
+	// Implement database logging logic to Update the database
+	sm.updateDatabase(service, currentStatus)
 
-	if err != nil {
-		sm.Logger.Printf("Error updating SystemMonitor: %v", err)
-	}
+	// Update the service status in sync.Map
+	sm.StatusTracking.Store(service.Name, currentStatus)
 
 	// Call the MetricEngine
 	//monitors.MetricEngine()
 }
 
-// LogServiceFailure logs the service failure
-func (sm *ServiceMonitor) LogServiceFailure(service ServiceMonitorConfig, status *ServiceMonitorStatus) {
+func (sm *ServiceMonitor) handleUnknownServiceType(service ServiceMonitorData) {
+	sm.MU.Lock()
+	defer sm.MU.Unlock()
 
-	sm.Logger.Printf("Service Failure - %s -> Name: %s, Type: %s, Error: %s",
-		service.Id, service.Name, service.Device, status.LastErrorLog)
-}
-
-// MetricEngine Aggregates all metric sources by AppId and metric
-func MetricEngine(metrics ...[][]ServiceMonitorStatus) []ServiceMonitorStatus {
-
-	var allMessageList []ServiceMonitorStatus
-
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("Recovered from panic:", r)
-		}
-	}()
-
-	for _, messageArray := range metrics {
-		for _, messages := range messageArray {
-			allMessageList = append(allMessageList, messages...)
-		}
+	currentStatus := &ServiceMonitorStatus{
+		Name:          service.Name,
+		Device:        service.Device,
+		Status:        "Failed Monitor Check; No Monitor Impl found for Service type",
+		LiveCheckFlag: constants.UnknownStatus,
+		LastCheckTime: time.Now(),
 	}
 
-	// Sort based on FLAG
-	sort.Slice(allMessageList, func(i, j int) bool {
-		return allMessageList[i].LiveCheckFlag < allMessageList[j].LiveCheckFlag
-	})
+	// Update the service status in sync.Map
+	//sm.StatusTracking[service.Name] = currentStatus
+	sm.StatusTracking.Store(service.Name, currentStatus)
 
-	// Print the sorted list
-	fmt.Println(allMessageList)
+	log.Printf("Service -> [%s]: No Checker Found For Type %s", service.Name, service.Device)
+}
 
-	return allMessageList
+func (sm *ServiceMonitor) handleServiceFailure(service ServiceMonitorData, currentStatus *ServiceMonitorStatus, message ServiceMonitorStatus) {
+	// Log service failure
+	log.Printf("Service -> [%s] failed. Reason::: %s", service.Name, message.Status)
+
+	// Update status
+	currentStatus.Status = message.Status
+	currentStatus.FailureCount++
+
+	// Determine escalation level
+	if currentStatus.FailureCount > 3 {
+		currentStatus.LiveCheckFlag = constants.Degraded
+	} else if currentStatus.FailureCount > 1 {
+		currentStatus.LiveCheckFlag = constants.Escalation
+	}
+
+	// Throttle alerts to avoid alert fatigue
+	if lastAlert, ok := sm.AlertCache.Load(service.SystemMonitorId.String() + "|" + service.Name); !ok || func() bool {
+		lastAlertTime, valid := lastAlert.(time.Time)
+		return valid && time.Since(lastAlertTime) < constants.AlertThrottleTime // Prevent alert spam within 10-min window
+	}() {
+		if currentStatus.FailureCount > constants.FailureThresholdCount && !service.IsAcknowledged {
+			log.Printf("Adding Service to Alert Channel: %s", service.Name)
+
+			sm.Alerts <- internal.ServiceAlertEvent{
+				SystemMonitorId: service.SystemMonitorId,
+				ServiceName:     service.Name,
+				Message:         fmt.Sprintf("%s is down: %s", service.Name, message.Status),
+				Severity:        "critical",
+				Timestamp:       time.Now(),
+			}
+		}
+
+		sm.AlertCache.Store(service.SystemMonitorId.String()+"|"+service.Name, time.Now())
+	}
+
+	//if ok {
+	//	if lastAlertTime, valid := lastAlert.(time.Time); valid {
+	//		// Use lastAlertTime safely here
+	//
+	//		if !ok || time.Since(lastAlertTime) > constants.AlertThrottleTime {
+	//			if currentStatus.FailureCount > constants.FailureThresholdCount && !service.IsAcknowledged {
+	//				log.Printf("Adding Service to Alert Channel: %s", service.Name)
+	//
+	//				sm.Alerts <- internal.ServiceAlertEvent{
+	//					ServiceName: service.Name,
+	//					Message:     fmt.Sprintf("%s is down: %s", service.Name, message.LastErrorLog),
+	//					Severity:    "critical",
+	//					Timestamp:   time.Now(),
+	//				}
+	//			}
+	//
+	//			sm.AlertCache.Store(service.Name, time.Now())
+	//		}
+	//	} else {
+	//		log.Println("Type assertion failed for lastAlert")
+	//	}
+	//} else {
+	//	log.Println("No previous alert found for service:", service.Name)
+	//}
+
+	// Track service failure
+	//sm.TrackServiceFailure(service, currentStatus, "")
+}
+
+func (sm *ServiceMonitor) handleServiceRecovery(service ServiceMonitorData, currentStatus *ServiceMonitorStatus) {
+	// Update status for healthy service
+	currentStatus.LiveCheckFlag = constants.Healthy
+	currentStatus.Status = "Service is healthy."
+	currentStatus.FailureCount = 0
+	currentStatus.LastServiceUpTime = time.Now()
+
+	// Log service recovery
+	log.Printf("Service %s is healthy.", service.Name)
+}
+
+func (sm *ServiceMonitor) updateDatabase(service ServiceMonitorData, currentStatus *ServiceMonitorStatus) {
+	// Update the database with the latest status
+	_, err := sm.Db.Exec(`
+        UPDATE [dbo].[SystemMonitor] 
+        SET 
+            Status = @Status, 
+            LiveCheckFlag = @LiveCheckFlag, 
+            LastServiceUpTime = @LastServiceUpTime, 
+            LastCheckTime = @LastCheckTime, 
+            FailureCount = @FailureCount
+        WHERE 
+            ServiceName = @Name`,
+		sql.Named("Status", currentStatus.Status),
+		sql.Named("LiveCheckFlag", currentStatus.LiveCheckFlag),
+		sql.Named("LastServiceUpTime", currentStatus.LastServiceUpTime),
+		sql.Named("LastCheckTime", currentStatus.LastCheckTime),
+		sql.Named("FailureCount", currentStatus.FailureCount),
+		sql.Named("Name", service.Name),
+	)
+
+	if err != nil {
+		log.Printf("Error updating SystemMonitor for service %s: %v", service.Name, err)
+	}
+}
+
+//
+//// TrackServiceFailure logs the service failure
+//func (sm *ServiceMonitor) TrackServiceFailure(service ServiceMonitorData, status *ServiceMonitorStatus, severity string) {
+//
+//	if !service.IsAcknowledged && status.FailureCount > 2 && utils.IsValidUUID(service.SystemMonitorId.String()) {
+//		log.Printf("Escalating Service -> %s", service.Name)
+//
+//		//sm.Db.Exec(`INSERT INTO [dbo].[AgentEscalations] (AgentID, Metric, Status, RootCause, Escalation, ENTITY_HOST)`, ("", status.Status, status.LastErrorLog, service.Host, service.Id, status.FailureCount))
+//
+//	} else if !utils.IsValidUUID(service.SystemMonitorId.String()) {
+//		log.Printf("Service Not linked to an app -> %s", service.SystemMonitorId, service.Name)
+//		//
+//		//d := sm.NotificationHandler
+//		//d.LoadConfig()
+//		//
+//		//d.GetEmailConfig()
+//
+//	} else {
+//		log.Printf("Service Failure - %s -> Name: %s, Type: %s, Error: %s, IsAcknowledged: %t, FailureCount: %d, App: %t",
+//			service.SystemMonitorId, service.Name, service.Device, status.LastErrorLog, service.IsAcknowledged, status.FailureCount, utils.IsValidUUID(service.SystemMonitorId.String()))
+//
+//	}
+//}
+
+func (sm *ServiceMonitor) GetUnprocessedAlertsCount() int {
+	sm.MU.RLock()         // Lock for read-only access
+	defer sm.MU.RUnlock() // Unlock after function execution
+	return len(sm.Alerts)
+}
+
+// ShouldSendAlert checks if an alert should be sent (rate-limiting).
+func (sm *ServiceMonitor) ShouldSendAlert(service string) bool {
+	lastAlert, ok := sm.AlertCache.Load(service)
+	if ok {
+		elapsed := time.Since(lastAlert.(time.Time))
+		if elapsed < 10*time.Minute {
+			return false
+		}
+	}
+	sm.AlertCache.Store(service, time.Now())
+	return true
+}
+
+func (sm *ServiceMonitor) StartAlertHandler() {
+	go func() {
+		//rec := make([]string, len(sm.Alerts))
+
+		//case i, recipient := <-sm.Alerts {
+		//	emailAddresses[i] = recipient.ServiceName
+		//}
+
+		for {
+			select {
+
+			case alert, ok := <-sm.Alerts:
+				if !ok {
+					log.Println("Alert Channel Closed, Stopping Alert Handler.")
+					return
+				}
+
+				log.Printf("Processing alert for service: %s", alert.ServiceName)
+
+				// Collect all SystemMonitorIds from the alert channel
+				var systemMonitorIds []string
+				var serviceNames []string
+				systemMonitorIds = append(systemMonitorIds, alert.SystemMonitorId.String())
+				serviceNames = append(serviceNames, alert.ServiceName)
+
+				// Fetch recipients for this alert
+				recipientMap, err := internal.FetchUsersAndGroupsByServiceNames(sm.Ctx, sm.Db, systemMonitorIds, serviceNames)
+				if err != nil {
+					log.Printf("Error fetching recipients for service %s: %v", alert.ServiceName, err)
+					continue
+				}
+
+				recipients, exists := recipientMap[alert.SystemMonitorId.String()+"|"+alert.ServiceName]
+				if !exists || len(recipients.Users) == 0 {
+					log.Printf("No recipients found for service %s|%s", alert.SystemMonitorId, alert.ServiceName)
+					continue
+				}
+
+				log.Printf("Alert Recipients \n. %v. Found %d for %s|%s", recipientMap[alert.SystemMonitorId.String()].Users, len(recipientMap[alert.SystemMonitorId.String()+"|"+alert.ServiceName].Users), alert.ServiceName, alert.SystemMonitorId)
+
+				// Send the notification asynchronously
+				go func(alert internal.ServiceAlertEvent, recipients internal.NotificationRecipients) {
+					err := sm.SendDowntimeServiceNotification(alert, recipients)
+					if err != nil {
+						log.Printf("Failed to send alert for service %s: %v", alert.ServiceName, err)
+					} else {
+						log.Printf("Successfully sent alert for service %s", alert.ServiceName)
+					}
+				}(alert, recipients)
+			}
+		}
+	}()
+}
+
+func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.ServiceAlertEvent, recipients internal.NotificationRecipients) error {
+	log.Printf("Processing alert for service: %s", event.ServiceName)
+
+	//body := "The Following Services needs to be confirmed operational or acknowledged via the Monitoring Console."
+	body := fmt.Sprintf("The following service needs to be confirmed operational or acknowledged via the Monitoring Console: %s", event.ServiceName)
+
+	emailConfig := sm.NotificationHandler.GetEmailConfig()
+	slackConfig := sm.NotificationHandler.GetSlackConfig()
+
+	//sendTo := []string{"calebb.jnr@gmail.com", "cboluwade@nibss-plc.com.ng"}
+	var recipientsGroup = internal.GroupRecipientsByPlatform(recipients.Users)
+
+	//log.Printf("RecipientsByPlatform: %v", x)
+
+	var wg sync.WaitGroup
+	errChan := make(chan error, len(recipients.Users))
+
+	// Send notifications to users
+	for platform, recipientsList := range recipientsGroup {
+		wg.Add(1)
+
+		go func(r []internal.NotificationRecipient) {
+			defer wg.Done()
+
+			switch platform {
+			case "Email":
+				if emailConfig.Enabled {
+					send, err := sm.NotificationHandler.FormatEmailMessageToSend(event, r[0].GroupName, constants.ConsoleBaseURL, make(map[string]string))
+					if err != nil {
+						return
+					}
+
+					emailAddresses := make([]string, len(r))
+					for i, recipient := range r {
+						emailAddresses[i] = recipient.Email
+					}
+
+					if err := sm.NotificationHandler.SendEmail(emailAddresses, event.ServiceName+" Health Check", body+"\n"+send); err != nil {
+						log.Printf("failed to send email to %s: %v", emailAddresses, err)
+						errChan <- err
+					}
+				}
+			case "Slack":
+				if slackConfig.Enabled {
+					var slackClient = sm.NotificationHandler.SlackBotClient(slackConfig)
+					for _, user := range recipientsList {
+						slackMessage := sm.NotificationHandler.FormatSlackMessageToSend(event, user.GroupName, "", constants.ConsoleBaseURL, make(map[string]string))
+
+						//"admin_x"
+						_, err := slackClient.SendSlackMessage(user.SlackId, slackMessage)
+						if err != nil {
+							log.Printf("Failed to send Slack message to %s: %v", user.Email, err)
+							errChan <- err
+						}
+					}
+				}
+
+			// Add other platforms as needed
+			default:
+				for _, user := range recipientsList {
+					log.Printf("Unsupported platform: %s for user %s", user.Platform, user.Email)
+					errChan <- fmt.Errorf("unsupported platform: %s", user.Platform)
+				}
+			}
+
+		}(recipientsList)
+
+	}
+
+	// Wait for all notifications to complete
+	wg.Wait()
+	close(errChan)
+
+	// Check if there were errors
+	if len(errChan) > 0 {
+		return fmt.Errorf("one or more notifications failed")
+	}
+	return nil
 }
 
 type TimeSeriesData struct {
@@ -272,7 +507,7 @@ type TimeSeriesData struct {
 	Value     float64
 }
 
-func CheckTSDataAboveThreshold(metricName string, entity string, tsData []TimeSeriesData, threshold float64, arrSequenceLength int) []struct {
+func CheckTSDataAboveThreshold(tsData []TimeSeriesData, threshold float64, arrSequenceLength int) []struct {
 	Timestamp string
 	Values    []float64
 } {
@@ -310,6 +545,7 @@ func CheckTSDataAboveThreshold(metricName string, entity string, tsData []TimeSe
 		}
 	}
 
+	log.Println("THRESHOLD", thresholds)
 	return thresholds
 }
 

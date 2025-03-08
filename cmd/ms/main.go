@@ -4,7 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/ZEGIFTED/MS.GoMonitor/internal"
 	"github.com/ZEGIFTED/MS.GoMonitor/monitors"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/messaging"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 	"github.com/joho/godotenv"
 	_ "github.com/microsoft/go-mssqldb" // SQL Server driver
@@ -32,19 +35,35 @@ func LoadConfig() (*EnvConfig, error) {
 	// Load .env file
 	err := godotenv.Load()
 	if err != nil {
-		log.Printf("Warning: .env file not found. Using system environment variables")
+		log.Printf("Warning: .env file not found. Using system environment variables. %s", err.Error())
 	}
 
 	config := &EnvConfig{
-		Port:      utils.GetEnvWithDefault("PORT", "8080"),
-		Host:      utils.GetEnvWithDefault("HOST", "localhost"),
-		APIKey:    utils.GetEnvWithDefault("API_KEY", ""),
-		APISecret: utils.GetEnvWithDefault("API_SECRET", ""),
-		GoEnv:     utils.GetEnvWithDefault("GO_ENV", "development"),
-		Debug:     utils.GetEnvWithDefault("DEBUG", "false") == "true",
+		Port:      constants.GetEnvWithDefault("PORT", "8080"),
+		Host:      constants.GetEnvWithDefault("HOST", "localhost"),
+		APIKey:    constants.GetEnvWithDefault("API_KEY", ""),
+		APISecret: constants.GetEnvWithDefault("API_SECRET", ""),
+		GoEnv:     constants.GetEnvWithDefault("GO_ENV", "development"),
+		Debug:     constants.GetEnvWithDefault("DEBUG", "false") == "true",
 	}
 
 	return config, nil
+}
+
+func NotificationConfigurationManager(db *sql.DB) *messaging.NotificationManager {
+	configManager := messaging.NotificationManager{
+		Logger: utils.Logger,
+		DB:     db,
+		Config: &messaging.NotificationConfig{},
+	}
+
+	err := configManager.LoadConfig()
+	if err != nil {
+		log.Printf("Error loading config: %v", err.Error())
+		return nil
+	}
+
+	return &configManager
 }
 
 // NewServiceMonitor creates a new service monitor instance
@@ -54,24 +73,30 @@ func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 	logger := cron.PrintfLogger(utils.CronLogger)
 
 	monitor := &monitors.ServiceMonitor{
-		Db:             db,
-		StatusTracking: make(map[string]*monitors.ServiceMonitorStatus),
-		Logger:         utils.Logger,
-		Checkers:       make(map[monitors.ServiceType]monitors.ServiceChecker),
-		Ctx:            ctx,
-		Cancel:         cancel,
+		Db: db,
+		//StatusTracking:     make(map[string]*monitors.ServiceMonitorStatus),
+		//Logger:              utils.Logger,
+		Checkers:            make(map[monitors.ServiceType]monitors.ServiceChecker),
+		NotificationHandler: NotificationConfigurationManager(db),
+		Ctx:                 ctx,
+		Cancel:              cancel,
 		Cron: cron.New(
 			cron.WithChain(
 				cron.SkipIfStillRunning(cron.DefaultLogger),
 			),
 			cron.WithLogger(logger),
 		),
+
+		//AlertCache: make(map[string]time.Time),
+		Alerts: make(chan internal.ServiceAlertEvent, 100),
 	}
 
 	// Register service type checkers
 	monitor.Checkers[monitors.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
 	monitor.Checkers[monitors.ServiceMonitorWebModules] = &monitors.WebModulesServiceChecker{}
 	//monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
+
+	monitor.Checkers[monitors.ServiceMonitorServer] = &monitors.ServerHealthChecker{}
 
 	//// Example usage
 	//tsData := []TimeSeriesData{
@@ -124,11 +149,32 @@ func main() {
 		log.Fatalf("Error connecting to the database: %v", err)
 	}
 
-	//filePath := utils.GenerateReport(db)
+	//nCm := NotificationConfigurationManager(db)
+	//
+	//if nCm != nil {
+	//	//pdfFilePath, csvFilePath := utils.GenerateReport(db)
+	//
+	//	//sendTo := []string{"calebb.jnr@gmail.com", "cboluwade@nibss-plc.com.ng"}
+	//	//nCm.SendReportEmail(sendTo, pdfFilePath, csvFilePath)
+	//} else {
+	//	fmt.Println("No notification configuration manager found", nCm)
+	//}
 
-	//sendTo := []string{"calebb.jnr@gmail.com", "cboluwade@nibss-plc.com.ng"}
-	//messaging.SendReportEmail(sendTo, filePath)
-
+	// Create the payload
+	//teamsMessage := messaging.TeamsMessage{
+	//	Type:       "MessageCard",
+	//	Context:    "http://schema.org/extensions",
+	//	Title:      "Test Teams Message 🚨",
+	//	Text:       "Test Teams Message__ da",
+	//	ThemeColor: "0076D7", // Microsoft blue color
+	//}
+	//
+	//webhookURL := "https://outlook.office.com/webhook/YOUR_WEBHOOK_URL"
+	//
+	//err_ := teams.SendTeamsMessage(webhookURL, teamsMessage)
+	//if err_ != nil {
+	//	fmt.Println("Error:", err)
+	//}
 	//extraInfo := map[string]string{
 	//	"Server":       "Server-01",
 	//	"Region":       "us-east-1",
@@ -137,13 +183,6 @@ func main() {
 	//	"Timestamp":    "2025-02-11T10:30:00Z",
 	//}
 	//
-	//slackClient := messaging.SlackBotClient()
-	//slackMessage := messaging.FormatSlackMessageToSend("Test Notification", "Hello World from Go", "", "actionURL", extraInfo)
-	//
-	//_, err_ := slackClient.SendSlackMessage("admin_x", slackMessage)
-	//if err_ != nil {
-	//	return
-	//}
 
 	// Create and start monitor
 	monitor := NewServiceMonitor(db)

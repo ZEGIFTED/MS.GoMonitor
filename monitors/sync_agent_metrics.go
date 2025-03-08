@@ -1,14 +1,14 @@
 package monitors
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"fmt"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	_ "github.com/microsoft/go-mssqldb"
 	"log"
 	"net/http"
 	"strings"
-	"time"
-
-	_ "github.com/microsoft/go-mssqldb"
 )
 
 func SyncMetrics(db *sql.DB, agentMetrics []AgentInfo, agentSyncURL string) error {
@@ -37,15 +37,15 @@ func SyncMetrics(db *sql.DB, agentMetrics []AgentInfo, agentSyncURL string) erro
 	// Upsert Agents in batch
 	agentQuery := `
 		MERGE INTO Agents AS target
-		USING (VALUES %s) AS source (AgentID, AgentHostName, AgentHostAddress, OS, Version, SDKVersion)
+		USING (VALUES %s) AS source (AgentID, AgentHostName, AgentHostAddress, OS, AgentVersion, SDKVersion)
 		ON target.AgentID = source.AgentID
 		WHEN MATCHED AND (target.AgentHostName <> source.AgentHostName OR target.AgentHostAddress <> source.AgentHostAddress OR target.OS <> source.OS OR 
-						  target.Version <> source.Version OR target.SDKVersion <> source.SDKVersion) THEN
-			UPDATE SET AgentHostName = source.AgentHostName, AgentHostAddress = source.AgentHostAddress, OS = source.OS, 
-						Version = source.Version, SDKVersion = source.SDKVersion, LastSync = GETDATE()
+						  target.AgentVersion <> source.AgentVersion OR target.SDKVersion <> source.SDKVersion) THEN
+			UPDATE SET AgentHostName = source.AgentVersion, AgentHostAddress = source.AgentHostAddress, OS = source.OS, 
+						AgentVersion = source.AgentVersion, SDKVersion = source.SDKVersion, LastSync = GETDATE()
 		WHEN NOT MATCHED THEN 
-			INSERT (AgentID, AgentHostName, AgentHostAddress, OS, Version, SDKVersion, LastSync) 
-			VALUES (source.AgentID, source.AgentHostName, source.AgentHostAddress, source.OS, source.Version, source.SDKVersion, GETDATE());
+			INSERT (AgentID, AgentHostName, AgentHostAddress, OS, AgentVersion, SDKVersion, LastSync) 
+			VALUES (source.AgentID, source.AgentHostName, source.AgentHostAddress, source.OS, source.AgentVersion, source.SDKVersion, GETDATE());
 	`
 
 	var agentValues []string
@@ -108,8 +108,12 @@ func SyncMetrics(db *sql.DB, agentMetrics []AgentInfo, agentSyncURL string) erro
 		}
 	}
 
+	// Create a custom HTTP client with disabled SSL verification
 	client := &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: constants.HTTPRequestTimeout,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
 	}
 
 	log.Println("Notifying Agent of Sync Completion", agentSyncURL)
