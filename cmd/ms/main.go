@@ -4,6 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
+
+	// "log/slog"
+	"os"
+	"os/signal"
+	"runtime"
+	"syscall"
+	"time"
+
 	"github.com/ZEGIFTED/MS.GoMonitor/internal"
 	"github.com/ZEGIFTED/MS.GoMonitor/monitors"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
@@ -12,12 +21,6 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/microsoft/go-mssqldb" // SQL Server driver
 	"github.com/robfig/cron/v3"
-	"log"
-	"os"
-	"os/signal"
-	"runtime"
-	"syscall"
-	"time"
 )
 
 // EnvConfig holds all environment variables
@@ -98,23 +101,6 @@ func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 
 	monitor.Checkers[monitors.ServiceMonitorServer] = &monitors.ServerHealthChecker{}
 
-	//// Example usage
-	//tsData := []TimeSeriesData{
-	//	{Timestamp: 1672531200000, Value: 95.0},
-	//	{Timestamp: 1672531260000, Value: 98.0},
-	//	{Timestamp: 1672531320000, Value: 97.0},
-	//	{Timestamp: 1672531380000, Value: 96.0},
-	//	{Timestamp: 1672531440000, Value: 99.0},
-	//	{Timestamp: 1672531500000, Value: 100.0},
-	//	{Timestamp: 1672531560000, Value: 101.0},
-	//	{Timestamp: 1672531620000, Value: 102.0},
-	//	{Timestamp: 1672531680000, Value: 103.0},
-	//	{Timestamp: 1672531740000, Value: 104.0},
-	//}
-	//
-	//thresholds := CheckTSDataAboveThreshold("CPU_Usage", "Server_1", tsData, 95.0, 10)
-	//fmt.Println("Thresholds breached:", thresholds)
-
 	return monitor
 }
 
@@ -149,16 +135,36 @@ func main() {
 		log.Fatalf("Error connecting to the database: %v", err)
 	}
 
-	//nCm := NotificationConfigurationManager(db)
-	//
-	//if nCm != nil {
-	//	//pdfFilePath, csvFilePath := utils.GenerateReport(db)
-	//
-	//	//sendTo := []string{"calebb.jnr@gmail.com", "cboluwade@nibss-plc.com.ng"}
-	//	//nCm.SendReportEmail(sendTo, pdfFilePath, csvFilePath)
-	//} else {
-	//	fmt.Println("No notification configuration manager found", nCm)
-	//}
+	// Start the report generation in a goroutine
+	go func() {
+		ticker := time.NewTicker(10 * time.Minute)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ticker.C:
+				nCm := NotificationConfigurationManager(db)
+
+				if nCm != nil {
+					pdfFilePath, csvFilePath := utils.GenerateReport(db)
+					sendTo, err := internal.FetchReportRecipients(db)
+
+					if err != nil {
+						log.Println("Error fetching report recipients:", err)
+					}
+
+					fmt.Println(sendTo)
+
+					sendTo_ := []string{"calebb.jnr@gmail.com", "cboluwade@nibss-plc.com.ng"}
+					nCm.SendReportEmail(sendTo_, pdfFilePath, csvFilePath)
+				} else {
+					fmt.Println("No notification configuration manager found", nCm)
+				}
+			case <-shutdown:
+				return
+			}
+		}
+	}()
 
 	// Create the payload
 	//teamsMessage := messaging.TeamsMessage{

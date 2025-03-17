@@ -26,7 +26,6 @@ type SNMPServiceChecker struct{}
 type ServerHealthChecker struct{}
 
 type ServiceMonitorData struct {
-	//Id              uuid.UUID `json:"AppID"`
 	SystemMonitorId uuid.UUID `json:"system_monitor_id"`
 	Name            string
 	Host            string

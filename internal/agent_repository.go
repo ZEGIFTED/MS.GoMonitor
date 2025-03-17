@@ -4,11 +4,13 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 )
 
 type AgentRepository struct {
@@ -81,4 +83,63 @@ func (a *AgentRepository) GetAgentThresholds(agentURL string) (AgentThresholds, 
 	log.Println("Agent Threshold API response", apiResponse, err)
 
 	return AgentThresholds{}, nil
+}
+
+func ServerResourceDetails(baseURL string, limit int) ([]ProcessResourceUsage, error) {
+	// Construct URL with query parameter.
+	resp, err := http.Get(baseURL + "/api/v1/agent/resource-usage?limit=" + strconv.Itoa(limit))
+
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body.
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse JSON response.
+	var processes []ProcessResourceUsage
+	if err := json.Unmarshal(body, &processes); err != nil {
+		return nil, err
+	}
+
+	return processes, nil
+}
+
+func (a *AgentRepository) GetAgentServiceStats(agentURL string) ([]ProcessResourceUsage, error) {
+	if agentURL == "" {
+		return []ProcessResourceUsage{}, fmt.Errorf("invalid agent Base URL")
+	}
+
+	// Create a custom HTTP client with disabled SSL verification
+	httpClient := &http.Client{
+		Timeout: constants.HTTPRequestTimeout,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+
+	resp, err := httpClient.Get(agentURL)
+
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body.
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse JSON response.
+	var processes []ProcessResourceUsage
+	if err := json.Unmarshal(body, &processes); err != nil {
+		return nil, err
+	}
+
+	return processes, nil
 }

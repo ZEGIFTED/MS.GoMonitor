@@ -4,14 +4,16 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/internal"
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
-	"github.com/jung-kurt/gofpdf"
 	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/ZEGIFTED/MS.GoMonitor/internal"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	"github.com/jung-kurt/gofpdf"
 )
 
 type SystemCount struct {
@@ -20,17 +22,22 @@ type SystemCount struct {
 }
 
 func GenerateReport(db *sql.DB) (string, string) {
+	slog.Info("Fetching Metrics To Generate Report")
 	var metrics, tableHeaders, err = internal.FetchMetricsReport(db)
 
 	if err != nil {
 		log.Println("Error fetching metrics report", err)
 	}
 
-	// Generate PDF
-	var filePath = GeneratePDF(metrics, tableHeaders)
-	var csvFilePath = GenerateCSV(metrics, tableHeaders)
+	if len(metrics) > 0 {
+		// Generate PDF
+		var filePath = GeneratePDF(metrics, tableHeaders)
+		var csvFilePath = GenerateCSV(metrics, tableHeaders)
 
-	return filePath, csvFilePath
+		return filePath, csvFilePath
+	}
+
+	return "", ""
 }
 
 func Header(pdf *gofpdf.Fpdf, reportTime string) {

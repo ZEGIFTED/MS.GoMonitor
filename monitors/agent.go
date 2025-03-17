@@ -5,12 +5,13 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 	"io"
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 )
 
 func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
@@ -45,7 +46,7 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 		Timeout: constants.HTTPRequestTimeout,
 	}
 
-	slog.Debug("Calling Agent API", agentAddress)
+	slog.Info("Calling Agent API", "Endpoint", agentAddress)
 	resp, err := client.Get(agentAddress)
 
 	if err != nil {
@@ -55,14 +56,14 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 			LiveCheckFlag: constants.Degraded,
 			Status:        "Agent Status Unknown " + err.Error(),
 			LastCheckTime: time.Now(),
-			FailureCount:  0,
+			FailureCount:  1,
 		}, false
 	}
 
 	defer func(Body io.ReadCloser) {
 		__err := Body.Close()
 		if __err != nil {
-			slog.Error("Error closing response body: %v", __err)
+			slog.Error("Error closing response body: %v", "Ex", __err.Error())
 		}
 	}(resp.Body)
 
@@ -168,8 +169,7 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 				LiveCheckFlag: constants.Degraded,
 				Status:        err_.Error(),
 				LastCheckTime: time.Now(),
-				FailureCount:  0,
-				//LastErrorLog:  "Invalid URL configuration",
+				FailureCount:  1,
 			}, false
 		}
 

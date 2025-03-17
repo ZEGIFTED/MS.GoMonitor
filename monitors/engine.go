@@ -4,13 +4,16 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
+	"log/slog"
+	"sync"
+	"time"
+
 	"github.com/ZEGIFTED/MS.GoMonitor/internal"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
+	"github.com/google/uuid"
 	_ "github.com/microsoft/go-mssqldb"
-	"log"
-	"sync"
-	"time"
 )
 
 func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
@@ -33,10 +36,11 @@ func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
 
 	for rows.Next() {
 		var service ServiceMonitorData
+		var uuidStr string
 		var Configuration string
 
 		err := rows.Scan(
-			&service.SystemMonitorId,
+			&uuidStr,
 			&service.Name,
 			&service.Host,
 			&service.Port,
@@ -55,6 +59,11 @@ func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
 			return fmt.Errorf("error scanning service row: %v", err)
 		}
 
+		service.SystemMonitorId, err = uuid.Parse(uuidStr)
+		if err != nil {
+			slog.Error(err.Error())
+		}
+
 		if Configuration == "" {
 			Configuration = "{}"
 		}
@@ -65,7 +74,6 @@ func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
 			continue
 		}
 
-		//service.AgentRepository = internal.AgentRepository{}
 		services = append(services, service)
 	}
 
@@ -73,7 +81,11 @@ func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
 	sm.Services = services
 	sm.MU.Unlock()
 
-	log.Printf("Loaded %d active services", len(services))
+	//for i, service := range services {
+	//	fmt.Println(i, service)
+	//}
+
+	log.Printf("Loaded %d active Services", len(services))
 	return nil
 }
 
@@ -109,7 +121,7 @@ func (sm *ServiceMonitor) StartService() error {
 	}
 
 	sm.Cron.Start()
-	sm.StartAlertHandler()
+	sm.AlertHandler()
 	return nil
 }
 
@@ -222,12 +234,13 @@ func (sm *ServiceMonitor) handleUnknownServiceType(service ServiceMonitorData) {
 	//sm.StatusTracking[service.Name] = currentStatus
 	sm.StatusTracking.Store(service.Name, currentStatus)
 
-	log.Printf("Service -> [%s]: No Checker Found For Type %s", service.Name, service.Device)
+	// log.Printf("Service -> [%s]: No Checker Found For Type %s", service.Name, service.Device)
 }
 
 func (sm *ServiceMonitor) handleServiceFailure(service ServiceMonitorData, currentStatus *ServiceMonitorStatus, message ServiceMonitorStatus) {
 	// Log service failure
-	log.Printf("Service -> [%s] failed. Reason::: %s", service.Name, message.Status)
+	serviceAlertIdentifier := service.SystemMonitorId.String() + "|" + service.Name
+	log.Printf("Service -> [%s] failed. Alert Identifier::: %s", service.Name, serviceAlertIdentifier)
 
 	// Update status
 	currentStatus.Status = message.Status
@@ -241,23 +254,27 @@ func (sm *ServiceMonitor) handleServiceFailure(service ServiceMonitorData, curre
 	}
 
 	// Throttle alerts to avoid alert fatigue
-	if lastAlert, ok := sm.AlertCache.Load(service.SystemMonitorId.String() + "|" + service.Name); !ok || func() bool {
+	if lastAlert, ok := sm.AlertCache.Load(serviceAlertIdentifier); !ok || func() bool {
 		lastAlertTime, valid := lastAlert.(time.Time)
 		return valid && time.Since(lastAlertTime) < constants.AlertThrottleTime // Prevent alert spam within 10-min window
 	}() {
+		log.Println(serviceAlertIdentifier, currentStatus.FailureCount > constants.FailureThresholdCount, service.IsAcknowledged)
 		if currentStatus.FailureCount > constants.FailureThresholdCount && !service.IsAcknowledged {
-			log.Printf("Adding Service to Alert Channel: %s", service.Name)
-
 			sm.Alerts <- internal.ServiceAlertEvent{
 				SystemMonitorId: service.SystemMonitorId,
 				ServiceName:     service.Name,
 				Message:         fmt.Sprintf("%s is down: %s", service.Name, message.Status),
 				Severity:        "critical",
 				Timestamp:       time.Now(),
+				AgentRepository: service.AgentRepository,
+				AgentAPI:        service.AgentAPIBaseURL,
 			}
+
+			log.Printf("Added Failed Service to Alert Channel: %s", serviceAlertIdentifier)
+			return
 		}
 
-		sm.AlertCache.Store(service.SystemMonitorId.String()+"|"+service.Name, time.Now())
+		sm.AlertCache.Store(serviceAlertIdentifier, time.Now())
 	}
 
 	//if ok {
@@ -355,20 +372,8 @@ func (sm *ServiceMonitor) GetUnprocessedAlertsCount() int {
 	return len(sm.Alerts)
 }
 
-// ShouldSendAlert checks if an alert should be sent (rate-limiting).
-func (sm *ServiceMonitor) ShouldSendAlert(service string) bool {
-	lastAlert, ok := sm.AlertCache.Load(service)
-	if ok {
-		elapsed := time.Since(lastAlert.(time.Time))
-		if elapsed < 10*time.Minute {
-			return false
-		}
-	}
-	sm.AlertCache.Store(service, time.Now())
-	return true
-}
-
-func (sm *ServiceMonitor) StartAlertHandler() {
+// AlertHandler checks if an alert should be sent (rate-limiting) and sends them.
+func (sm *ServiceMonitor) AlertHandler() {
 	go func() {
 		//rec := make([]string, len(sm.Alerts))
 
@@ -400,13 +405,22 @@ func (sm *ServiceMonitor) StartAlertHandler() {
 					continue
 				}
 
-				recipients, exists := recipientMap[alert.SystemMonitorId.String()+"|"+alert.ServiceName]
-				if !exists || len(recipients.Users) == 0 {
-					log.Printf("No recipients found for service %s|%s", alert.SystemMonitorId, alert.ServiceName)
+				alertIdentifier := alert.SystemMonitorId.String() + "|" + alert.ServiceName
+
+				recipients, exists := recipientMap[alertIdentifier]
+				if !exists {
+					//if !exists || len(recipients.Users) == 0 {
+					log.Printf("No recipients found for service Identifier %s", alertIdentifier)
 					continue
 				}
 
-				log.Printf("Alert Recipients \n. %v. Found %d for %s|%s", recipientMap[alert.SystemMonitorId.String()].Users, len(recipientMap[alert.SystemMonitorId.String()+"|"+alert.ServiceName].Users), alert.ServiceName, alert.SystemMonitorId)
+				// agentStats, aErr := alert.AgentRepository.ValidateAgentURL(alert.AgentAPI, "/api/v1/agent/resource-usage?limit=5")
+
+				// if aErr != nil {
+				// 	log.Println(aErr.Error())
+				// }
+
+				// alert.AgentRepository.GetAgentServiceStats(agentStats)
 
 				// Send the notification asynchronously
 				go func(alert internal.ServiceAlertEvent, recipients internal.NotificationRecipients) {
@@ -425,16 +439,10 @@ func (sm *ServiceMonitor) StartAlertHandler() {
 func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.ServiceAlertEvent, recipients internal.NotificationRecipients) error {
 	log.Printf("Processing alert for service: %s", event.ServiceName)
 
-	//body := "The Following Services needs to be confirmed operational or acknowledged via the Monitoring Console."
-	body := fmt.Sprintf("The following service needs to be confirmed operational or acknowledged via the Monitoring Console: %s", event.ServiceName)
-
 	emailConfig := sm.NotificationHandler.GetEmailConfig()
 	slackConfig := sm.NotificationHandler.GetSlackConfig()
 
-	//sendTo := []string{"calebb.jnr@gmail.com", "cboluwade@nibss-plc.com.ng"}
 	var recipientsGroup = internal.GroupRecipientsByPlatform(recipients.Users)
-
-	//log.Printf("RecipientsByPlatform: %v", x)
 
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(recipients.Users))
@@ -449,9 +457,9 @@ func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.Service
 			switch platform {
 			case "Email":
 				if emailConfig.Enabled {
-					send, err := sm.NotificationHandler.FormatEmailMessageToSend(event, r[0].GroupName, constants.ConsoleBaseURL, make(map[string]string))
+					formattedEmail, err := sm.NotificationHandler.FormatEmailMessageToSend(event, r[0].UserName, r[0].GroupName, constants.ConsoleBaseURL, make(map[string]any))
 					if err != nil {
-						return
+						errChan <- err
 					}
 
 					emailAddresses := make([]string, len(r))
@@ -459,7 +467,7 @@ func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.Service
 						emailAddresses[i] = recipient.Email
 					}
 
-					if err := sm.NotificationHandler.SendEmail(emailAddresses, event.ServiceName+" Health Check", body+"\n"+send); err != nil {
+					if err := sm.NotificationHandler.SendEmail(emailAddresses, event.ServiceName+" Health Check", formattedEmail); err != nil {
 						log.Printf("failed to send email to %s: %v", emailAddresses, err)
 						errChan <- err
 					}

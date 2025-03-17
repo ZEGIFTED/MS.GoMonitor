@@ -2,11 +2,12 @@ package monitors
 
 import (
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
-	"github.com/gosnmp/gosnmp"
 	"log"
 	"net"
 	"time"
+
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	"github.com/gosnmp/gosnmp"
 )
 
 func (service *SNMPServiceChecker) Check(config ServiceMonitorData) (ServiceMonitorStatus, bool) {
@@ -40,6 +41,45 @@ func (service *SNMPServiceChecker) Check(config ServiceMonitorData) (ServiceMoni
 		{".1.3.6.1.2.1.31.1.1.1.6.1", "Inbound traffic"},
 		{".1.3.6.1.2.1.31.1.1.1.10.1", "Outbound traffic"},
 	}
+
+	// const OIDs interface {} = (
+	// 	".1.3.6.1.2.1.1.1.0",
+	// 	".1.3.6.1.2.1.1.3.0" // 4118776 UPTIME
+	// 	".1.3.6.1.2.1.1.5.0", // System Name
+	// 	".1.3.6.1.2.1.1.6.0", // location
+
+	// 	".1.3.6.1.2.1.25.2.3.1.4.1", // OID for physical memory utilization
+	// 	".1.3.6.1.2.1.25.2.3.1.4.2", // OID for physical memory utilization
+	// 	".1.3.6.1.2.1.25.2.3.1.4.3", // OID for physical memory utilization
+	// 	".1.3.6.1.2.1.25.2.3.1.4.4", // OID for physical memory utilization
+	// 	".1.3.6.1.2.1.25.2.3.1.4.5", // OID for physical memory utilization
+	// 	// ".1.3.6.1.2.1.25.2.3.1.4.6", // OID for physical memory utilization
+
+	// 	".1.3.6.1.2.1.25.2.3.1.6.1", // Memory Usage
+	// 	".1.3.6.1.2.1.25.2.3.1.6.3", // Memory Usage
+
+	// 	// ".1.3.6.1.2.1.25.2.3.1.2.5",
+	// 	".1.3.6.1.2.1.25.2.3.1.3.1",
+	// 	".1.3.6.1.2.1.25.2.3.1.3.2",
+	// 	".1.3.6.1.2.1.25.2.3.1.3.3",
+	// 	".1.3.6.1.2.1.25.2.3.1.3.4",
+	// 	".1.3.6.1.2.1.25.2.3.1.3.5",
+	// 	// ".1.3.6.1.2.1.25.2.3.1.3.6",
+	// 	// ".1.3.6.1.2.1.25.2.3.1.3.7",
+	// 	// ".1.3.6.1.2.1.25.2.3.1.3.8",
+
+	// 	".1.3.6.1.2.1.25.2.3.1.5.1",
+	// 	".1.3.6.1.2.1.25.2.3.1.5.2",
+	// 	".1.3.6.1.2.1.25.2.3.1.5.3",
+	// 	".1.3.6.1.2.1.25.2.3.1.5.4",
+	// 	".1.3.6.1.2.1.25.2.3.1.5.5",
+	// 	// ".1.3.6.1.2.1.25.2.3.1.5.6",
+	// 	// ".1.3.6.1.2.1.25.2.3.1.5.7",
+
+	// 	// ".1.3.6.1.2.1.25.2.3.1.8.1",
+	// 	".1.3.6.1.2.1.25.2.3.1.7.2",
+	// 	".1.3.6.1.2.1.25.2.3.1.7.5",
+	// );
 
 	//ifInOctetsOID  = "1.3.6.1.2.1.2.2.1.10.1" // Incoming traffic (Replace 1 with your interface index)
 	//ifOutOctetsOID = "1.3.6.1.2.1.2.2.1.16.1" // Outgoing traffic
@@ -82,7 +122,7 @@ func (service *SNMPServiceChecker) Check(config ServiceMonitorData) (ServiceMoni
 			LiveCheckFlag: constants.Escalation,
 			Status:        "Error getting SNMP interfaces " + err.Error(),
 			LastCheckTime: time.Now(),
-			FailureCount:  0,
+			FailureCount:  1,
 			//LastErrorLog:  fmt.Sprintf("Error connecting to device: %v", err),
 		}, false
 	}

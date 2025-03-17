@@ -8,11 +8,13 @@ import (
 	//"bytes"
 	"crypto/tls"
 	"fmt"
+
 	"github.com/ZEGIFTED/MS.GoMonitor/internal"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/go-mail/mail/v2"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
+
 	//"html/template"
 	"log"
 	"os"
@@ -125,7 +127,7 @@ func (cfgManager *NotificationManager) FormatSlackMessageToSend(event internal.S
 //}
 
 // Load the HTML template from file
-func loadTemplate(filePath string, data map[string]interface{}) (string, error) {
+func loadTemplate(filePath string, data EmailTemplateData) (string, error) {
 	//var emailTemplate embed.FS
 
 	dir, _ := os.Getwd()
@@ -138,7 +140,7 @@ func loadTemplate(filePath string, data map[string]interface{}) (string, error) 
 	}
 
 	// Parse and execute the template
-	tmpl, err := template.New("emailTemplate").Parse(string(templateContent))
+	tmpl, err := template.ParseFiles(templateContent)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse template: %v", err)
 	}
@@ -151,16 +153,47 @@ func loadTemplate(filePath string, data map[string]interface{}) (string, error) 
 	return emailBody.String(), nil
 }
 
-func (cfgManager *NotificationManager) FormatEmailMessageToSend(event internal.ServiceAlertEvent, groupName, actionURL string, extraInfo map[string]string) (string, error) {
+func (cfgManager *NotificationManager) FormatEmailMessageToSend(event internal.ServiceAlertEvent, userName, groupName, actionURL string, extraInfo map[string]interface{}) (string, error) {
+
 	// Prepare template data
-	data := map[string]interface{}{
-		"ServiceName": event.ServiceName,
-		"groupName":   groupName,
-		"AlertLevel":  WarningAlertLevel,
-		"Timestamp":   time.Now().Format("2006-01-02 15:04:05"),
-		"Message":     event.Message,
-		"ActionURL":   actionURL,
-		"ExtraInfo":   extraInfo,
+	data := EmailTemplateData{
+		Title:       "Test Title",
+		Heading:     fmt.Sprintf("The following service needs to be confirmed operational or acknowledged via the Monitoring Console: %s", event.ServiceName),
+		ServiceName: event.ServiceName,
+		User: UserData{
+			Name:           userName,
+			RecipientGroup: groupName,
+		},
+
+		Items: []string{"loop test 1", "loop test 2"},
+		// "AlertLevel":  WarningAlertLevel,
+		Content:     event.Message,
+		ActionURL:   actionURL,
+		ExtraFields: extraInfo,
+
+		Logo: Logo{
+			UseSVG: false,
+
+			// Only used if UseSVG is false
+			ImageURL: "/pkg/public/nibsslogo.png",
+
+			// SVG customization options
+			Text:           "MS",
+			PrimaryColor:   "#0066cc",
+			SecondaryColor: "#ff9900",
+		},
+		Meta: MetaData{
+			Timestamp:    event.Timestamp.Format("2006-01-02 15:04:05"),
+			Year:         time.Now().Year(),
+			CompanyName:  "NIBSS Corp",
+			SupportEmail: "calebb.jnr@gmail.com",
+			SupportPhone: "080X-XXX-XXXX",
+			FooterLinks: []Link{
+				{Text: "Privacy Policy", URL: "/privacy", NewTab: false},
+				{Text: "Terms of Service", URL: "/terms", NewTab: false},
+				{Text: "FAQ", URL: "/faq", NewTab: false},
+			},
+		},
 	}
 
 	// Load and render email template
@@ -169,8 +202,6 @@ func (cfgManager *NotificationManager) FormatEmailMessageToSend(event internal.S
 		log.Printf("Error loading email template: %v", err)
 		return "", fmt.Errorf("failed to load email template: %w", err)
 	}
-
-	fmt.Println("Email template:", emailBody)
 
 	return emailBody, nil
 }
@@ -211,9 +242,8 @@ func (cfgManager *NotificationManager) SendEmail(to []string, subject string, bo
 		senderMailAddr = ""
 	}
 
-	fmt.Println(smtpHost, smtpPort, senderMailAddr, smtpUser, smtpPass)
-
 	if smtpHost == "" || smtpPort == 0 || smtpUser == "" || smtpPass == "" || senderMailAddr == "" || len(to) < 1 {
+		fmt.Println(smtpHost, smtpPort, senderMailAddr, smtpUser, smtpPass)
 		return fmt.Errorf("email notifications are not configured properly")
 	}
 
@@ -225,52 +255,16 @@ func (cfgManager *NotificationManager) SendEmail(to []string, subject string, bo
 	m.SetHeader("From", senderMailAddr)
 	m.SetHeader("To", to...)
 	m.SetHeader("Subject", subject)
-	m.SetBody("text/plain", body)
+	m.SetBody("text/html", body)
+	// m.AddAlternative("text/plain", body)
 
 	if err := d.DialAndSend(m); err != nil {
 		return fmt.Errorf("failed to send email: %s", err.Error())
 	}
 
 	log.Println("📧Email sent successfully.")
+
 	return nil
-	//	smtpServer := os.Getenv("MAIL_HOST")
-	//	smtpPort := os.Getenv("MAIL_PORT")
-	//	sender := os.Getenv("MAIL_USER")
-	//	password := os.Getenv("MAIL_PASS")
-	//	recipient := os.Getenv("EMAIL_RECIPIENT")
-	//
-	//	//senderEmail := "youremail@nibss-plc.com"
-	//
-	//	//strings.EqualFold(smtpServer, "smtp.gmail.com")
-	//
-	//	if smtpServer == "" || sender == "" || password == "" || recipient == "" {
-	//		log.Println("Email notifications are not configured properly.")
-	//		return fmt.Errorf("email notifications are not configured properly")
-	//	}
-	//
-	//	auth := smtp.PlainAuth("", sender, password, smtpServer)
-	//
-	//	// Build the email headers and body
-	//	msg := bytes.Buffer{}
-	//	//msg.WriteString(fmt.Sprintf("From: %s\r\n", sender))
-	//	//msg.WriteString(fmt.Sprintf("To: %s\r\n", to[0])) // Sending to the first recipient (for simplicity)
-	//	msg.WriteString(fmt.Sprintf("Subject: %s\r\n", subject))
-	//	//msg.WriteString("MIME-version: 1.0;\r\n")
-	//	//msg.WriteString("Content-Type: text/html; charset=\"UTF-8\";\r\n")
-	//	//msg.WriteString("\r\n")
-	//	//msg.WriteString(body)
-	//
-	//	emailBody := FormatEmailMessageToSend()
-	//	err := smtp.SendMail(smtpServer+":"+smtpPort, auth, sender, []string{recipient}, []byte(emailBody))
-	//
-	//	if err != nil {
-	//		log.Println("Failed to send email:", err)
-	//		return err
-	//	} else {
-	//		log.Println("📧 Email alert sent successfully!")
-	//	}
-	//
-	//	return err
 }
 
 // SendReportEmail Notification Method
@@ -278,24 +272,46 @@ func (cfgManager *NotificationManager) SendReportEmail(to []string, pdfAttachmen
 	emailConfig := cfgManager.GetEmailConfig()
 	cfgManager.Logger.Println("Email config", emailConfig)
 
-	fmt.Println(emailConfig, constants.SMTPHost, constants.SMTPPort, constants.SMTPUser, constants.SMTPPass)
+	// Use values from cfgManager if they are not empty, otherwise fall back to constants
+	smtpHost := emailConfig.SMTPServer
+	if smtpHost == "" {
+		smtpHost = constants.SMTPHost
+	}
+
+	smtpPort := emailConfig.SMTPPort
+	if smtpPort == 0 {
+		port, err := strconv.Atoi(constants.SMTPPort)
+		if err != nil {
+			fmt.Println("Invalid port:", constants.SMTPPort, err)
+			smtpPort = 587
+		}
+		smtpPort = port
+	}
+
+	smtpUser := emailConfig.Username
+	if smtpUser == "" {
+		smtpUser = constants.SMTPUser
+	}
+
+	smtpPass := emailConfig.Password
+	if smtpPass == "" {
+		smtpPass = constants.SMTPPass
+	}
+
+	senderMailAddr := emailConfig.FromAddress
+	if senderMailAddr == "" {
+		senderMailAddr = ""
+	}
+
+	if smtpHost == "" || smtpPort == 0 || smtpUser == "" || smtpPass == "" || senderMailAddr == "" || len(to) < 1 {
+		fmt.Println("email notifications are not configured properly", smtpHost, smtpPort, senderMailAddr, smtpUser, smtpPass)
+	}
+
+	d := mail.NewDialer(smtpHost, smtpPort, smtpUser, smtpPass)
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	subject := "Hourly IT Infrastructure Report"
 	body := "Please find the attached IT infrastructure report for the last hour. If you're receiving this notification, either you or a group you're part has been profiled for this notification.\n\nBest regards,\nIT Monitoring System"
-
-	if constants.SMTPHost == "" || constants.SMTPUser == "" || constants.SMTPPass == "" || len(to) < 1 {
-		log.Println("Email notifications are not configured properly.")
-	}
-
-	// Connect to the SMTP server
-	port, err := strconv.Atoi(constants.SMTPPort)
-	if err != nil {
-		fmt.Println("Invalid port:", constants.SMTPPort, err)
-		return
-	}
-
-	d := mail.NewDialer(constants.SMTPHost, port, constants.SMTPUser, constants.SMTPPass)
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	m := mail.NewMessage()
 	m.SetHeader("From", constants.SMTPUser)
@@ -320,11 +336,13 @@ func (cfgManager *NotificationManager) SlackBotClient(slackConfig_ SlackConfig) 
 	logger := log.New(os.Stdout, "SLACK-BOT: ", log.Ldate|log.Ltime|log.Lshortfile)
 
 	slackConfig := cfgManager.GetSlackConfig()
-	cfgManager.Logger.Println("Email config", slackConfig)
+	cfgManager.Logger.Println("Slack config", slackConfig)
 
+	token_, _ := os.LookupEnv("SLACK_TOKEN")
+
+	log.Println("Slack Token >>>", slackConfig.BotToken, token_)
 	token := slackConfig.BotToken
 	if token == "" {
-		token_, _ := os.LookupEnv("SLACK_TOKEN")
 
 		token = token_
 	}
@@ -347,12 +365,13 @@ func (s *SlackClient) SendSlackMessage(channel string, message SlackMessage) (st
 		slack.MsgOptionText(message.Text, false),
 		slack.MsgOptionBlocks(message.Blocks...),
 		slack.MsgOptionAttachments(message.Attachments...),
-		slack.MsgOptionUsername("Monitoring Spirit"),
+		slack.MsgOptionUsername("MS"),
 		//slack.MsgOptionPostMessageParameters(params),
 	}
 
 	_, timestamp, err := s.client.PostMessage(
-		strings.ToLower(channel),
+		// strings.ToLower(channel),
+		"epayment-console",
 		msgOptions...,
 	)
 

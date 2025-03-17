@@ -1,38 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MS Monitor</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
-        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h2 { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #007bff; color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .footer { margin-top: 20px; font-size: 12px; color: #555; }
+      :root {
+        --primary: #2563eb;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --dark: #1f2937;
+        --light: #f3f4f6;
+      }
+      body {
+        /* font-family: Arial, sans-serif; */
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        /* background-color: #f4f4f4; */
+        background-color: #f9fafb;
+        /* margin: 20px; */
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+      .container {
+        background-color: #fff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      header {
+        /* background-color: #f4f4f4; */
+        background-color: var(--dark);
+        color: white;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        /* justify-content: space-between; */
+      }
+      .dashboard {
+        flex-grow: 1;
+      }
+      .dashboard h1 {
+        margin: 0;
+        font-size: 1.6rem;
+      }
+      .dashboard p {
+        color: var(--danger);
+        margin: 5px 0;
+      }
+      .logo-container {
+        margin-right: 20px;
+        flex-shrink: 0;
+      }
+      .logo-container img,
+      .logo-container svg {
+        max-height: 60px;
+        max-width: 200px;
+      }
+      .logo-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+      }
+      .content-section {
+        margin-bottom: 30px;
+      }
+      .user-info {
+        background-color: #e9f7fe;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      .user-menu {
+        display: flex;
+        align-items: center;
+      }
+      .user-menu-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 5px;
+        color: white;
+        padding: 8px 15px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        margin-left: 10px;
+        transition: all 0.2s;
+      }
+
+      .user-menu-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .user-icon {
+        background-color: var(--info);
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        font-weight: bold;
+      }
+
+      .nav-container {
+        background-color: white;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 0 20px;
+      }
+      .nav-links {
+        margin: 20px 0;
+      }
+      .nav-links a {
+        margin-right: 15px;
+        text-decoration: none;
+        color: #0066cc;
+      }
+      .nav-links a:hover {
+        text-decoration: underline;
+      }
+
+      h2 {
+        color: #333;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+      }
+      th {
+        background: var(--primary);
+        color: white;
+      }
+      tr:nth-child(even) {
+        background-color: var(--light);
+      }
+      footer {
+        /* color: #555; */
+        text-align: center;
+        margin-top: 20px;
+        padding: 15px;
+        background: var(--light);
+        border-radius: 5px;
+        font-size: 0.9rem;
+      }
+      footer a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      footer a:hover {
+        text-decoration: underline;
+      }
+      .item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+      }
     </style>
-</head>
-<body>
-<div class="container">
-    <h2>Alert: Threshold Messages</h2>
-    <p>The following messages have been triggered based on the thresholds:</p>
-    <table>
-        <tr>
-            <th>Flag</th>
-            <th>Content</th>
-            <th>Group</th>
-        </tr>
-        {{ range . }}
-        <tr>
-            <td>{{ .FLAG }}</td>
-            <td>{{ .Content }}</td>
-            <td>{{ .Group }}</td>
-        </tr>
-        {{ end }}
-    </table>
-    <p class="footer">This is an automated message. Please do not reply.</p>
-</div>
-</body>
+  </head>
+  <body>
+    <div class="container">
+      <div class="content-section user-info">
+        <h2>Hi There, {{.User.Name}}!</h2>
+        <p>You are receiving this notification because you belong to {{ .User.RecipientGroup }}.</p>
+      </div>
+
+      <header>
+        <div class="logo-container">
+          {{if .Logo.UseSVG}}
+          <!-- Inline SVG Logo -->
+          <svg
+            width="160"
+            height="60"
+            viewBox="0 0 100 50"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              x="10"
+              y="10"
+              width="40"
+              height="30"
+              rx="5"
+              fill="{{.Logo.PrimaryColor}}"
+            />
+            <circle cx="70" cy="25" r="15" fill="{{.Logo.SecondaryColor}}" />
+            <text
+              class="logo-text"
+              x="30"
+              y="30"
+              font-family="Arial"
+              font-size="12"
+              fill="none"
+            >
+              {{.Logo.Text}}
+            </text>
+          </svg>
+          {{else}}
+          <!-- Image Logo -->
+          <img
+            src="{{.Logo.ImageURL}}"
+            alt="{{ .Meta.CompanyName }} Logo"
+            width="160"
+            height="60"
+          />
+          {{end}}
+
+          <!-- <h1 class="logo-text">{{.Meta.CompanyName}} Monitor</h1> -->
+        </div>
+
+        <div class="dashboard">
+          <h1>{{ .Heading }}</h1>
+          <p>{{ .Content }}</p>
+        </div>
+
+        <div class="nav-links">
+          <a href="{{ .ActionURL }}" target="_blank" rel="noopener noreferrer"
+            >View More Details</a
+          >
+          <a href="{{ .ActionURL }}" target="_blank" rel="noopener noreferrer"
+            >View Monitoring Board</a
+          >
+        </div>
+
+        <p class="dashboard-title">{{.Meta.Timestamp}}</p>
+      </header>
+
+      {{if .Items}}
+      <div class="content-section">
+        <h2>Items List</h2>
+        <ul>
+          {{ range .Items }}
+          <li class="item">{{ . }}</li>
+          {{ end }}
+        </ul>
+      </div>
+      {{end}}
+
+      <!-- Table Data -->
+
+      {{if .TableData}}
+      <div class="content-section">
+        <h2>Data Overview</h2>
+        <table>
+          <thead>
+            <tr>
+              {{range .TableHeaders}}
+              <th>{{ . }}</th>
+              {{end}}
+            </tr>
+          </thead>
+          <tbody>
+            {{range .TableData}}
+            <tr>
+              {{range .}}
+              <td>{{ . }}</td>
+              {{end}}
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+      {{end}}
+
+      <footer class="footer">
+        <div class="footer-logo-container">
+          {{if .Logo.UseSVG}}
+          <!-- Small footer SVG Logo -->
+          <svg
+            width="100"
+            height="40"
+            viewBox="0 0 100 50"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              x="10"
+              y="10"
+              width="40"
+              height="30"
+              rx="5"
+              fill="{{.Logo.PrimaryColor}}"
+            />
+            <circle cx="70" cy="25" r="15" fill="{{.Logo.SecondaryColor}}" />
+            <text x="30" y="30" font-family="Arial" font-size="12" fill="white">
+              {{.Logo.Text}}
+            </text>
+          </svg>
+          {{else}}
+          <!-- Small footer Image Logo -->
+          <img
+            src="{{.Logo.ImageURL}}"
+            alt="{{.Meta.CompanyName}} Logo"
+            width="100"
+            height="40"
+          />
+          {{end}}
+        </div>
+
+        <p>
+          This is an automated message. Please do not reply, If you wish to stop receiving such
+          notifications, contact Admin.
+        </p>
+        <p>
+          If you have any questions or concerns, please reach out to our support
+          team at
+          <a href="tel:23480X-XXX-XXXX">{{.Meta.SupportPhone}}</a> or
+          <a href="mailto:{{.Meta.SupportEmail}}">MS {{.Meta.SupportEmail}}</a>.
+        </p>
+        <p>
+          &copy;. {{.Meta.Year}} {{.Meta.CompanyName}}. All rights reserved.
+        </p>
+
+        <!-- Footer links with dynamic URLs -->
+        <div class="footer-links">
+          {{range .Meta.FooterLinks}}
+          <a
+            href="{{.URL}}"
+            {{if
+            .NewTab}}target="_blank"
+            rel="noopener noreferrer"
+            {{end}}
+            >{{.Text}}</a
+          >
+          | {{end}}
+        </div>
+        <!-- <div>
+          <img src="https://keysupport.keystonebankng.com:7104/assets/app-store.svg" width="50" alt="" />
+  
+          <img src="https://keysupport.keystonebankng.com:7104/assets/google-play.svg" width="50" alt="" />
+        </div> -->
+      </footer>
+    </div>
+  </body>
 </html>

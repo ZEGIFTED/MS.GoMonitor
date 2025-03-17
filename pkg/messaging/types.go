@@ -2,8 +2,9 @@ package messaging
 
 import (
 	"database/sql"
-	"github.com/slack-go/slack"
 	"log"
+
+	"github.com/slack-go/slack"
 )
 
 // NotificationPlatform represents the type of notification service
@@ -34,6 +35,57 @@ type EmailConfig struct {
 	Password    string `json:"password"`
 	FromAddress string `json:"from_address"`
 	UseTLS      bool   `json:"use_tls"`
+}
+
+type UserData struct {
+	Name           string
+	RecipientGroup string
+}
+
+type Link struct {
+	Text   string
+	URL    string
+	NewTab bool
+}
+
+type Logo struct {
+	UseSVG   bool
+	ImageURL string
+	// Width          string
+	// Height         string
+	// FooterWidth    string
+	// FooterHeight   string
+	Text           string
+	PrimaryColor   string
+	SecondaryColor string
+}
+
+type MetaData struct {
+	Year         int
+	CompanyName  string
+	Timestamp    string
+	FooterLinks  []Link
+	SupportEmail string
+	SupportPhone string
+}
+
+type EmailTemplateData struct {
+	Title   string
+	Heading string
+	Content string
+
+	ServiceName string
+
+	User                UserData
+	ActionURL           string
+	DashboardMonitorURL string
+
+	Items       []string
+	TableData   [][]string
+	ExtraFields map[string]interface{}
+
+	Logo Logo
+	Meta MetaData
 }
 
 // SlackClient handles Slack API interactions

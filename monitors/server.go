@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/ZEGIFTED/MS.GoMonitor/internal"
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"log"
 	"log/slog"
 	"time"
+
+	"github.com/ZEGIFTED/MS.GoMonitor/internal"
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 )
 
 func (service *ServerHealthChecker) Check(server ServiceMonitorData, ctx context.Context, db *sql.DB) (ServiceMonitorStatus, bool) {
@@ -55,7 +56,7 @@ func (service *ServerHealthChecker) Check(server ServiceMonitorData, ctx context
 		)
 
 		if err_ != nil {
-			slog.ErrorContext(ctx, "Error scanning row:", err)
+			slog.ErrorContext(ctx, "Error scanning row:", "Error", err_.Error())
 			continue
 		}
 
@@ -78,12 +79,12 @@ func (service *ServerHealthChecker) Check(server ServiceMonitorData, ctx context
 	for agentID, metrics := range agentMetrics {
 		agentThresholds, tErr := server.AgentRepository.GetAgentThresholds(agentThresholdEndpoint)
 		if tErr != nil {
-			slog.Error("Error fetching agent thresholds:", err)
+			slog.Error(" fetching agent thresholds:", "Error", tErr.Error())
 			continue
 		}
 
 		// Placeholder for metric processing
-		slog.Info("Processing metrics for agent %s", agentID)
+		slog.Info("Processing metrics for agent %s", "AgentId", agentID)
 		service.MetricEngine(agentThresholds, metrics)
 	}
 

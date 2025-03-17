@@ -15,15 +15,21 @@ func FetchUsersAndGroupsByServiceNames(ctx context.Context, db *sql.DB, systemMo
 
 	// Convert service IDs to a comma-separated string
 	serviceIDsString := strings.Join(serviceNames, ",")
-	systemMonitorIdStrings := strings.Join(systemMonitorIds, ",")
+	systemMonitorIdString := strings.Join(systemMonitorIds, ",")
 
-	log.Printf("Fetching recipients for service ids: %s. %s\n", serviceIDsString, systemMonitorIds)
+	log.Printf("Fetching recipients for service: %s. %s", serviceIDsString, systemMonitorIdString)
 
 	// Construct the query dynamically
+	//query := "EXEC NotificationGroupsSP @NOTIFY_SERVICE_GROUP = 'MONITOR_SERVICE', @APP_OR_SERVICE_IDs = ?, @SERVICE_NAMES = ?;"
+	//
+	//// Execute the query
+	//rows, err := db.QueryContext(ctx, query, serviceIDsString, systemMonitorIdString)
 	query := "EXEC NotificationGroupsSP @NOTIFY_SERVICE_GROUP = 'MONITOR_SERVICE', @SERVICE_NAMES = @serviceNames, @APP_OR_SERVICE_IDs = @systemMonitorIds;"
 
-	// Execute the query
-	rows, err := db.QueryContext(ctx, query, sql.Named("serviceNames", serviceIDsString), sql.Named("systemMonitorIds", systemMonitorIdStrings))
+	rows, err := db.QueryContext(ctx, query,
+		sql.Named("serviceNames", serviceIDsString),
+		sql.Named("systemMonitorIds", systemMonitorIdString),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %v", err.Error())
 	}
@@ -73,7 +79,7 @@ func FetchUsersAndGroupsByServiceNames(ctx context.Context, db *sql.DB, systemMo
 			}
 		}
 
-		log.Printf("Recipient: %s......%v", r.SystemMonitorId.String()+"|"+r.ServiceName, r)
+		//log.Printf("Recipient: %s......%v", r.SystemMonitorId.String()+"|"+r.ServiceName, r)
 
 		// Append the recipient to the Users slice
 		recipients.Users = append(recipients.Users, r)
@@ -82,9 +88,11 @@ func FetchUsersAndGroupsByServiceNames(ctx context.Context, db *sql.DB, systemMo
 		recipientMap[r.SystemMonitorId.String()+"|"+r.ServiceName] = recipients
 	}
 
-	log.Printf("Recipients: %v", recipientMap)
-
 	return recipientMap, nil
+}
+
+func FetchReportRecipients(db *sql.DB) (map[string]NotificationRecipients, error) {
+	return make(map[string]NotificationRecipients), nil
 }
 
 // GroupRecipientsByPlatform Helper function to group recipients by notification platform
