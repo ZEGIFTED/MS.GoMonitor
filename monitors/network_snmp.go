@@ -1,6 +1,8 @@
 package monitors
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net"
@@ -10,7 +12,7 @@ import (
 	"github.com/gosnmp/gosnmp"
 )
 
-func (service *SNMPServiceChecker) Check(config ServiceMonitorData) (ServiceMonitorStatus, bool) {
+func (service *SNMPServiceChecker) Check(config ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
 	host := config.Host
 	port := config.Port
 
@@ -107,10 +109,11 @@ func (service *SNMPServiceChecker) Check(config ServiceMonitorData) (ServiceMoni
 	snmp := &gosnmp.GoSNMP{
 		Target:    host, // Replace with your device's IP
 		Port:      121,
-		Community: community,
-		Version:   gosnmp.Version2c,
-		Timeout:   time.Duration(10) * time.Second,
-		Retries:   constants.MaxRetries,
+		Community: "n3tadmin",
+		// Community: community,
+		Version: gosnmp.Version2c,
+		Timeout: time.Duration(10) * time.Second,
+		Retries: constants.MaxRetries,
 	}
 
 	// Connect to the device

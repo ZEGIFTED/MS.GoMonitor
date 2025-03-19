@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ZEGIFTED/MS.GoMonitor/internal"
+	"github.com/ZEGIFTED/MS.GoMonitor/notifier"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 	"github.com/google/uuid"
@@ -18,10 +19,8 @@ import (
 
 func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
 	log.Println("Fetching Services...")
-	query := `EXEC ServiceReport @SERVICE_LEVEL = 'MONITOR', @VP = 1;`
 
-	//rows, err := sm.db.Query(query)
-	rows, err := sm.Db.QueryContext(sm.Ctx, query)
+	rows, err := sm.Db.QueryContext(sm.Ctx, "EXEC ServiceReport @SERVICE_LEVEL = 'MONITOR', @VP = 1;")
 	if err != nil {
 		return fmt.Errorf("error querying services: %v", err)
 	}
@@ -260,15 +259,24 @@ func (sm *ServiceMonitor) handleServiceFailure(service ServiceMonitorData, curre
 	}() {
 		log.Println(serviceAlertIdentifier, currentStatus.FailureCount > constants.FailureThresholdCount, service.IsAcknowledged)
 		if currentStatus.FailureCount > constants.FailureThresholdCount && !service.IsAcknowledged {
-			sm.Alerts <- internal.ServiceAlertEvent{
-				SystemMonitorId: service.SystemMonitorId,
-				ServiceName:     service.Name,
-				Message:         fmt.Sprintf("%s is down: %s", service.Name, message.Status),
-				Severity:        "critical",
-				Timestamp:       time.Now(),
-				AgentRepository: service.AgentRepository,
-				AgentAPI:        service.AgentAPIBaseURL,
+			// sm.Alerts <- internal.ServiceAlertEvent{
+			// 	SystemMonitorId: service.SystemMonitorId,
+			// 	ServiceName:     service.Name,
+			// 	Message:         fmt.Sprintf("%s is down: %s", service.Name, message.Status),
+			// 	Severity:        "critical",
+			// 	Timestamp:       time.Now(),
+			// 	AgentRepository: service.AgentRepository,
+			// 	AgentAPI:        service.AgentAPIBaseURL,
+			// }
+
+			serviceAlertMessage := notifier.NotiferEvent{
+				Title:      fmt.Sprintf("%s is down", service.Name),
+				Identifier: serviceAlertIdentifier,
+				Message:    message.Status,
+				Timestamp:  time.Now().Format(time.RFC3339),
 			}
+
+			notifier.SendNotification(serviceAlertMessage)
 
 			log.Printf("Added Failed Service to Alert Channel: %s", serviceAlertIdentifier)
 			return
@@ -375,12 +383,6 @@ func (sm *ServiceMonitor) GetUnprocessedAlertsCount() int {
 // AlertHandler checks if an alert should be sent (rate-limiting) and sends them.
 func (sm *ServiceMonitor) AlertHandler() {
 	go func() {
-		//rec := make([]string, len(sm.Alerts))
-
-		//case i, recipient := <-sm.Alerts {
-		//	emailAddresses[i] = recipient.ServiceName
-		//}
-
 		for {
 			select {
 
@@ -414,13 +416,32 @@ func (sm *ServiceMonitor) AlertHandler() {
 					continue
 				}
 
-				// agentStats, aErr := alert.AgentRepository.ValidateAgentURL(alert.AgentAPI, "/api/v1/agent/resource-usage?limit=5")
+				currentStatus, ok := sm.StatusTracking.Load(alert.ServiceName)
 
-				// if aErr != nil {
-				// 	log.Println(aErr.Error())
-				// }
+				if !ok {
+					log.Println(err)
+				}
 
-				// alert.AgentRepository.GetAgentServiceStats(agentStats)
+				if currentStatus != nil {
+					fmt.Println("currentStatus in Alert", currentStatus)
+				}
+
+				if alert.Device != "Network" && alert.Device != "Database" {
+					agentStatsEndpoint, aErr := alert.AgentRepository.ValidateAgentURL(alert.AgentAPI, "/api/v1/agent/resource-usage?limit=5")
+
+					if aErr != nil {
+						log.Println(aErr.Error())
+					}
+
+					stats, statsErr := alert.AgentRepository.GetAgentServiceStats(agentStatsEndpoint)
+
+					if statsErr != nil {
+						log.Println(statsErr.Error())
+					}
+
+					log.Println(stats)
+					alert.ServiceStats = stats
+				}
 
 				// Send the notification asynchronously
 				go func(alert internal.ServiceAlertEvent, recipients internal.NotificationRecipients) {
@@ -445,6 +466,7 @@ func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.Service
 	var recipientsGroup = internal.GroupRecipientsByPlatform(recipients.Users)
 
 	var wg sync.WaitGroup
+	var formattedEmails []string
 	errChan := make(chan error, len(recipients.Users))
 
 	// Send notifications to users
@@ -457,9 +479,13 @@ func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.Service
 			switch platform {
 			case "Email":
 				if emailConfig.Enabled {
-					formattedEmail, err := sm.NotificationHandler.FormatEmailMessageToSend(event, r[0].UserName, r[0].GroupName, constants.ConsoleBaseURL, make(map[string]any))
-					if err != nil {
-						errChan <- err
+					for _, user := range r {
+						formattedEmail, err := sm.NotificationHandler.FormatEmailMessageToSend(event, user.UserName, user.GroupName, constants.ConsoleBaseURL, make(map[string]any))
+						if err != nil {
+							errChan <- err
+						}
+
+						formattedEmails = append(formattedEmails, formattedEmail)
 					}
 
 					emailAddresses := make([]string, len(r))
@@ -467,15 +493,16 @@ func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.Service
 						emailAddresses[i] = recipient.Email
 					}
 
-					if err := sm.NotificationHandler.SendEmail(emailAddresses, event.ServiceName+" Health Check", formattedEmail); err != nil {
+					if err := sm.NotificationHandler.SendEmail(emailAddresses, event.ServiceName+" Health Check", formattedEmails); err != nil {
 						log.Printf("failed to send email to %s: %v", emailAddresses, err)
 						errChan <- err
 					}
+
 				}
 			case "Slack":
 				if slackConfig.Enabled {
 					var slackClient = sm.NotificationHandler.SlackBotClient(slackConfig)
-					for _, user := range recipientsList {
+					for _, user := range r {
 						slackMessage := sm.NotificationHandler.FormatSlackMessageToSend(event, user.GroupName, "", constants.ConsoleBaseURL, make(map[string]string))
 
 						//"admin_x"

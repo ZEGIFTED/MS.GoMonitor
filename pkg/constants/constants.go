@@ -2,10 +2,11 @@ package constants
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 func init() {
@@ -46,9 +47,10 @@ var (
 	LogFileName        = LogPath + "ms-svc_monitor.log"
 	DatabaseConnString = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s;", DB.Host, DB.User, DB.Password, DB.Port, DB.Name)
 	SMTPHost           = GetEnvWithDefault("MAIL_HOST", "localhost")
-	SMTPPort           = GetEnvWithDefault("MAIL_PORT", "")
-	SMTPUser           = GetEnvWithDefault("MAIL_USER", "")
+	SMTPPort           = GetEnvWithDefault("MAIL_PORT", "25")
+	SMTPUser           = GetEnvWithDefault("MAIL_USER", "test-notification@nibss-plc.com.ng")
 	SMTPPass           = GetEnvWithDefault("MAIL_PASS", "password123$_")
+	STMP_ADMIN_MAIL    = GetEnvWithDefault("STMP_ADMIN_MAIL", "test-notification@nibss-plc.com.ng")
 )
 
 const (

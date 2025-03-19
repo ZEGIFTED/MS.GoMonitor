@@ -165,7 +165,8 @@ func (cfgManager *NotificationManager) FormatEmailMessageToSend(event internal.S
 			RecipientGroup: groupName,
 		},
 
-		Items: []string{"loop test 1", "loop test 2"},
+		ProcessTableData: event.ServiceStats,
+		// Items: []string{"loop test 1", "loop test 2"},
 		// "AlertLevel":  WarningAlertLevel,
 		Content:     event.Message,
 		ActionURL:   actionURL,
@@ -175,7 +176,7 @@ func (cfgManager *NotificationManager) FormatEmailMessageToSend(event internal.S
 			UseSVG: false,
 
 			// Only used if UseSVG is false
-			ImageURL: "/pkg/public/nibsslogo.png",
+			ImageURL: "https://www.nairaland.com/attachments/16335515_nibss_webp_webpdaf3da7d372b13f0ba3978a66d93f798",
 
 			// SVG customization options
 			Text:           "MS",
@@ -207,7 +208,7 @@ func (cfgManager *NotificationManager) FormatEmailMessageToSend(event internal.S
 }
 
 // SendEmail Notification Method
-func (cfgManager *NotificationManager) SendEmail(to []string, subject string, body string) error {
+func (cfgManager *NotificationManager) SendEmail(to []string, subject string, emailBodies []string) error {
 	emailConfig := cfgManager.GetEmailConfig()
 	//cfgManager.Logger.Println("Email config", emailConfig)
 
@@ -255,7 +256,11 @@ func (cfgManager *NotificationManager) SendEmail(to []string, subject string, bo
 	m.SetHeader("From", senderMailAddr)
 	m.SetHeader("To", to...)
 	m.SetHeader("Subject", subject)
-	m.SetBody("text/html", body)
+
+	for _, body := range emailBodies {
+		m.SetBody("text/html", body)
+	}
+
 	// m.AddAlternative("text/plain", body)
 
 	if err := d.DialAndSend(m); err != nil {
@@ -270,7 +275,6 @@ func (cfgManager *NotificationManager) SendEmail(to []string, subject string, bo
 // SendReportEmail Notification Method
 func (cfgManager *NotificationManager) SendReportEmail(to []string, pdfAttachmentFilePath string, csvAttachmentFilePath string) {
 	emailConfig := cfgManager.GetEmailConfig()
-	cfgManager.Logger.Println("Email config", emailConfig)
 
 	// Use values from cfgManager if they are not empty, otherwise fall back to constants
 	smtpHost := emailConfig.SMTPServer
@@ -300,7 +304,7 @@ func (cfgManager *NotificationManager) SendReportEmail(to []string, pdfAttachmen
 
 	senderMailAddr := emailConfig.FromAddress
 	if senderMailAddr == "" {
-		senderMailAddr = ""
+		senderMailAddr = constants.STMP_ADMIN_MAIL
 	}
 
 	if smtpHost == "" || smtpPort == 0 || smtpUser == "" || smtpPass == "" || senderMailAddr == "" || len(to) < 1 {
@@ -313,8 +317,10 @@ func (cfgManager *NotificationManager) SendReportEmail(to []string, pdfAttachmen
 	subject := "Hourly IT Infrastructure Report"
 	body := "Please find the attached IT infrastructure report for the last hour. If you're receiving this notification, either you or a group you're part has been profiled for this notification.\n\nBest regards,\nIT Monitoring System"
 
+	log.Println("Report Paths >>>", pdfAttachmentFilePath, csvAttachmentFilePath)
+
 	m := mail.NewMessage()
-	m.SetHeader("From", constants.SMTPUser)
+	m.SetHeader("From", senderMailAddr)
 	m.SetHeader("To", to...)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", body)
@@ -326,9 +332,6 @@ func (cfgManager *NotificationManager) SendReportEmail(to []string, pdfAttachmen
 	}
 
 	log.Println("📧Email Report sent successfully with the report attached.")
-
-	//strings.EqualFold(smtpServer, "smtp.gmail.com")
-
 }
 
 // SlackBotClient creates a new SlackClient instance

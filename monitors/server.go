@@ -84,7 +84,7 @@ func (service *ServerHealthChecker) Check(server ServiceMonitorData, ctx context
 		}
 
 		// Placeholder for metric processing
-		slog.Info("Processing metrics for agent %s", "AgentId", agentID)
+		slog.Info("Processing metrics", "AgentId", agentID)
 		service.MetricEngine(agentThresholds, metrics)
 	}
 
@@ -99,7 +99,7 @@ func (service *ServerHealthChecker) Check(server ServiceMonitorData, ctx context
 }
 
 // MetricEngine Aggregates all metric sources by AppId and AgentId
-func (service *ServerHealthChecker) MetricEngine(agentThresholds internal.AgentThresholds, metrics []Metric) {
+func (service *ServerHealthChecker) MetricEngine(agentThresholds internal.AgentThresholdResponse, metrics []Metric) {
 	var cpuTSdata []TimeSeriesData
 	for _, metric := range metrics {
 		cpuTSdata = append(cpuTSdata, TimeSeriesData{

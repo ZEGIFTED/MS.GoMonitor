@@ -29,6 +29,7 @@ func GenerateReport(db *sql.DB) (string, string) {
 		log.Println("Error fetching metrics report", err)
 	}
 
+	log.Println(metrics)
 	if len(metrics) > 0 {
 		// Generate PDF
 		var filePath = GeneratePDF(metrics, tableHeaders)

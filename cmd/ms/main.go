@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 
 	// "log/slog"
 	"os"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/ZEGIFTED/MS.GoMonitor/internal"
 	"github.com/ZEGIFTED/MS.GoMonitor/monitors"
+	"github.com/ZEGIFTED/MS.GoMonitor/notifier"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/messaging"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
@@ -97,7 +99,7 @@ func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 	// Register service type checkers
 	monitor.Checkers[monitors.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
 	monitor.Checkers[monitors.ServiceMonitorWebModules] = &monitors.WebModulesServiceChecker{}
-	//monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
+	monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
 
 	monitor.Checkers[monitors.ServiceMonitorServer] = &monitors.ServerHealthChecker{}
 
@@ -126,14 +128,26 @@ func main() {
 		}
 	}(db)
 
-	// Test the connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	// Test the connection
 	err = db.PingContext(ctx)
 	if err != nil {
 		log.Fatalf("Error connecting to the database: %v", err)
 	}
+
+	go func() {
+		http.HandleFunc("/ws/notifer", notifier.ServeNotifierWs)
+		log.Println("WebSocket server running on :2345")
+		err := http.ListenAndServe(":2345", nil)
+		if err != nil {
+			log.Fatal("WebSocket server error:", err)
+		}
+	}()
+
+	go notifier.Hub_.Run()
+	// go notifier.SendNotifications()
 
 	// Start the report generation in a goroutine
 	go func() {
@@ -153,12 +167,17 @@ func main() {
 						log.Println("Error fetching report recipients:", err)
 					}
 
-					fmt.Println(sendTo)
+					fmt.Println("Report Receipents >>>", sendTo, pdfFilePath, csvFilePath)
 
 					sendTo_ := []string{"calebb.jnr@gmail.com", "cboluwade@nibss-plc.com.ng"}
-					nCm.SendReportEmail(sendTo_, pdfFilePath, csvFilePath)
+
+					if pdfFilePath != "" && csvFilePath != "" {
+						nCm.SendReportEmail(sendTo_, pdfFilePath, csvFilePath)
+					} else {
+						log.Println("Skipping Reports")
+					}
 				} else {
-					fmt.Println("No notification configuration manager found", nCm)
+					log.Println("No notification configuration manager found", nCm)
 				}
 			case <-shutdown:
 				return
@@ -206,7 +225,7 @@ func main() {
 
 	// Implement graceful shutdown
 	// Give some time for ongoing checks to complete
-	ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
+	_, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	// Keep the program running

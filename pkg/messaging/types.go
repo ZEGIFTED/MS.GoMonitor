@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/ZEGIFTED/MS.GoMonitor/internal"
 	"github.com/slack-go/slack"
 )
 
@@ -80,9 +81,10 @@ type EmailTemplateData struct {
 	ActionURL           string
 	DashboardMonitorURL string
 
-	Items       []string
-	TableData   [][]string
-	ExtraFields map[string]interface{}
+	Items            []string
+	TableData        [][]string
+	ProcessTableData internal.ProcessResponse
+	ExtraFields      map[string]interface{}
 
 	Logo Logo
 	Meta MetaData

@@ -39,13 +39,14 @@
         padding: 15px 20px;
         margin-bottom: 20px;
         border-radius: 5px;
-        display: flex;
+        /* display: flex;
         align-items: center;
-        flex-wrap: wrap;
+        flex-wrap: wrap; */
         /* justify-content: space-between; */
       }
       .dashboard {
-        flex-grow: 1;
+        /* flex-grow: 1; */
+        gap: 5;
       }
       .dashboard h1 {
         margin: 0;
@@ -177,7 +178,10 @@
     <div class="container">
       <div class="content-section user-info">
         <h2>Hi There, {{.User.Name}}!</h2>
-        <p>You are receiving this notification because you belong to {{ .User.RecipientGroup }}.</p>
+        <p>
+          You are receiving this notification because you belong to {{
+          .User.RecipientGroup }}.
+        </p>
       </div>
 
       <header>
@@ -228,6 +232,8 @@
           <p>{{ .Content }}</p>
         </div>
 
+        <br />
+
         <div class="nav-links">
           <a href="{{ .ActionURL }}" target="_blank" rel="noopener noreferrer"
             >View More Details</a
@@ -253,23 +259,31 @@
 
       <!-- Table Data -->
 
-      {{if .TableData}}
+      {{if .ProcessTableData}}
       <div class="content-section">
         <h2>Data Overview</h2>
         <table>
           <thead>
             <tr>
-              {{range .TableHeaders}}
-              <th>{{ . }}</th>
-              {{end}}
+              <th>PID</th>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Status</th>
+              <th>CPU Percent</th>
+              <th>Memory Percent</th>
+              <th>Create Time</th>
             </tr>
           </thead>
           <tbody>
-            {{range .TableData}}
+            {{range .ProcessTableData}}
             <tr>
-              {{range .}}
-              <td>{{ . }}</td>
-              {{end}}
+              <td>{{ .PID }}</td>
+              <td>{{ .Name }}</td>
+              <td>{{ .Username }}</td>
+              <td>{{ .Status }}</td>
+              <td>{{ .CPUPercent }}</td>
+              <td>{{ .MemoryPercent }}</td>
+              <td>{{ .CreateTime }}</td>
             </tr>
             {{end}}
           </tbody>
@@ -312,8 +326,8 @@
         </div>
 
         <p>
-          This is an automated message. Please do not reply, If you wish to stop receiving such
-          notifications, contact Admin.
+          This is an automated message. Please do not reply, If you wish to stop
+          receiving such notifications, contact Admin.
         </p>
         <p>
           If you have any questions or concerns, please reach out to our support

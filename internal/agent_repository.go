@@ -16,9 +16,6 @@ import (
 type AgentRepository struct {
 }
 
-// AgentThresholds returns Agent Threshold Information
-type AgentThresholds struct{}
-
 func (a *AgentRepository) ValidateAgentURL(AgentAPIBaseURL, endpoint string) (string, error) {
 	// Parse the AgentAPIBaseURL
 	parsedURL, err := url.Parse(AgentAPIBaseURL)
@@ -45,9 +42,9 @@ func (a *AgentRepository) ValidateAgentURL(AgentAPIBaseURL, endpoint string) (st
 	//return agentAddress, nil
 }
 
-func (a *AgentRepository) GetAgentThresholds(agentURL string) (AgentThresholds, error) {
+func (a *AgentRepository) GetAgentThresholds(agentURL string) (AgentThresholdResponse, error) {
 	if agentURL == "" {
-		return AgentThresholds{}, fmt.Errorf("invalid agent Base URL")
+		return AgentThresholdResponse{}, fmt.Errorf("invalid agent Base URL")
 	}
 
 	// Create a custom HTTP client with disabled SSL verification
@@ -61,7 +58,7 @@ func (a *AgentRepository) GetAgentThresholds(agentURL string) (AgentThresholds, 
 	resp, err := httpClient.Get(agentURL)
 
 	if err != nil {
-		return AgentThresholds{}, err
+		return AgentThresholdResponse{}, err
 	}
 
 	defer func(Body io.ReadCloser) {
@@ -74,15 +71,17 @@ func (a *AgentRepository) GetAgentThresholds(agentURL string) (AgentThresholds, 
 	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		return AgentThresholds{}, err
+		return AgentThresholdResponse{}, err
 	}
 
 	var apiResponse AgentThresholdResponse
-	err = json.Unmarshal(body, &apiResponse)
+	if err_ := json.Unmarshal(body, &apiResponse); err_ != nil {
+		return AgentThresholdResponse{}, err
+	}
 
-	log.Println("Agent Threshold API response", apiResponse, err)
+	log.Println("Agent Threshold API response", apiResponse)
 
-	return AgentThresholds{}, nil
+	return apiResponse, nil
 }
 
 func ServerResourceDetails(baseURL string, limit int) ([]ProcessResourceUsage, error) {
@@ -109,20 +108,20 @@ func ServerResourceDetails(baseURL string, limit int) ([]ProcessResourceUsage, e
 	return processes, nil
 }
 
-func (a *AgentRepository) GetAgentServiceStats(agentURL string) ([]ProcessResourceUsage, error) {
+func (a *AgentRepository) GetAgentServiceStats(agentURL string) (ProcessResponse, error) {
 	if agentURL == "" {
-		return []ProcessResourceUsage{}, fmt.Errorf("invalid agent Base URL")
+		return nil, fmt.Errorf("invalid agent Base URL")
 	}
 
 	// Create a custom HTTP client with disabled SSL verification
-	httpClient := &http.Client{
-		Timeout: constants.HTTPRequestTimeout,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
-
-	resp, err := httpClient.Get(agentURL)
+	// httpClient := &http.Client{
+	// 	Timeout: constants.HTTPRequestTimeout,
+	// 	Transport: &http.Transport{
+	// 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	// 	},
+	// }
+	log.Println("Retrieving Device Processes")
+	resp, err := http.Get(agentURL)
 
 	if err != nil {
 		return nil, err
@@ -136,8 +135,9 @@ func (a *AgentRepository) GetAgentServiceStats(agentURL string) ([]ProcessResour
 	}
 
 	// Parse JSON response.
-	var processes []ProcessResourceUsage
-	if err := json.Unmarshal(body, &processes); err != nil {
+	var processes ProcessResponse
+	if err := json.Unmarshal([]byte(body), &processes); err != nil {
+		log.Println("Error unmarshalling JSON:", err)
 		return nil, err
 	}
 

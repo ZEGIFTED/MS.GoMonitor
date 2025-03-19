@@ -71,7 +71,7 @@ func (cfgManager *NotificationManager) LoadConfig() error {
 }
 
 // validate checks if the loaded configuration is valid
-func (cfgManager *NotificationManager) validate() error {
+func (cfgManager *NotificationManager) Validate() error {
 	// Validate Email configuration if enabled
 	if cfgManager.Config.Email.Enabled {
 		if cfgManager.Config.Email.SMTPServer == "" || cfgManager.Config.Email.SMTPPort == 0 {
