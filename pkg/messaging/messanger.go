@@ -2,6 +2,8 @@ package messaging
 
 import (
 	"bytes"
+	"log/slog"
+
 	//"embed"
 	"html/template"
 
@@ -186,7 +188,7 @@ func (cfgManager *NotificationManager) FormatEmailMessageToSend(event internal.S
 		Meta: MetaData{
 			Timestamp:    event.Timestamp.Format("2006-01-02 15:04:05"),
 			Year:         time.Now().Year(),
-			CompanyName:  "NIBSS Corp",
+			CompanyName:  constants.OrganizationName,
 			SupportEmail: "calebb.jnr@gmail.com",
 			SupportPhone: "080X-XXX-XXXX",
 			FooterLinks: []Link{
@@ -315,9 +317,7 @@ func (cfgManager *NotificationManager) SendReportEmail(to []string, pdfAttachmen
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	subject := "Hourly IT Infrastructure Report"
-	body := "Please find the attached IT infrastructure report for the last hour. If you're receiving this notification, either you or a group you're part has been profiled for this notification.\n\nBest regards,\nIT Monitoring System"
-
-	log.Println("Report Paths >>>", pdfAttachmentFilePath, csvAttachmentFilePath)
+	body := "Please find the attached IT infrastructure report for the last hour. If you're receiving this notification, either you or a group you're part has been profiled for this notification.\n\nBest regards,\nMS Monitoring System"
 
 	m := mail.NewMessage()
 	m.SetHeader("From", senderMailAddr)
@@ -328,7 +328,7 @@ func (cfgManager *NotificationManager) SendReportEmail(to []string, pdfAttachmen
 	m.Attach(csvAttachmentFilePath)
 
 	if err := d.DialAndSend(m); err != nil {
-		log.Fatalf("Failed to send email: %s", err.Error())
+		slog.Error("Failed to send email.", "Error", err.Error())
 	}
 
 	log.Println("📧Email Report sent successfully with the report attached.")

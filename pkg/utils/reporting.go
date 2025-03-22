@@ -29,7 +29,6 @@ func GenerateReport(db *sql.DB) (string, string) {
 		log.Println("Error fetching metrics report", err)
 	}
 
-	log.Println(metrics)
 	if len(metrics) > 0 {
 		// Generate PDF
 		var filePath = GeneratePDF(metrics, tableHeaders)
@@ -248,12 +247,13 @@ func UsageBar(pdf *gofpdf.Fpdf, x, y, percentage float64) {
 //}
 
 func MetricsTable(pdf *gofpdf.Fpdf, metrics []internal.Metric, tableHeaders []string) {
+	pdf.SetY(50)
 	// Define column widths for each column.
 	//colWidths := []float64{30, 50, 20, 40, 30, 30, 30}
 	colWidths := []float64{30, 50, 30, 30, 50, 40, 20}
 
 	// Set header font.
-	pdf.SetFont("Arial", "B", 10)
+	pdf.SetFont("Arial", "B", 12)
 	// Table header.
 	for i, header := range tableHeaders {
 		pdf.CellFormat(colWidths[i], 7, header, "1", 0, "C", false, 0, "")
@@ -302,15 +302,15 @@ func MetricsTable(pdf *gofpdf.Fpdf, metrics []internal.Metric, tableHeaders []st
 			pdf.SetFont("Arial", "", 12)
 			pdf.Cell(190, 10, "Failed to fetch process details.")
 		} else {
-			ProcessTable(pdf, processes)
+			ProcessTable(pdf, processes, mx.AgentHostName)
 		}
 	}
 
-	pdf.SetFooterFunc(func() {
-		pdf.SetY(-10)
-		pdf.SetFont("Arial", "", 7)
-		pdf.CellFormat(0, 10, fmt.Sprintf("All Rights Reserved. Company Name. Page %d", pdf.PageNo()), "0", 0, "C", false, 0, "")
-	})
+	// pdf.SetFooterFunc(func() {
+	// 	pdf.SetY(-10)
+	// 	pdf.SetFont("Arial", "", 7)
+	// 	pdf.CellFormat(0, 10, fmt.Sprintf("All Rights Reserved. %s. Page %d", constants.OrganizationName, pdf.PageNo()), "0", 0, "C", false, 0, "")
+	// })
 }
 
 func NetworkMetricsTable(pdf *gofpdf.Fpdf, metrics []internal.Metric, tableHeaders []string) {
@@ -368,9 +368,12 @@ func WrappedTextCell(pdf *gofpdf.Fpdf, width float64, height float64, text strin
 }
 
 // ProcessTable adds a table to the PDF for a given server's process list.
-func ProcessTable(pdf *gofpdf.Fpdf, processes []internal.ProcessResourceUsage) {
+func ProcessTable(pdf *gofpdf.Fpdf, processes []internal.ProcessResourceUsage, server string) {
 	// Define column widths for each column.
 	colWidths := []float64{20, 80, 20, 40, 30, 20, 20}
+
+	pdf.Cell(pdf.GetY(), 8, fmt.Sprintf("Current Process Utilization for %s", server))
+
 	// Table header.
 	headers := []string{"PID", "Process Name", "Status", "Create Time", "Username", "CPU %", "Memory %"}
 
@@ -447,9 +450,6 @@ func GenerateCSV(metrics []internal.Metric, tableHeaders []string) string {
 			log.Panic(err_)
 		}
 	}
-
-	fmt.Printf("Writing CSV Report to %s", filePath)
-
 	log.Printf("Writing CSV Report to %s", filePath)
 
 	return filePath
@@ -527,9 +527,7 @@ func GeneratePDF(metrics []internal.Metric, headers []string) string {
 		pdf.CellFormat(boxWidth, boxHeight/2, fmt.Sprintf("%d", count.Count), "0", 0, "C", false, 0, "")
 	}
 
-	//pdf.AddPage()
 	// Table section
-	pdf.SetY(60)
 	MetricsTable(pdf, metrics, headers)
 
 	// Network Devices Section
@@ -544,14 +542,14 @@ func GeneratePDF(metrics []internal.Metric, headers []string) string {
 	NetworkMetricsTable(pdf, metrics, netHeaders)
 
 	// Chart section on new page
-	pdf.SetY(30)
-	ChartSection(pdf, metrics)
+	// pdf.SetY(30)
+	// ChartSection(pdf, metrics)
 
 	// Add footer
 	pdf.SetFooterFunc(func() {
 		pdf.SetY(-10)
 		pdf.SetFont("Arial", "", 7)
-		pdf.CellFormat(0, 10, fmt.Sprintf("All Rights Reserved. Company Name. Page %d", pdf.PageNo()), "0", 0, "C", false, 0, "")
+		pdf.CellFormat(0, 10, fmt.Sprintf("All Rights Reserved. %s. Page %d", constants.OrganizationName, pdf.PageNo()), "0", 0, "C", false, 0, "")
 	})
 
 	// Sanitize filename to avoid issues with colons or other special characters

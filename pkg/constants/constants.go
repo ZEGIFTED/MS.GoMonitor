@@ -61,6 +61,7 @@ const (
 	HTTPRequestTimeout = time.Duration(30) * time.Second
 	ReportsDir         = "reports"
 	ConsoleBaseURL     = "http://172.20.10.12:56865/console/"
+	OrganizationName   = "NIBSS MS"
 )
 
 var (

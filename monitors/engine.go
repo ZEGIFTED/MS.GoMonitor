@@ -257,7 +257,7 @@ func (sm *ServiceMonitor) handleServiceFailure(service ServiceMonitorData, curre
 		lastAlertTime, valid := lastAlert.(time.Time)
 		return valid && time.Since(lastAlertTime) < constants.AlertThrottleTime // Prevent alert spam within 10-min window
 	}() {
-		log.Println(serviceAlertIdentifier, currentStatus.FailureCount > constants.FailureThresholdCount, service.IsAcknowledged)
+		log.Println(serviceAlertIdentifier, currentStatus.FailureCount, constants.FailureThresholdCount, service.IsAcknowledged)
 		if currentStatus.FailureCount > constants.FailureThresholdCount && !service.IsAcknowledged {
 			// sm.Alerts <- internal.ServiceAlertEvent{
 			// 	SystemMonitorId: service.SystemMonitorId,

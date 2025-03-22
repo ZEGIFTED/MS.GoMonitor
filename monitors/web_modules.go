@@ -5,9 +5,10 @@ import (
 	"crypto/tls"
 	"database/sql"
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"net/http"
 	"time"
+
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 )
 
 func (service *WebModulesServiceChecker) Check(config ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
@@ -50,7 +51,7 @@ func (service *WebModulesServiceChecker) Check(config ServiceMonitorData, _ cont
 			Name:          config.Name,
 			Device:        config.Device,
 			LiveCheckFlag: constants.Degraded,
-			Status:        "Agent Status Unknown " + err.Error(),
+			Status:        err.Error(),
 			LastCheckTime: time.Now(),
 			FailureCount:  1,
 		}, false

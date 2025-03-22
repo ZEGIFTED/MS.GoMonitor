@@ -68,6 +68,8 @@ func NotificationConfigurationManager(db *sql.DB) *messaging.NotificationManager
 		return nil
 	}
 
+	configManager.Validate()
+
 	return &configManager
 }
 
@@ -99,7 +101,7 @@ func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 	// Register service type checkers
 	monitor.Checkers[monitors.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
 	monitor.Checkers[monitors.ServiceMonitorWebModules] = &monitors.WebModulesServiceChecker{}
-	monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
+	// monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
 
 	monitor.Checkers[monitors.ServiceMonitorServer] = &monitors.ServerHealthChecker{}
 
@@ -139,7 +141,7 @@ func main() {
 
 	go func() {
 		http.HandleFunc("/ws/notifer", notifier.ServeNotifierWs)
-		log.Println("WebSocket server running on :2345")
+		log.Println("Notifer server running on :2345")
 		err := http.ListenAndServe(":2345", nil)
 		if err != nil {
 			log.Fatal("WebSocket server error:", err)
@@ -151,7 +153,7 @@ func main() {
 
 	// Start the report generation in a goroutine
 	go func() {
-		ticker := time.NewTicker(10 * time.Minute)
+		ticker := time.NewTicker(7 * time.Minute)
 		defer ticker.Stop()
 
 		for {
@@ -167,7 +169,7 @@ func main() {
 						log.Println("Error fetching report recipients:", err)
 					}
 
-					fmt.Println("Report Receipents >>>", sendTo, pdfFilePath, csvFilePath)
+					fmt.Println("Report Receipents >>>", sendTo)
 
 					sendTo_ := []string{"calebb.jnr@gmail.com", "cboluwade@nibss-plc.com.ng"}
 

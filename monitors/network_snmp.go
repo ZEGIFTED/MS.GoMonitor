@@ -16,14 +16,14 @@ func (service *SNMPServiceChecker) Check(config ServiceMonitorData, _ context.Co
 	host := config.Host
 	port := config.Port
 
-	if host == "" {
+	if host == "" && port == 0 {
 		return ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
 			LiveCheckFlag: constants.Degraded,
 			Status:        "Invalid SNMP configuration",
 			LastCheckTime: time.Now(),
-			FailureCount:  0,
+			FailureCount:  1,
 		}, false
 	}
 
@@ -108,7 +108,7 @@ func (service *SNMPServiceChecker) Check(config ServiceMonitorData, _ context.Co
 	// Configure SNMP connection
 	snmp := &gosnmp.GoSNMP{
 		Target:    host, // Replace with your device's IP
-		Port:      121,
+		Port:      161,
 		Community: "n3tadmin",
 		// Community: community,
 		Version: gosnmp.Version2c,
@@ -123,10 +123,9 @@ func (service *SNMPServiceChecker) Check(config ServiceMonitorData, _ context.Co
 			Name:          config.Name,
 			Device:        config.Device,
 			LiveCheckFlag: constants.Escalation,
-			Status:        "Error getting SNMP interfaces " + err.Error(),
+			Status:        "Error Connecting to Network Device SNMP " + err.Error(),
 			LastCheckTime: time.Now(),
 			FailureCount:  1,
-			//LastErrorLog:  fmt.Sprintf("Error connecting to device: %v", err),
 		}, false
 	}
 
@@ -164,25 +163,25 @@ func (service *SNMPServiceChecker) Check(config ServiceMonitorData, _ context.Co
 		}
 	}
 
-	// Get interface information
-	interfaces, err := getInterfaces(snmp)
-	if err != nil {
-		return ServiceMonitorStatus{
-			Name:          config.Name,
-			Device:        config.Device,
-			LiveCheckFlag: constants.Escalation,
-			//Status:        "Error getting SNMP interfaces",
-			Status:        "Error getting SNMP interfaces " + err.Error(),
-			LastCheckTime: time.Now(),
-			FailureCount:  1,
-		}, false
-	}
+	// // Get interface information
+	// interfaces, err := getInterfaces(snmp)
+	// if err != nil {
+	// 	return ServiceMonitorStatus{
+	// 		Name:          config.Name,
+	// 		Device:        config.Device,
+	// 		LiveCheckFlag: constants.Escalation,
+	// 		//Status:        "Error getting SNMP interfaces",
+	// 		Status:        "Error getting SNMP interfaces " + err.Error(),
+	// 		LastCheckTime: time.Now(),
+	// 		FailureCount:  1,
+	// 	}, false
+	// }
 
-	fmt.Println("\nInterface Information:")
-	fmt.Println("----------------------------------------")
-	for _, iface := range interfaces {
-		fmt.Printf("Interface: %s\n", iface)
-	}
+	// fmt.Println("\nInterface Information:")
+	// fmt.Println("----------------------------------------")
+	// for _, iface := range interfaces {
+	// 	fmt.Printf("Interface: %s\n", iface)
+	// }
 
 	return ServiceMonitorStatus{
 		Name:              config.Name,

@@ -60,7 +60,7 @@ func FetchMetricsReport(db *sql.DB) ([]Metric, []string, error) {
 		headers = append(headers, cols...)
 
 		for _, h := range headers {
-			if h != "AgentAPIBaseURL" {
+			if h != "AgentAPIBaseURL" && h != "AgentAPI" {
 				tableHeaders = append(tableHeaders, h)
 			}
 		}

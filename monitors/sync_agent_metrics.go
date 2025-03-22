@@ -4,11 +4,12 @@ import (
 	"crypto/tls"
 	"database/sql"
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
-	_ "github.com/microsoft/go-mssqldb"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	_ "github.com/microsoft/go-mssqldb"
 )
 
 func SyncMetrics(db *sql.DB, agentMetrics []AgentInfo, agentSyncURL string) error {
@@ -41,7 +42,7 @@ func SyncMetrics(db *sql.DB, agentMetrics []AgentInfo, agentSyncURL string) erro
 		ON target.AgentID = source.AgentID
 		WHEN MATCHED AND (target.AgentHostName <> source.AgentHostName OR target.AgentHostAddress <> source.AgentHostAddress OR target.OS <> source.OS OR 
 						  target.AgentVersion <> source.AgentVersion OR target.SDKVersion <> source.SDKVersion) THEN
-			UPDATE SET AgentHostName = source.AgentVersion, AgentHostAddress = source.AgentHostAddress, OS = source.OS, 
+			UPDATE SET AgentHostName = source.AgentHostName, AgentHostAddress = source.AgentHostAddress, OS = source.OS, 
 						AgentVersion = source.AgentVersion, SDKVersion = source.SDKVersion, LastSync = GETDATE()
 		WHEN NOT MATCHED THEN 
 			INSERT (AgentID, AgentHostName, AgentHostAddress, OS, AgentVersion, SDKVersion, LastSync) 

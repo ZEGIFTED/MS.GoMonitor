@@ -40,8 +40,6 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 		}, false
 	}
 
-	//agentAddress := fmt.Sprintf("%v://%s:%d", protocol, host, port)
-
 	client := &http.Client{
 		Timeout: constants.HTTPRequestTimeout,
 	}
@@ -74,10 +72,9 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 			Name:          agent.Name,
 			Device:        agent.Device,
 			LiveCheckFlag: constants.Escalation,
-			Status:        "Unable to Sync Agent Metrics",
+			Status:        "Unable to Sync Agent Metrics " + err.Error(),
 			LastCheckTime: time.Now(),
 			FailureCount:  1,
-			//LastErrorLog: fmt.Sprintf("Unable to read HTTP Content: %d. %s", resp.StatusCode, err.Error()),
 		}, false
 	}
 
