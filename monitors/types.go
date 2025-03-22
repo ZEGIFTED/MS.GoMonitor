@@ -3,12 +3,13 @@ package monitors
 import (
 	"context"
 	"database/sql"
+	"sync"
+	"time"
+
 	"github.com/ZEGIFTED/MS.GoMonitor/internal"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/messaging"
 	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
-	"sync"
-	"time"
 )
 
 type ServiceType string
@@ -16,13 +17,15 @@ type ServiceType string
 const (
 	ServiceMonitorAgent      ServiceType = "AGENT"
 	ServiceMonitorWebModules ServiceType = "Web Modules"
-	ServiceMonitorSNMP       ServiceType = "Network"
+	ServiceMonitorSNMP_V2    ServiceType = "NetworkV2"
+	ServiceMonitorSNMP_V3    ServiceType = "NetworkV3"
 	ServiceMonitorServer     ServiceType = "Server"
 )
 
 type AgentServiceChecker struct{}
 type WebModulesServiceChecker struct{}
-type SNMPServiceChecker struct{}
+type SNMPServiceCheckerV2 struct{}
+type SNMPServiceCheckerV3 struct{}
 type ServerHealthChecker struct{}
 
 type ServiceMonitorData struct {
@@ -137,7 +140,9 @@ type ServerResource struct {
 }
 
 // NetworkDevice represents the network device bandwidth utilization data
-type NetworkDevice struct {
+type NetworkDeviceMetric struct {
 	DeviceName           string
+	Uptime               string
+	Interfaces           string
 	BandwidthUtilization float64
 }
