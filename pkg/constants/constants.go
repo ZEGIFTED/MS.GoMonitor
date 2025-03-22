@@ -13,7 +13,7 @@ func init() {
 	// Load .env file
 	err := godotenv.Load()
 	if err != nil {
-		log.Printf("Warning: .env file not found. Using system environment variables")
+		log.Fatalf("Warning: Error loading Env file. %s", err.Error())
 	}
 }
 
@@ -23,6 +23,8 @@ func GetEnvWithDefault(key, defaultValue string) string {
 	if value == "" {
 		return defaultValue
 	}
+
+	log.Println(key, ">>>", value)
 	return value
 }
 
@@ -35,7 +37,7 @@ type DBConfig struct {
 }
 
 var DB = DBConfig{
-	Host:     GetEnvWithDefault("DB_HOST", "localhost"),
+	Host:     GetEnvWithDefault("DB_HOST", "172.20.10.3"),
 	Port:     GetEnvWithDefault("DB_PORT", "1433"),
 	Name:     GetEnvWithDefault("DB_NAME", "MS"),
 	User:     GetEnvWithDefault("DB_USER", "sa"),
@@ -50,7 +52,7 @@ var (
 	SMTPPort           = GetEnvWithDefault("MAIL_PORT", "25")
 	SMTPUser           = GetEnvWithDefault("MAIL_USER", "test-notification@nibss-plc.com.ng")
 	SMTPPass           = GetEnvWithDefault("MAIL_PASS", "password123$_")
-	STMP_ADMIN_MAIL    = GetEnvWithDefault("STMP_ADMIN_MAIL", "test-notification@nibss-plc.com.ng")
+	STMP_ADMIN_MAIL    = GetEnvWithDefault("STMPADMIN", "test-notification@nibss-plc.com.ng2")
 )
 
 const (

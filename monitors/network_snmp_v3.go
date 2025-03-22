@@ -6,17 +6,23 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/gosnmp/gosnmp"
 )
 
-func (service *SNMPServiceCheckerV2) Check(config ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
-	host := config.Host
-	port := config.Port
+func (service *SNMPServiceCheckerV3) Check(config ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
 
-	if host == "" && port == 0 {
+	// Define the SNMPv3 connection parameters
+	target := config.Host
+	port := 161
+	username := "msmonitoring"
+	authPassword := "CaMoniLeb" // Replace with your SNMPv3 authentication password
+	privPassword := "CaMoniLeb" // Replace with your SNMPv3 privacy password
+
+	if target == "" && port == 0 {
 		return ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
@@ -90,40 +96,35 @@ func (service *SNMPServiceCheckerV2) Check(config ServiceMonitorData, _ context.
 	//	".1.3.6.1.2.1.2.2.1.16", // ifOutOctets
 	//	".1.3.6.1.2.1.2.2.1.5",  // ifSpeed
 
-	CommunityString, ok := config.Configuration["communityString"]
-
-	fmt.Println(CommunityString)
-	if !ok || CommunityString == "" {
-		log.Println("communityString is missing in configuration... Using default")
-
-		CommunityString = "public"
-	}
-
-	community, ok := CommunityString.(string)
-	if !ok {
-		log.Println("communityString is not a string")
-	}
-
-	fmt.Println(host, port, community)
 	// Configure SNMP connection
 	snmp := &gosnmp.GoSNMP{
-		Target:    host, // Replace with your device's IP
-		Port:      161,
-		Community: "n3tadmin",
-		// Community: community,
-		Version: gosnmp.Version3,
-		Timeout: time.Duration(5) * time.Second,
+		Target:        target,
+		Port:          uint16(port),
+		Version:       gosnmp.Version3,
+		Timeout:       time.Duration(35) * time.Second,
+		SecurityModel: gosnmp.UserSecurityModel,
+		MsgFlags:      gosnmp.AuthPriv, // Use AuthPriv for both authentication and privacy
+		SecurityParameters: &gosnmp.UsmSecurityParameters{
+			UserName:                 username,
+			AuthenticationProtocol:   gosnmp.SHA, // Use SHA for authentication
+			AuthenticationPassphrase: authPassword,
+			PrivacyProtocol:          gosnmp.AES, // Use AES for privacy
+			PrivacyPassphrase:        privPassword,
+			AuthoritativeEngineTime:  uint32(time.Now().Unix()),
+		},
 		Retries: constants.MaxRetries,
+		Logger:  gosnmp.NewLogger(log.New(os.Stdout, "", 0)),
 	}
 
 	// Connect to the device
 	err := snmp.Connect()
 	if err != nil {
+		log.Println("SNMP Connection Error", err.Error())
 		return ServiceMonitorStatus{
 			Name:          config.Name,
 			Device:        config.Device,
 			LiveCheckFlag: constants.Escalation,
-			Status:        "Error Connecting to Network Device SNMP " + err.Error(),
+			Status:        "Network Device Connection Error " + err.Error(),
 			LastCheckTime: time.Now(),
 			FailureCount:  1,
 		}, false
@@ -137,8 +138,7 @@ func (service *SNMPServiceCheckerV2) Check(config ServiceMonitorData, _ context.
 	}(snmp.Conn)
 
 	// Get SNMP metrics
-	fmt.Printf("Device Information for %s:\n", config.Host)
-	fmt.Println("----------------------------------------")
+	fmt.Printf("Device Information for %s: ---------------- \n", config.Host)
 
 	for _, metric := range commonMetrics {
 		result, err := snmp.Get([]string{metric.OID})
@@ -163,7 +163,7 @@ func (service *SNMPServiceCheckerV2) Check(config ServiceMonitorData, _ context.
 		}
 	}
 
-	// // Get interface information
+	// Get interface information
 	// interfaces, err := getInterfaces(snmp)
 	// if err != nil {
 	// 	return ServiceMonitorStatus{
@@ -194,7 +194,7 @@ func (service *SNMPServiceCheckerV2) Check(config ServiceMonitorData, _ context.
 	}, true
 }
 
-func getInterfaces(snmp *gosnmp.GoSNMP) ([]string, error) {
+func getInterfacesV3(snmp *gosnmp.GoSNMP) ([]string, error) {
 	var interfaces []string
 
 	//err_ := snmp.Walk("1.3.6.1.2.1.2.2.1", func(variable gosnmp.SnmpPDU) error {

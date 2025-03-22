@@ -1,0 +1,978 @@
+MS-SVC_MONITOR: 2025/03/21 10:55:58 main.go:43: Warning: .env file not found. Using system environment variables. open .env: The system cannot find the file specified.
+MS-SVC_MONITOR: 2025/03/21 10:55:59 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 10:55:59 main.go:142: WebSocket server running on :2345
+MS-SVC_MONITOR: 2025/03/21 10:56:00 engine.go:93: Starting Up MS Monitoring Service...
+MS-SVC_MONITOR: 2025/03/21 10:56:00 engine.go:21: Fetching Services...
+MS-SVC_MONITOR: 2025/03/21 10:56:01 engine.go:87: Loaded 7 active Services
+MS-SVC_MONITOR: 2025/03/21 10:56:11 main.go:220: Shutting down...
+MS-SVC_MONITOR: 2025/03/21 10:56:12 engine.go:131: Stopping MS-SVC_MONITOR
+MS-SVC_MONITOR: 2025/03/21 10:56:12 engine.go:140: All jobs completed
+MS-SVC_MONITOR: 2025/03/21 10:56:12 main.go:224: Shutdown complete
+MS-SVC_MONITOR: 2025/03/21 16:20:41 main.go:43: Warning: .env file not found. Using system environment variables. open .env: The system cannot find the file specified.
+MS-SVC_MONITOR: 2025/03/21 16:20:41 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 16:20:41 main.go:143: WebSocket server running on :2345
+MS-SVC_MONITOR: 2025/03/21 16:20:41 engine.go:93: Starting Up MS Monitoring Service...
+MS-SVC_MONITOR: 2025/03/21 16:20:41 engine.go:21: Fetching Services...
+MS-SVC_MONITOR: 2025/03/21 16:20:41 engine.go:87: Loaded 7 active Services
+MS-SVC_MONITOR: 2025/03/21 16:20:52 main.go:221: Shutting down...
+MS-SVC_MONITOR: 2025/03/21 16:20:52 engine.go:131: Stopping MS-SVC_MONITOR
+MS-SVC_MONITOR: 2025/03/21 16:20:52 engine.go:140: All jobs completed
+MS-SVC_MONITOR: 2025/03/21 16:20:52 main.go:225: Shutdown complete
+MS-SVC_MONITOR: 2025/03/21 16:21:52 main.go:143: WebSocket server running on :2345
+MS-SVC_MONITOR: 2025/03/21 16:21:52 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 16:21:52 engine.go:93: Starting Up MS Monitoring Service...
+MS-SVC_MONITOR: 2025/03/21 16:21:52 engine.go:21: Fetching Services...
+MS-SVC_MONITOR: 2025/03/21 16:21:52 engine.go:87: Loaded 7 active Services
+MS-SVC_MONITOR: 2025/03/21 16:25:00 network_snmp_v3.go:104: communityString is missing in configuration... Using default
+MS-SVC_MONITOR: 2025/03/21 16:25:01 network_snmp_v3.go:104: communityString is missing in configuration... Using default
+MS-SVC_MONITOR: 2025/03/21 16:25:03 network_snmp_v3.go:164: Error getting System Description: unknown username
+MS-SVC_MONITOR: 2025/03/21 16:25:03 network_snmp_v3.go:164: Error getting Uptime: unknown username
+MS-SVC_MONITOR: 2025/03/21 16:25:03 network_snmp_v3.go:164: Error getting System Name: unknown username
+MS-SVC_MONITOR: 2025/03/21 16:25:03 network_snmp_v3.go:164: Error getting Number of Interfaces: unknown username
+MS-SVC_MONITOR: 2025/03/21 16:25:03 network_snmp_v3.go:164: Error getting Memory: unknown username
+MS-SVC_MONITOR: 2025/03/21 16:25:03 network_snmp_v3.go:164: Error getting Inbound traffic: unknown username
+MS-SVC_MONITOR: 2025/03/21 16:25:04 network_snmp_v3.go:164: Error getting Outbound traffic: unknown username
+MS-SVC_MONITOR: 2025/03/21 16:25:04 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 16:25:05 engine.go:260: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171 false false
+MS-SVC_MONITOR: 2025/03/21 16:25:23 network_snmp_v3.go:164: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:25:42 main.go:221: Shutting down...
+MS-SVC_MONITOR: 2025/03/21 16:25:42 engine.go:131: Stopping MS-SVC_MONITOR
+MS-SVC_MONITOR: 2025/03/21 16:25:42 engine.go:391: Alert Channel Closed, Stopping Alert Handler.
+MS-SVC_MONITOR: 2025/03/21 16:25:44 network_snmp_v3.go:164: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:26:04 network_snmp_v3.go:164: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:26:12 engine.go:142: Shutdown timed out waiting for jobs
+MS-SVC_MONITOR: 2025/03/21 16:26:12 main.go:225: Shutdown complete
+MS-SVC_MONITOR: 2025/03/21 16:28:50 constants.go:27: PORT%!(EXTRA string=>>>, string=8080)
+MS-SVC_MONITOR: 2025/03/21 16:28:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 16:28:50 main.go:143: WebSocket server running on :2345
+MS-SVC_MONITOR: 2025/03/21 16:28:50 engine.go:93: Starting Up MS Monitoring Service...
+MS-SVC_MONITOR: 2025/03/21 16:28:50 engine.go:21: Fetching Services...
+MS-SVC_MONITOR: 2025/03/21 16:28:50 engine.go:87: Loaded 7 active Services
+MS-SVC_MONITOR: 2025/03/21 16:30:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:30:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:30:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:30:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:31:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:31:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:31:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:31:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:31:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:31:41 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:32:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:32:02 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:32:21 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:32:22 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:32:42 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 16:32:42 engine.go:260: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170 false false
+MS-SVC_MONITOR: 2025/03/21 16:32:51 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 16:32:51 engine.go:260: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171 false false
+MS-SVC_MONITOR: 2025/03/21 16:35:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:35:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:35:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:35:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:36:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:36:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:36:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:36:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:36:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:36:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:37:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:37:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:37:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:37:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:37:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 16:37:40 engine.go:260: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170 true false
+MS-SVC_MONITOR: 2025/03/21 16:37:40 notify.go:133: {VI-170 is down 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170 2025-03-21T16:37:40+01:00 Error getting SNMP interfaces BulkWalk error: request timeout (after 3 retries)}
+MS-SVC_MONITOR: 2025/03/21 16:37:40 engine.go:281: Added Failed Service to Alert Channel: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 16:37:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 16:37:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:38:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:38:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 16:39:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:39:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 16:40:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:40:21 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:40:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:40:41 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:41:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:41:01 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:41:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:41:21 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:41:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:41:41 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:42:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:42:01 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:42:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:42:21 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:42:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 16:42:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:42:56 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 16:43:11 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:45:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:45:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:45:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:45:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:46:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:46:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:46:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:46:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:46:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:46:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:47:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:47:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:47:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:47:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:47:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 16:47:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:47:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 16:48:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:48:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 16:49:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:49:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 16:50:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:50:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:50:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:50:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:51:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:51:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:51:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:51:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:51:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:51:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:52:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:52:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:52:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:52:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:52:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 16:52:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 16:52:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:53:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:55:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:55:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:55:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:55:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:56:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:56:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:56:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:56:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:56:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:56:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:57:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:57:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:57:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:57:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 16:57:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 16:57:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:57:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 16:58:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:58:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 16:59:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 16:59:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 17:00:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:00:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:00:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:00:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:01:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:01:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:01:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:01:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:01:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:01:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:02:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:02:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:02:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:02:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:02:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:02:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:02:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:03:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:05:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:05:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:05:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:05:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:06:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:06:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:06:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:06:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:06:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:06:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:07:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:07:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:07:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:07:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:07:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:07:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:07:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:08:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:08:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 17:09:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:09:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 17:10:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:10:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:10:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:10:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:11:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:11:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:11:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:11:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:11:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:11:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:12:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:12:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:12:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:12:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:12:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:12:50 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:12:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:13:05 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:15:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:15:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:15:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:15:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:16:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:16:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:16:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:16:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:16:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:16:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:17:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:17:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:17:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:17:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:17:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:17:50 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:17:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:18:05 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:18:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 17:19:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:19:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 17:20:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:20:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:20:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:20:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:21:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:21:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:21:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:21:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:21:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:21:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:22:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:22:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:22:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:22:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:22:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:22:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:22:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:23:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:25:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:25:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:25:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:25:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:26:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:26:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:26:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:26:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:26:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:26:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:27:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:27:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:27:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:27:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:27:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:27:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:27:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:28:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:28:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 17:29:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:29:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 17:30:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:30:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:30:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:30:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:31:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:31:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:31:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:31:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:31:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:31:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:32:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:32:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:32:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:32:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:32:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:32:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:32:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:33:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:35:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:35:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:35:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:35:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:36:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:36:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:36:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:36:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:36:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:36:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:37:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:37:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:37:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:37:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:37:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:37:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:37:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:38:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:38:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 17:39:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:39:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 17:40:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:40:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:40:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:40:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:41:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:41:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:41:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:41:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:41:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:41:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:42:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:42:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:42:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:42:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:42:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:42:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:42:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:43:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:45:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:45:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:45:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:45:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:46:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:46:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:46:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:46:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:46:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:46:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:47:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:47:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:47:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:47:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:47:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:47:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:47:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:48:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:48:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 17:49:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:49:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 17:50:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:50:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:50:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:50:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:51:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:51:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:51:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:51:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:51:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:51:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:52:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:52:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:52:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:52:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:52:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:52:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:52:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:53:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:55:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:55:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:55:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:55:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:56:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:56:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:56:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:56:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:56:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:56:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:57:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:57:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:57:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:57:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 17:57:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 17:57:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:57:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 17:58:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:58:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 17:59:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 17:59:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 18:00:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:00:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:00:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:00:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:01:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:01:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:01:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:01:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:01:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:01:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:02:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:02:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:02:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:02:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:02:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:02:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:02:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:03:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:05:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:05:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:05:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:05:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:06:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:06:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:06:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:06:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:06:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:06:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:07:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:07:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:07:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:07:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:07:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:07:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:07:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:08:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:08:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 18:09:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:09:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 18:10:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:10:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:10:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:10:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:11:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:11:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:11:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:11:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:11:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:11:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:12:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:12:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:12:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:12:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:12:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:12:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:12:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:13:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:15:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:15:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:15:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:15:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:16:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:16:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:16:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:16:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:16:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:16:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:17:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:17:01 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:17:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:17:21 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:17:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:17:51 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:17:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:18:06 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:18:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 18:19:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:19:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 18:20:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:20:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:20:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:20:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:21:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:21:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:21:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:21:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:21:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:21:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:22:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:22:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:22:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:22:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:22:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:22:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:22:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:23:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:25:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:25:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:25:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:25:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:26:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:26:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:26:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:26:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:26:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:26:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:27:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:27:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:27:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:27:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:27:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:27:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:27:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:28:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:28:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 18:29:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:29:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 18:30:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:30:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:30:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:30:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:31:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:31:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:31:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:31:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:31:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:31:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:32:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:32:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:32:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:32:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:32:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:32:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:32:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:33:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:35:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:35:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:35:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:35:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:36:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:36:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:36:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:36:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:36:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:36:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:37:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:37:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:37:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:37:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:37:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:37:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:37:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:38:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:38:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 18:39:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:39:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 18:40:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:40:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:40:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:40:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:41:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:41:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:41:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:41:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:41:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:41:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:42:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:42:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:42:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:42:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:42:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:42:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:42:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:43:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:45:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:45:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:45:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:45:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:46:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:46:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:46:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:46:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:46:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:46:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:47:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:47:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:47:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:47:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:47:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:47:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:47:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:48:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:48:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 18:49:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:49:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 18:50:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:50:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:50:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:50:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:51:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:51:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:51:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:51:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:51:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:51:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:52:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:52:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:52:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:52:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:52:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:52:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:52:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:53:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:55:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:55:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:55:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:55:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:56:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:56:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:56:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:56:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:56:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:56:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:57:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:57:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:57:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:57:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 18:57:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 18:57:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:57:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 18:58:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:58:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 18:59:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 18:59:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 19:00:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:00:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:00:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:00:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:01:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:01:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:01:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:01:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:01:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:01:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:02:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:02:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:02:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:02:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:02:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:02:50 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:02:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:03:05 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:05:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:05:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:05:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:05:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:06:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:06:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:06:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:06:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:06:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:06:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:07:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:07:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:07:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:07:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:07:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:07:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:07:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:08:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:08:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 19:09:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:09:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 19:10:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:10:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:10:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:10:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:11:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:11:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:11:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:11:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:11:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:11:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:12:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:12:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:12:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:12:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:12:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:12:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:12:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:13:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:15:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:15:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:15:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:15:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:16:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:16:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:16:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:16:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:16:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:16:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:17:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:17:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:17:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:17:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:17:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:17:50 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:17:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:18:05 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:18:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 19:19:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:19:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 19:20:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:20:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:20:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:20:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:21:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:21:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:21:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:21:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:21:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:21:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:22:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:22:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:22:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:22:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:22:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:22:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:22:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:23:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:25:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:25:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:25:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:25:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:26:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:26:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:26:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:26:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:26:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:26:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:27:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:27:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:27:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:27:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:27:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:27:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:27:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:28:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:28:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 19:29:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:29:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 19:30:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:30:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:30:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:30:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:31:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:31:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:31:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:31:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:31:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:31:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:32:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:32:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:32:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:32:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:32:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:32:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:32:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:33:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:35:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:35:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:35:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:35:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:36:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:36:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:36:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:36:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:36:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:36:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:37:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:37:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:37:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:37:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:37:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:37:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:37:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:38:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:38:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 19:39:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:39:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 19:40:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:40:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:40:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:40:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:41:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:41:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:41:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:41:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:41:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:41:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:42:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:42:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:42:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:42:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:42:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:42:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:42:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:43:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:45:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:45:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:45:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:45:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:46:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:46:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:46:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:46:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:46:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:46:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:47:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:47:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:47:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:47:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:47:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:47:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:47:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:48:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:48:50 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/21 19:49:05 main.go:67: Error loading config: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:49:05 main.go:181: No notification configuration manager found <nil>
+MS-SVC_MONITOR: 2025/03/21 19:50:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:50:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:50:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:50:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:51:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:51:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:51:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:51:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:51:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:51:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:52:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:52:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:52:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:52:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:52:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:52:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:52:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:53:10 engine.go:349: Error updating SystemMonitor for service VU-171: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:55:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:55:20 network_snmp_v3.go:147: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:55:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:55:40 network_snmp_v3.go:147: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:56:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:56:00 network_snmp_v3.go:147: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:56:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:56:20 network_snmp_v3.go:147: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:56:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:56:40 network_snmp_v3.go:147: Error getting Memory: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:57:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:57:00 network_snmp_v3.go:147: Error getting Inbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:57:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:57:20 network_snmp_v3.go:147: Error getting Outbound traffic: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/21 19:57:33 main.go:221: Shutting down...
+MS-SVC_MONITOR: 2025/03/21 19:57:33 engine.go:131: Stopping MS-SVC_MONITOR
+MS-SVC_MONITOR: 2025/03/21 19:57:33 engine.go:391: Alert Channel Closed, Stopping Alert Handler.
+MS-SVC_MONITOR: 2025/03/21 19:57:40 engine.go:242: Service -> [VI-170] failed. Alert Identifier::: 8c750c36-e3c7-4a57-b2ec-ebd974c7e885|VI-170
+MS-SVC_MONITOR: 2025/03/21 19:57:55 engine.go:242: Service -> [VU-171] failed. Alert Identifier::: 3386f2c6-a5f2-41f5-b6f0-50c6020c0d52|VU-171
+MS-SVC_MONITOR: 2025/03/21 19:57:55 engine.go:349: Error updating SystemMonitor for service VI-170: unable to open tcp connection with host '10.109.0.116:1433': dial tcp 10.109.0.116:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/21 19:58:03 engine.go:142: Shutdown timed out waiting for jobs
+MS-SVC_MONITOR: 2025/03/21 19:58:03 main.go:225: Shutdown complete
+MS-SVC_MONITOR: 2025/03/21 20:38:57 constants.go:27: PORT >>> 8080
+MS-SVC_MONITOR: 2025/03/21 20:39:12 db_helper.go:21: Error connecting to the database with Connection String server=172.20.10.3;user id=sa;password=dbuser123$;port=1433;database=MS;. Error: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 06:29:28 constants.go:27: PORT >>> 8080
+MS-SVC_MONITOR: 2025/03/22 06:29:43 db_helper.go:22: Error connecting to the database with Connection String server=172.20.10.3;user id=sa;password=dbuser123$;port=1433;database=MS;. Error: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 06:29:58 main.go:138: Error connecting to the database: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 06:32:01 constants.go:27: PORT >>> 8080
+MS-SVC_MONITOR: 2025/03/22 06:32:16 db_helper.go:22: Error connecting to the database with Connection String server=172.20.10.3;user id=sa;password=dbuser123$;port=1433;database=MS;. Error: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 06:32:31 main.go:138: Error connecting to the database: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 06:32:31 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/22 06:32:31 main.go:143: WebSocket server running on :2345
+MS-SVC_MONITOR: 2025/03/22 06:32:46 main.go:67: Error loading config: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 06:32:46 engine.go:93: Starting Up MS Monitoring Service...
+MS-SVC_MONITOR: 2025/03/22 06:32:46 engine.go:21: Fetching Services...
+MS-SVC_MONITOR: 2025/03/22 06:33:01 engine.go:97: Failed to load initial services: error querying services: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 06:59:38 constants.go:27: PORT >>> 8080
+MS-SVC_MONITOR: 2025/03/22 06:59:53 db_helper.go:22: Error connecting to the database with Connection String server=172.20.10.3;user id=sa;password=dbuser123$;port=1433;database=MS;. Error: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:00:08 main.go:138: Error connecting to the database: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:00:08 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/22 07:00:08 main.go:143: WebSocket server running on :2345
+MS-SVC_MONITOR: 2025/03/22 07:00:23 main.go:67: Error loading config: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:00:23 engine.go:127: Starting Up MS Monitoring Service...
+MS-SVC_MONITOR: 2025/03/22 07:00:23 engine.go:22: Fetching Services...
+MS-SVC_MONITOR: 2025/03/22 07:00:23 engine.go:44: Fetching Services From Database...
+MS-SVC_MONITOR: 2025/03/22 07:00:38 engine.go:27: Failed to load services from database: error querying services: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout. Falling back to JSON file...
+MS-SVC_MONITOR: 2025/03/22 07:00:38 engine.go:131: Failed to load initial services: failed to load services from JSON: error unmarshalling JSON: json: cannot unmarshal number into Go struct field ServiceMonitorData.VP of type bool
+MS-SVC_MONITOR: 2025/03/22 07:03:31 constants.go:27: PORT >>> 8080
+MS-SVC_MONITOR: 2025/03/22 07:03:46 db_helper.go:22: Error connecting to the database with Connection String server=172.20.10.3;user id=sa;password=dbuser123$;port=1433;database=MS;. Error: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:04:01 main.go:138: Error connecting to the database: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:04:01 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/22 07:04:01 main.go:143: WebSocket server running on :2345
+MS-SVC_MONITOR: 2025/03/22 07:04:16 main.go:67: Error loading config: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:04:16 engine.go:127: Starting Up MS Monitoring Service...
+MS-SVC_MONITOR: 2025/03/22 07:04:16 engine.go:22: Fetching Services...
+MS-SVC_MONITOR: 2025/03/22 07:04:16 engine.go:44: Fetching Services From Database...
+MS-SVC_MONITOR: 2025/03/22 07:04:31 engine.go:27: Failed to load services from database: error querying services: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout. Falling back to JSON file...
+MS-SVC_MONITOR: 2025/03/22 07:04:31 engine.go:131: Failed to load initial services: failed to load services from JSON: error unmarshalling JSON: json: cannot unmarshal string into Go struct field ServiceMonitorData.Configuration of type map[string]interface {}
+MS-SVC_MONITOR: 2025/03/22 07:06:50 constants.go:27: PORT >>> 8080
+MS-SVC_MONITOR: 2025/03/22 07:07:05 db_helper.go:22: Error connecting to the database with Connection String server=172.20.10.3;user id=sa;password=dbuser123$;port=1433;database=MS;. Error: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:07:20 main.go:138: Error connecting to the database: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:07:20 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/22 07:07:20 main.go:143: WebSocket server running on :2345
+MS-SVC_MONITOR: 2025/03/22 07:07:35 main.go:67: Error loading config: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:07:35 engine.go:127: Starting Up MS Monitoring Service...
+MS-SVC_MONITOR: 2025/03/22 07:07:35 engine.go:22: Fetching Services...
+MS-SVC_MONITOR: 2025/03/22 07:07:35 engine.go:44: Fetching Services From Database...
+MS-SVC_MONITOR: 2025/03/22 07:07:50 engine.go:27: Failed to load services from database: error querying services: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout. Falling back to JSON file...
+MS-SVC_MONITOR: 2025/03/22 07:10:10 network_snmp_v3.go:146: Error getting System Description: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:10:10 network_snmp_v3.go:146: Error getting System Description: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:10:20 network_snmp_v3.go:146: Error getting Uptime: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:10:20 network_snmp_v3.go:146: Error getting Uptime: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:10:30 network_snmp_v3.go:146: Error getting System Name: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:10:30 network_snmp_v3.go:146: Error getting System Name: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:10:40 network_snmp_v3.go:146: Error getting Number of Interfaces: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:10:40 network_snmp_v3.go:146: Error getting Number of Interfaces: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:10:50 network_snmp_v3.go:146: Error getting Memory: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:10:50 network_snmp_v3.go:146: Error getting Memory: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:11:00 network_snmp_v3.go:146: Error getting Inbound traffic: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:11:00 network_snmp_v3.go:146: Error getting Inbound traffic: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:11:10 network_snmp_v3.go:146: Error getting Outbound traffic: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:11:10 engine.go:359: Service Network1 is healthy.
+MS-SVC_MONITOR: 2025/03/22 07:11:10 network_snmp_v3.go:146: Error getting Outbound traffic: request timeout (after 1 retries)
+MS-SVC_MONITOR: 2025/03/22 07:11:10 engine.go:359: Service Service2 is healthy.
+MS-SVC_MONITOR: 2025/03/22 07:11:25 engine.go:383: Error updating SystemMonitor for service Network1: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:11:25 engine.go:383: Error updating SystemMonitor for service Service2: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:11:41 main.go:221: Shutting down...
+MS-SVC_MONITOR: 2025/03/22 07:11:41 engine.go:165: Stopping MS-SVC_MONITOR
+MS-SVC_MONITOR: 2025/03/22 07:11:41 engine.go:174: All jobs completed
+MS-SVC_MONITOR: 2025/03/22 07:11:41 main.go:225: Shutdown complete
+MS-SVC_MONITOR: 2025/03/22 07:17:18 constants.go:27: PORT >>> 8080
+MS-SVC_MONITOR: 2025/03/22 07:17:33 db_helper.go:22: Error connecting to the database with Connection String server=172.20.10.3;user id=sa;password=dbuser123$;port=1433;database=MS;. Error: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:17:48 main.go:138: Error connecting to the database: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:17:48 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/22 07:17:48 main.go:143: WebSocket server running on :2345
+MS-SVC_MONITOR: 2025/03/22 07:18:03 main.go:67: Error loading config: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:18:03 engine.go:127: Starting Up MS Monitoring Service...
+MS-SVC_MONITOR: 2025/03/22 07:18:03 engine.go:22: Fetching Services...
+MS-SVC_MONITOR: 2025/03/22 07:18:03 engine.go:44: Fetching Services From Database...
+MS-SVC_MONITOR: 2025/03/22 07:18:18 engine.go:27: Failed to load services from database: error querying services: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout. Falling back to JSON file...
+MS-SVC_MONITOR: 2025/03/22 07:21:00 network_snmp_v3.go:148: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/22 07:21:02 network_snmp_v3.go:148: Error getting System Description: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/22 07:22:00 network_snmp_v3.go:148: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/22 07:22:02 network_snmp_v3.go:148: Error getting Uptime: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/22 07:23:01 network_snmp_v3.go:148: Error getting System Name: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/22 07:23:33 network_snmp_v3.go:148: Error getting System Name: not in time window
+MS-SVC_MONITOR: 2025/03/22 07:24:00 main.go:221: Shutting down...
+MS-SVC_MONITOR: 2025/03/22 07:24:00 engine.go:165: Stopping MS-SVC_MONITOR
+MS-SVC_MONITOR: 2025/03/22 07:24:00 engine.go:425: Alert Channel Closed, Stopping Alert Handler.
+MS-SVC_MONITOR: 2025/03/22 07:24:01 network_snmp_v3.go:148: Error getting Number of Interfaces: request timeout (after 3 retries)
+MS-SVC_MONITOR: 2025/03/22 07:24:30 engine.go:176: Shutdown timed out waiting for jobs
+MS-SVC_MONITOR: 2025/03/22 07:24:30 main.go:225: Shutdown complete
+MS-SVC_MONITOR: 2025/03/22 07:34:39 constants.go:27: PORT >>> 8080
+MS-SVC_MONITOR: 2025/03/22 07:34:54 db_helper.go:22: Error connecting to the database with Connection String server=172.20.10.3;user id=sa;password=dbuser123$;port=1433;database=MS;. Error: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:35:09 main.go:138: Error connecting to the database: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:35:09 configuration_manager.go:13: Loading Notification Manager configuration
+MS-SVC_MONITOR: 2025/03/22 07:35:09 main.go:143: WebSocket server running on :2345
+MS-SVC_MONITOR: 2025/03/22 07:35:24 main.go:67: Error loading config: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout
+MS-SVC_MONITOR: 2025/03/22 07:35:24 engine.go:127: Starting Up MS Monitoring Service...
+MS-SVC_MONITOR: 2025/03/22 07:35:24 engine.go:22: Fetching Services...
+MS-SVC_MONITOR: 2025/03/22 07:35:24 engine.go:44: Fetching Services From Database...
+MS-SVC_MONITOR: 2025/03/22 07:35:39 engine.go:27: Failed to load services from database: error querying services: unable to open tcp connection with host '172.20.10.3:1433': dial tcp 172.20.10.3:1433: i/o timeout. Falling back to JSON file...
+MS-SVC_MONITOR: 2025/03/22 07:40:37 main.go:221: Shutting down...
+MS-SVC_MONITOR: 2025/03/22 07:40:37 engine.go:165: Stopping MS-SVC_MONITOR
+MS-SVC_MONITOR: 2025/03/22 07:40:37 engine.go:425: Alert Channel Closed, Stopping Alert Handler.
+MS-SVC_MONITOR: 2025/03/22 07:41:07 engine.go:176: Shutdown timed out waiting for jobs
+MS-SVC_MONITOR: 2025/03/22 07:41:07 main.go:225: Shutdown complete

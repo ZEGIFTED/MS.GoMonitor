@@ -2,8 +2,9 @@ package utils
 
 import (
 	"database/sql"
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"log"
+
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 )
 
 func DatabaseConnection() *sql.DB {
@@ -18,7 +19,7 @@ func DatabaseConnection() *sql.DB {
 	// Check if the database is open and can be pinged
 	err = db.Ping()
 	if err != nil {
-		log.Fatalf("Error connecting to the database with Connection String %s. Error: %s", connString, err.Error())
+		log.Printf("Error connecting to the database with Connection String %s. Error: %s", connString, err.Error())
 	}
 
 	return db

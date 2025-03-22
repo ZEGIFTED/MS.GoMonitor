@@ -44,7 +44,7 @@ func LoadConfig() (*EnvConfig, error) {
 	}
 
 	config := &EnvConfig{
-		Port:      constants.GetEnvWithDefault("PORT", "8080"),
+		Port:      constants.GetEnvWithDefault("PORT", "8082"),
 		Host:      constants.GetEnvWithDefault("HOST", "localhost"),
 		APIKey:    constants.GetEnvWithDefault("API_KEY", ""),
 		APISecret: constants.GetEnvWithDefault("API_SECRET", ""),
@@ -103,7 +103,7 @@ func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 	monitor.Checkers[monitors.ServiceMonitorWebModules] = &monitors.WebModulesServiceChecker{}
 	// monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
 
-	monitor.Checkers[monitors.ServiceMonitorServer] = &monitors.ServerHealthChecker{}
+	// monitor.Checkers[monitors.ServiceMonitorServer] = &monitors.ServerHealthChecker{}
 
 	return monitor
 }
@@ -136,7 +136,7 @@ func main() {
 	// Test the connection
 	err = db.PingContext(ctx)
 	if err != nil {
-		log.Fatalf("Error connecting to the database: %v", err)
+		log.Printf("Error connecting to the database: %v", err)
 	}
 
 	go func() {

@@ -1,0 +1,32 @@
+[
+    {
+        "uuid": "123e4567-e89b-12d3-a456-426614174000",
+        "name": "Network1",
+        "host": "192.168.100.252",
+        "port": 161,
+        "vp": true,
+        "device": "NetworkV3",
+        "failure_count": 0,
+        "retry_count": 1,
+        "configuration": {},
+        "check_interval": "*/5 * * * *",
+        "is_acknowledged": false,
+        "snooze_until": null,
+        "agent_api_base_url": ""
+    },
+    {
+        "uuid": "123e4567-e89b-12d3-a456-426614174001",
+        "name": "Service2",
+        "host": "192.168.202.195",
+        "port": 161,
+        "vp": true,
+        "device": "NetworkV3",
+        "failure_count": 0,
+        "retry_count": 1,
+        "configuration": {},
+        "check_interval": "*/5 * * * *",
+        "is_acknowledged": false,
+        "snooze_until": null,
+        "agent_api_base_url": "http://example.org/api"
+    }
+]

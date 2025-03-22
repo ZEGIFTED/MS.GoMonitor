@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"os"
 	"sync"
 	"time"
 
@@ -17,12 +18,34 @@ import (
 	_ "github.com/microsoft/go-mssqldb"
 )
 
-func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
+func (sm *ServiceMonitor) LoadServicesInventory() error {
 	log.Println("Fetching Services...")
+
+	// Try to load services from the database first
+	services, err := sm.LoadServicesFromDatabase()
+	if err != nil {
+		log.Printf("Failed to load services from database: %v. Falling back to JSON file...", err)
+
+		// If database fails, load from JSON file
+		services, err = sm.loadServicesFromJSON("services.json")
+		if err != nil {
+			return fmt.Errorf("failed to load services from JSON: %v", err)
+		}
+	}
+
+	sm.MU.Lock()
+	sm.Services = services
+	sm.MU.Unlock()
+
+	return nil
+}
+
+func (sm *ServiceMonitor) LoadServicesFromDatabase() ([]ServiceMonitorData, error) {
+	log.Println("Fetching Services From Database...")
 
 	rows, err := sm.Db.QueryContext(sm.Ctx, "EXEC ServiceReport @SERVICE_LEVEL = 'MONITOR', @VP = 1;")
 	if err != nil {
-		return fmt.Errorf("error querying services: %v", err)
+		return nil, fmt.Errorf("error querying services: %v", err)
 	}
 	defer func(rows *sql.Rows) {
 		err := rows.Close()
@@ -55,7 +78,7 @@ func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
 		)
 
 		if err != nil {
-			return fmt.Errorf("error scanning service row: %v", err)
+			return nil, fmt.Errorf("error scanning service row: %v", err)
 		}
 
 		service.SystemMonitorId, err = uuid.Parse(uuidStr)
@@ -80,12 +103,23 @@ func (sm *ServiceMonitor) LoadServicesFromDatabase() error {
 	sm.Services = services
 	sm.MU.Unlock()
 
-	//for i, service := range services {
-	//	fmt.Println(i, service)
-	//}
-
 	log.Printf("Loaded %d active Services", len(services))
-	return nil
+	return services, nil
+}
+
+func (sm *ServiceMonitor) loadServicesFromJSON(filename string) ([]ServiceMonitorData, error) {
+	file, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, fmt.Errorf("error reading JSON file: %v", err)
+	}
+
+	var services []ServiceMonitorData
+	err = json.Unmarshal(file, &services)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshalling JSON: %v", err)
+	}
+
+	return services, nil
 }
 
 // StartService begins the monitoring process
@@ -93,7 +127,7 @@ func (sm *ServiceMonitor) StartService() error {
 	log.Println("Starting Up MS Monitoring Service...")
 
 	// Load initial services
-	if err := sm.LoadServicesFromDatabase(); err != nil {
+	if err := sm.LoadServicesInventory(); err != nil {
 		log.Fatalf("Failed to load initial services: %v", err)
 	}
 
