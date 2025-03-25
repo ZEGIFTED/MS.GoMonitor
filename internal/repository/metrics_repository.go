@@ -1,28 +1,19 @@
-package internal
+package repository
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 	"log"
+
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 )
-
-type Metric struct {
-	AgentHostAddress string
-	AgentHostName    string
-
-	CpuUsage               float64
-	MemoryUsage            float64
-	CurrentDiskUtilization float64
-	TotalStorageCapacity   string
-	AgentAPI               string
-}
 
 func AgentDataSync() string {
 	return "AgentDataSync"
 }
 
-func FetchMetricsReport(db *sql.DB) ([]Metric, []string, error) {
+func FetchMetricsReport(db *sql.DB) ([]mstypes.AgentRepositoryMetric, []string, error) {
 	rows, err := db.QueryContext(context.Background(), "EXECUTE ResourceUtilizationSP @StartDate = '', @EndDate = ''")
 	if err != nil {
 		log.Fatalf("Query failed: %s", err.Error())
@@ -35,12 +26,12 @@ func FetchMetricsReport(db *sql.DB) ([]Metric, []string, error) {
 		}
 	}(rows)
 
-	var metrics []Metric
+	var metrics []mstypes.AgentRepositoryMetric
 	var headers []string
 	var tableHeaders []string
 
 	for rows.Next() {
-		var resource Metric
+		var resource mstypes.AgentRepositoryMetric
 
 		err := rows.Scan(
 			&resource.AgentHostName,

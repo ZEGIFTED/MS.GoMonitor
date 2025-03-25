@@ -11,7 +11,7 @@ import (
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 )
 
-func (service *WebModulesServiceChecker) Check(config ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
+func (service *WebModulesServiceChecker) Check(web ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
 	// Create a custom HTTP client with disabled SSL verification
 	httpClient := &http.Client{
 		Timeout: constants.HTTPRequestTimeout,
@@ -20,9 +20,9 @@ func (service *WebModulesServiceChecker) Check(config ServiceMonitorData, _ cont
 		},
 	}
 
-	host := config.Host
-	port := config.Port
-	protocol, ok := config.Configuration["protocol"]
+	host := web.Host
+	port := web.Port
+	protocol, ok := web.Configuration["protocol"]
 
 	if !ok || (protocol != "https" && protocol != "http") {
 		//log.Println("invalid agent protocol in configuration... Using default")
@@ -34,8 +34,8 @@ func (service *WebModulesServiceChecker) Check(config ServiceMonitorData, _ cont
 
 	if host == "" {
 		return ServiceMonitorStatus{
-			Name:          config.Name,
-			Device:        config.Device,
+			Name:          web.Name,
+			Device:        web.Device,
 			LiveCheckFlag: constants.Degraded,
 			Status:        "Invalid URL Configuration Setup",
 			LastCheckTime: time.Now(),
@@ -48,8 +48,8 @@ func (service *WebModulesServiceChecker) Check(config ServiceMonitorData, _ cont
 
 	if err != nil {
 		return ServiceMonitorStatus{
-			Name:          config.Name,
-			Device:        config.Device,
+			Name:          web.Name,
+			Device:        web.Device,
 			LiveCheckFlag: constants.Degraded,
 			Status:        err.Error(),
 			LastCheckTime: time.Now(),
@@ -72,8 +72,8 @@ func (service *WebModulesServiceChecker) Check(config ServiceMonitorData, _ cont
 
 	if resp.StatusCode != http.StatusOK {
 		return ServiceMonitorStatus{
-			Name:          config.Name,
-			Device:        config.Device,
+			Name:          web.Name,
+			Device:        web.Device,
 			LiveCheckFlag: constants.Escalation,
 			Status:        fmt.Sprintf("Bad HTTP Status: %d.", resp.StatusCode),
 			LastCheckTime: time.Now(),
@@ -82,8 +82,8 @@ func (service *WebModulesServiceChecker) Check(config ServiceMonitorData, _ cont
 	}
 
 	return ServiceMonitorStatus{
-		Name:              config.Name,
-		Device:            config.Device,
+		Name:              web.Name,
+		Device:            web.Device,
 		LiveCheckFlag:     constants.Healthy,
 		Status:            "Healthy",
 		LastCheckTime:     time.Now(),

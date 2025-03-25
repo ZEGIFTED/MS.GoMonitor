@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/messaging"
 	"net/http"
+
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 )
 
 // MessageType defines the type of message being sent
@@ -21,11 +22,11 @@ type MessageGroup struct {
 	WebhookURL string
 	Type       MessageType
 	Recipients []string
-	Message    messaging.TeamsMessage
+	Message    mstypes.TeamsMessage
 }
 
 // SendTeamsMessage sends a message to a Microsoft Teams channel or group using a webhook URL
-func SendTeamsMessage(webhookURL string, message messaging.TeamsMessage) error {
+func SendTeamsMessage(webhookURL string, message mstypes.TeamsMessage) error {
 
 	// Construct the message body with mentions
 	//var formattedMessage string

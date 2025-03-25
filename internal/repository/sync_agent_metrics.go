@@ -1,4 +1,4 @@
-package monitors
+package repository
 
 import (
 	"crypto/tls"
@@ -9,10 +9,11 @@ import (
 	"strings"
 
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 	_ "github.com/microsoft/go-mssqldb"
 )
 
-func SyncMetrics(db *sql.DB, agentMetrics []AgentInfo, agentSyncURL string) error {
+func SyncAgentMetrics(db *sql.DB, agentMetrics []mstypes.AgentInfo, agentSyncURL string) error {
 	// Begin Sync Transaction
 	tx, err := db.Begin()
 
@@ -25,13 +26,8 @@ func SyncMetrics(db *sql.DB, agentMetrics []AgentInfo, agentSyncURL string) erro
 	defer func(tx *sql.Tx) {
 		if err != nil {
 			tx.Rollback()
-			//log.Printf("Error rolling back SyncMetrics transaction: %v", err)
 		} else {
 			tx.Commit()
-			//if err != nil {
-			//log.Printf("Error Committing SyncMetrics transaction: %v", err)
-			//return
-			//}
 		}
 	}(tx)
 

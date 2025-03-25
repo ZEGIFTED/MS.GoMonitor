@@ -13,7 +13,7 @@ func DatabaseConnection() *sql.DB {
 
 	db, err := sql.Open("sqlserver", connString)
 	if err != nil {
-		log.Fatal("Error creating connection pool: ", err.Error())
+		log.Println("Error creating connection pool: ", err.Error())
 	}
 
 	// Check if the database is open and can be pinged

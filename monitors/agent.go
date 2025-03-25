@@ -10,8 +10,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ZEGIFTED/MS.GoMonitor/internal/repository"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 )
 
 func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
@@ -89,7 +91,7 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 		}, false
 	}
 
-	var apiResponse AgentMetricResponse
+	var apiResponse mstypes.AgentMetricResponse
 	err = json.Unmarshal(body, &apiResponse)
 
 	//log.Println("Agent API response", apiResponse, err)
@@ -106,7 +108,7 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 	}
 
 	// Convert data to our Agent struct
-	agentData := AgentInfo{
+	agentData := mstypes.AgentInfo{
 		AgentID:    apiResponse.AgentInfo.AgentID,
 		Name:       apiResponse.AgentInfo.Name,
 		IPAddress:  apiResponse.AgentInfo.IPAddress,
@@ -126,7 +128,7 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 		//}
 
 		// Append metric with properly converted types'
-		agentData.Metrics = append(agentData.Metrics, Metric{
+		agentData.Metrics = append(agentData.Metrics, mstypes.Metric{
 			Timestamp:    int64(apiResponse.SystemInfo.CPU[i][0]), // Convert to int64
 			TimestampMem: int64(apiResponse.SystemInfo.Memory[i][0]),
 			CPUUsage:     apiResponse.SystemInfo.CPU[i][1],
@@ -136,7 +138,7 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 
 	// Convert Disk metrics
 	for _, disk := range apiResponse.SystemInfo.Disk {
-		agentData.Disks = append(agentData.Disks, DiskMetric{
+		agentData.Disks = append(agentData.Disks, mstypes.DiskMetric{
 			Drive:      disk.Drive,
 			Size:       disk.Size,
 			Free:       disk.Free,
@@ -146,7 +148,7 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 		})
 	}
 
-	var agents []AgentInfo
+	var agents []mstypes.AgentInfo
 
 	//service.LastCheckTime = service.LastCheckTime.Add(1 * time.Minute)
 	//check.LastCheckTime = time.Now()
@@ -170,8 +172,7 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 			}, false
 		}
 
-		//agentSyncURL := fmt.Sprintf("%v://%s:%d", protocol, host, port)
-		if syncErr := SyncMetrics(db, agents, agentSyncURL); syncErr != nil {
+		if syncErr := repository.SyncAgentMetrics(db, agents, agentSyncURL); syncErr != nil {
 			return ServiceMonitorStatus{
 				Name:          agent.Name,
 				Device:        agent.Device,

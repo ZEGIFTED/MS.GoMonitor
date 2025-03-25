@@ -20,6 +20,7 @@ import (
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/messaging"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 	"github.com/joho/godotenv"
 	_ "github.com/microsoft/go-mssqldb" // SQL Server driver
 	"github.com/robfig/cron/v3"
@@ -59,7 +60,7 @@ func NotificationConfigurationManager(db *sql.DB) *messaging.NotificationManager
 	configManager := messaging.NotificationManager{
 		Logger: utils.Logger,
 		DB:     db,
-		Config: &messaging.NotificationConfig{},
+		Config: &mstypes.NotificationConfig{},
 	}
 
 	err := configManager.LoadConfig()
@@ -99,9 +100,10 @@ func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 	}
 
 	// Register service type checkers
-	monitor.Checkers[monitors.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
-	monitor.Checkers[monitors.ServiceMonitorWebModules] = &monitors.WebModulesServiceChecker{}
-	// monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
+	// monitor.Checkers[monitors.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
+	// monitor.Checkers[monitors.ServiceMonitorWebModules] = &monitors.WebModulesServiceChecker{}
+	// monitor.Checkers[monitors.ServiceMonitorSNMP_V3] = &monitors.SNMPServiceCheckerV3{}
+	monitor.Checkers[monitors.ServiceMonitorSNMP_V2] = &monitors.SNMPServiceCheckerV2{}
 
 	// monitor.Checkers[monitors.ServiceMonitorServer] = &monitors.ServerHealthChecker{}
 
@@ -109,11 +111,19 @@ func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 }
 
 func main() {
+	envErr := godotenv.Load(".env")
+
+	if envErr != nil {
+		log.Fatalf("Fatal Error loading Env file. %s", envErr.Error())
+	}
+
+	log.Println("Environment Variables Loaded:", os.Environ())
+
 	// Ensure multi-core utilization
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	_, err := LoadConfig()
 	if err != nil {
@@ -187,6 +197,16 @@ func main() {
 		}
 	}()
 
+	handler := &monitors.NetworkManager{
+		Community: "public",
+		TrapPort:  162, // Standard SNMP trap port
+	}
+
+	trapErr := handler.StartListener()
+	if err != nil {
+		log.Fatalf("Failed to start trap handler: %v", trapErr)
+	}
+
 	// Create the payload
 	//teamsMessage := messaging.TeamsMessage{
 	//	Type:       "MessageCard",
@@ -220,6 +240,7 @@ func main() {
 	// Wait for shutdown signal
 	<-shutdown
 	log.Println("Shutting down...")
+	handler.StopListener()
 
 	// Graceful shutdown
 	monitor.StopService()

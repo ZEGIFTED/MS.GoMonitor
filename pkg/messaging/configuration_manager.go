@@ -7,7 +7,16 @@ import (
 	"fmt"
 	"log"
 	"strings"
+
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 )
+
+// NotificationManager handles loading and accessing notification configurations
+type NotificationManager struct {
+	Config *mstypes.NotificationConfig
+	Logger *log.Logger
+	DB     *sql.DB
+}
 
 func (cfgManager *NotificationManager) LoadConfig() error {
 	log.Println("Loading Notification Manager configuration")
@@ -97,12 +106,12 @@ func (cfgManager *NotificationManager) Validate() error {
 }
 
 // GetEmailConfig returns the email configuration
-func (cfgManager *NotificationManager) GetEmailConfig() EmailConfig {
+func (cfgManager *NotificationManager) GetEmailConfig() mstypes.EmailConfig {
 	return *cfgManager.Config.Email
 }
 
 // GetSlackConfig returns the Slack configuration
-func (cfgManager *NotificationManager) GetSlackConfig() SlackConfig {
+func (cfgManager *NotificationManager) GetSlackConfig() mstypes.SlackConfig {
 	return *cfgManager.Config.Slack
 }
 

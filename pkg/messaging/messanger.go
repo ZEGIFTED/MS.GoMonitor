@@ -13,6 +13,7 @@ import (
 
 	"github.com/ZEGIFTED/MS.GoMonitor/internal"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 	"github.com/go-mail/mail/v2"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
@@ -41,7 +42,7 @@ var SeverityColors = map[string]string{
 	"default":          "#808080", // Gray for Default/Fallback
 }
 
-func (cfgManager *NotificationManager) FormatSlackMessageToSend(event internal.ServiceAlertEvent, groupName, alertLevel, actionURL string, extraInfo map[string]string) SlackMessage {
+func (cfgManager *NotificationManager) FormatSlackMessageToSend(event internal.ServiceAlertEvent, groupName, alertLevel, actionURL string, extraInfo map[string]string) mstypes.SlackMessage {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 
 	// Fallback text for non-rich clients
@@ -110,7 +111,7 @@ func (cfgManager *NotificationManager) FormatSlackMessageToSend(event internal.S
 		},
 	}
 
-	return SlackMessage{
+	return mstypes.SlackMessage{
 		Text:        fallbackText,
 		Blocks:      blocks,
 		Attachments: attachments,
@@ -129,7 +130,7 @@ func (cfgManager *NotificationManager) FormatSlackMessageToSend(event internal.S
 //}
 
 // Load the HTML template from file
-func loadTemplate(filePath string, data EmailTemplateData) (string, error) {
+func loadTemplate(filePath string, data mstypes.EmailTemplateData) (string, error) {
 	//var emailTemplate embed.FS
 
 	dir, _ := os.Getwd()
@@ -158,11 +159,11 @@ func loadTemplate(filePath string, data EmailTemplateData) (string, error) {
 func (cfgManager *NotificationManager) FormatEmailMessageToSend(event internal.ServiceAlertEvent, userName, groupName, actionURL string, extraInfo map[string]interface{}) (string, error) {
 
 	// Prepare template data
-	data := EmailTemplateData{
+	data := mstypes.EmailTemplateData{
 		Title:       "Test Title",
 		Heading:     fmt.Sprintf("The following service needs to be confirmed operational or acknowledged via the Monitoring Console: %s", event.ServiceName),
 		ServiceName: event.ServiceName,
-		User: UserData{
+		User: mstypes.UserData{
 			Name:           userName,
 			RecipientGroup: groupName,
 		},
@@ -174,7 +175,7 @@ func (cfgManager *NotificationManager) FormatEmailMessageToSend(event internal.S
 		ActionURL:   actionURL,
 		ExtraFields: extraInfo,
 
-		Logo: Logo{
+		Logo: mstypes.Logo{
 			UseSVG: false,
 
 			// Only used if UseSVG is false
@@ -185,13 +186,13 @@ func (cfgManager *NotificationManager) FormatEmailMessageToSend(event internal.S
 			PrimaryColor:   "#0066cc",
 			SecondaryColor: "#ff9900",
 		},
-		Meta: MetaData{
+		Meta: mstypes.MetaData{
 			Timestamp:    event.Timestamp.Format("2006-01-02 15:04:05"),
 			Year:         time.Now().Year(),
 			CompanyName:  constants.OrganizationName,
 			SupportEmail: "calebb.jnr@gmail.com",
 			SupportPhone: "080X-XXX-XXXX",
-			FooterLinks: []Link{
+			FooterLinks: []mstypes.Link{
 				{Text: "Privacy Policy", URL: "/privacy", NewTab: false},
 				{Text: "Terms of Service", URL: "/terms", NewTab: false},
 				{Text: "FAQ", URL: "/faq", NewTab: false},
@@ -335,7 +336,7 @@ func (cfgManager *NotificationManager) SendReportEmail(to []string, pdfAttachmen
 }
 
 // SlackBotClient creates a new SlackClient instance
-func (cfgManager *NotificationManager) SlackBotClient(slackConfig_ SlackConfig) *SlackClient {
+func (cfgManager *NotificationManager) SlackBotClient(slackConfig_ mstypes.SlackConfig) *SlackClient {
 	logger := log.New(os.Stdout, "SLACK-BOT: ", log.Ldate|log.Ltime|log.Lshortfile)
 
 	slackConfig := cfgManager.GetSlackConfig()
@@ -361,7 +362,7 @@ func (cfgManager *NotificationManager) SlackBotClient(slackConfig_ SlackConfig) 
 	}
 }
 
-func (s *SlackClient) SendSlackMessage(channel string, message SlackMessage) (string, error) {
+func (s *SlackClient) SendSlackMessage(channel string, message mstypes.SlackMessage) (string, error) {
 	s.logger.Printf("Sending to Slack Channel: %s", channel)
 
 	msgOptions := []slack.MsgOption{

@@ -1,4 +1,4 @@
-package internal
+package repository
 
 import (
 	"crypto/tls"
@@ -11,10 +11,10 @@ import (
 	"strconv"
 
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 )
 
-type AgentRepository struct {
-}
+type AgentRepository struct{}
 
 func (a *AgentRepository) ValidateAgentURL(AgentAPIBaseURL, endpoint string) (string, error) {
 	// Parse the AgentAPIBaseURL
@@ -42,9 +42,9 @@ func (a *AgentRepository) ValidateAgentURL(AgentAPIBaseURL, endpoint string) (st
 	//return agentAddress, nil
 }
 
-func (a *AgentRepository) GetAgentThresholds(agentURL string) (AgentThresholdResponse, error) {
+func (a *AgentRepository) GetAgentThresholds(agentURL string) (mstypes.AgentThresholdResponse, error) {
 	if agentURL == "" {
-		return AgentThresholdResponse{}, fmt.Errorf("invalid agent Base URL")
+		return mstypes.AgentThresholdResponse{}, fmt.Errorf("invalid agent Base URL")
 	}
 
 	// Create a custom HTTP client with disabled SSL verification
@@ -58,7 +58,7 @@ func (a *AgentRepository) GetAgentThresholds(agentURL string) (AgentThresholdRes
 	resp, err := httpClient.Get(agentURL)
 
 	if err != nil {
-		return AgentThresholdResponse{}, err
+		return mstypes.AgentThresholdResponse{}, err
 	}
 
 	defer func(Body io.ReadCloser) {
@@ -71,12 +71,12 @@ func (a *AgentRepository) GetAgentThresholds(agentURL string) (AgentThresholdRes
 	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		return AgentThresholdResponse{}, err
+		return mstypes.AgentThresholdResponse{}, err
 	}
 
-	var apiResponse AgentThresholdResponse
+	var apiResponse mstypes.AgentThresholdResponse
 	if err_ := json.Unmarshal(body, &apiResponse); err_ != nil {
-		return AgentThresholdResponse{}, err
+		return mstypes.AgentThresholdResponse{}, err
 	}
 
 	log.Println("Agent Threshold API response", apiResponse)
@@ -84,7 +84,7 @@ func (a *AgentRepository) GetAgentThresholds(agentURL string) (AgentThresholdRes
 	return apiResponse, nil
 }
 
-func ServerResourceDetails(baseURL string, limit int) ([]ProcessResourceUsage, error) {
+func ServerResourceDetails(baseURL string, limit int) ([]mstypes.ProcessResourceUsage, error) {
 	// Construct URL with query parameter.
 	resp, err := http.Get(baseURL + "/api/v1/agent/resource-usage?limit=" + strconv.Itoa(limit))
 
@@ -100,7 +100,7 @@ func ServerResourceDetails(baseURL string, limit int) ([]ProcessResourceUsage, e
 	}
 
 	// Parse JSON response.
-	var processes []ProcessResourceUsage
+	var processes []mstypes.ProcessResourceUsage
 	if err := json.Unmarshal(body, &processes); err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func ServerResourceDetails(baseURL string, limit int) ([]ProcessResourceUsage, e
 	return processes, nil
 }
 
-func (a *AgentRepository) GetAgentServiceStats(agentURL string) (ProcessResponse, error) {
+func (a *AgentRepository) GetAgentServiceStats(agentURL string) (mstypes.ProcessResponse, error) {
 	if agentURL == "" {
 		return nil, fmt.Errorf("invalid agent Base URL")
 	}
@@ -135,7 +135,7 @@ func (a *AgentRepository) GetAgentServiceStats(agentURL string) (ProcessResponse
 	}
 
 	// Parse JSON response.
-	var processes ProcessResponse
+	var processes mstypes.ProcessResponse
 	if err := json.Unmarshal([]byte(body), &processes); err != nil {
 		log.Println("Error unmarshalling JSON:", err)
 		return nil, err

@@ -14,6 +14,7 @@ import (
 	"github.com/ZEGIFTED/MS.GoMonitor/notifier"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 	"github.com/google/uuid"
 	_ "github.com/microsoft/go-mssqldb"
 )
@@ -172,28 +173,9 @@ func (sm *ServiceMonitor) StopService() {
 	select {
 	case <-ctx.Done():
 		log.Println("All jobs completed")
-	case <-time.After(30 * time.Second):
+	case <-time.After(15 * time.Second):
 		log.Println("Shutdown timed out waiting for jobs")
 	}
-}
-
-// SendAlert sends an alert to a configured webhook
-func (sm *ServiceMonitor) SendAlert(services []ServiceMonitorStatus) {
-	// Implement alert sending logic (e.g., HTTP POST to webhook)
-
-	//filePath := utils.GenerateServiceDowntimeAlert()
-
-	//messaging.
-	//slackClient := messaging.SlackBotClient()
-	//slackMessage := messaging.FormatSlackMessageToSend("Test Notification", "Hello World from Go", "", "actionURL", extraInfo)
-	//
-	//_, err_ := slackClient.SendSlackMessage("admin_x", slackMessage)
-	//if err_ != nil {
-	//	return
-	//}
-
-	//sendTo := []string{"calebb.jnr@gmail.com", "cboluwade@nibss-plc.com.ng"}
-	//messaging.SendReportEmail(sendTo, filePath)
 }
 
 // Example: Thread-safe iteration with RWMutex
@@ -478,7 +460,7 @@ func (sm *ServiceMonitor) AlertHandler() {
 				}
 
 				// Send the notification asynchronously
-				go func(alert internal.ServiceAlertEvent, recipients internal.NotificationRecipients) {
+				go func(alert internal.ServiceAlertEvent, recipients mstypes.NotificationRecipients) {
 					err := sm.SendDowntimeServiceNotification(alert, recipients)
 					if err != nil {
 						log.Printf("Failed to send alert for service %s: %v", alert.ServiceName, err)
@@ -491,7 +473,7 @@ func (sm *ServiceMonitor) AlertHandler() {
 	}()
 }
 
-func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.ServiceAlertEvent, recipients internal.NotificationRecipients) error {
+func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.ServiceAlertEvent, recipients mstypes.NotificationRecipients) error {
 	log.Printf("Processing alert for service: %s", event.ServiceName)
 
 	emailConfig := sm.NotificationHandler.GetEmailConfig()
@@ -507,7 +489,7 @@ func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.Service
 	for platform, recipientsList := range recipientsGroup {
 		wg.Add(1)
 
-		go func(r []internal.NotificationRecipient) {
+		go func(r []mstypes.NotificationRecipient) {
 			defer wg.Done()
 
 			switch platform {

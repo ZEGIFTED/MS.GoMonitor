@@ -8,8 +8,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/ZEGIFTED/MS.GoMonitor/internal"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 )
 
 func (service *ServerHealthChecker) Check(server ServiceMonitorData, ctx context.Context, db *sql.DB) (ServiceMonitorStatus, bool) {
@@ -43,10 +43,10 @@ func (service *ServerHealthChecker) Check(server ServiceMonitorData, ctx context
 		}(rows)
 	}
 
-	agentMetrics := make(map[string][]Metric)
+	agentMetrics := make(map[string][]mstypes.Metric)
 
 	for rows.Next() {
-		var metric Metric
+		var metric mstypes.Metric
 		err_ := rows.Scan(
 			&metric.AgentID,
 			&metric.Timestamp,
@@ -99,7 +99,7 @@ func (service *ServerHealthChecker) Check(server ServiceMonitorData, ctx context
 }
 
 // MetricEngine Aggregates all metric sources by AppId and AgentId
-func (service *ServerHealthChecker) MetricEngine(agentThresholds internal.AgentThresholdResponse, metrics []Metric) {
+func (service *ServerHealthChecker) MetricEngine(agentThresholds mstypes.AgentThresholdResponse, metrics []mstypes.Metric) {
 	var cpuTSdata []TimeSeriesData
 	for _, metric := range metrics {
 		cpuTSdata = append(cpuTSdata, TimeSeriesData{

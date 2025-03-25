@@ -11,8 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ZEGIFTED/MS.GoMonitor/internal"
+	"github.com/ZEGIFTED/MS.GoMonitor/internal/repository"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 	"github.com/jung-kurt/gofpdf"
 )
 
@@ -23,7 +24,7 @@ type SystemCount struct {
 
 func GenerateReport(db *sql.DB) (string, string) {
 	slog.Info("Fetching Metrics To Generate Report")
-	var metrics, tableHeaders, err = internal.FetchMetricsReport(db)
+	var metrics, tableHeaders, err = repository.FetchMetricsReport(db)
 
 	if err != nil {
 		log.Println("Error fetching metrics report", err)
@@ -76,7 +77,7 @@ func Header(pdf *gofpdf.Fpdf, reportTime string) {
 	pdf.Image(logoPath, pageWidth-50, 5, 35, 0, false, "", 0, "")
 }
 
-func ChartSection(pdf *gofpdf.Fpdf, metrics []internal.Metric) {
+func ChartSection(pdf *gofpdf.Fpdf, metrics []mstypes.AgentRepositoryMetric) {
 	pdf.AddPage()
 
 	// Section Title
@@ -246,7 +247,7 @@ func UsageBar(pdf *gofpdf.Fpdf, x, y, percentage float64) {
 //	}
 //}
 
-func MetricsTable(pdf *gofpdf.Fpdf, metrics []internal.Metric, tableHeaders []string) {
+func MetricsTable(pdf *gofpdf.Fpdf, metrics []mstypes.AgentRepositoryMetric, tableHeaders []string) {
 	pdf.SetY(50)
 	// Define column widths for each column.
 	//colWidths := []float64{30, 50, 20, 40, 30, 30, 30}
@@ -295,7 +296,7 @@ func MetricsTable(pdf *gofpdf.Fpdf, metrics []internal.Metric, tableHeaders []st
 
 	// Fetch process details via Agent API.
 	for _, mx := range metrics {
-		processes, err := internal.ServerResourceDetails(mx.AgentAPI, 10)
+		processes, err := repository.ServerResourceDetails(mx.AgentAPI, 10)
 
 		if err != nil {
 			log.Printf("Error fetching process details: %v", err)
@@ -313,7 +314,7 @@ func MetricsTable(pdf *gofpdf.Fpdf, metrics []internal.Metric, tableHeaders []st
 	// })
 }
 
-func NetworkMetricsTable(pdf *gofpdf.Fpdf, metrics []internal.Metric, tableHeaders []string) {
+func NetworkMetricsTable(pdf *gofpdf.Fpdf, metrics []mstypes.AgentRepositoryMetric, tableHeaders []string) {
 	// Define column widths for each column.
 	colWidths := []float64{30, 80, 30, 50, 40, 20, 20}
 
@@ -368,7 +369,7 @@ func WrappedTextCell(pdf *gofpdf.Fpdf, width float64, height float64, text strin
 }
 
 // ProcessTable adds a table to the PDF for a given server's process list.
-func ProcessTable(pdf *gofpdf.Fpdf, processes []internal.ProcessResourceUsage, server string) {
+func ProcessTable(pdf *gofpdf.Fpdf, processes []mstypes.ProcessResourceUsage, server string) {
 	// Define column widths for each column.
 	colWidths := []float64{20, 80, 20, 40, 30, 20, 20}
 
@@ -408,7 +409,7 @@ func ProcessTable(pdf *gofpdf.Fpdf, processes []internal.ProcessResourceUsage, s
 	}
 }
 
-func GenerateCSV(metrics []internal.Metric, tableHeaders []string) string {
+func GenerateCSV(metrics []mstypes.AgentRepositoryMetric, tableHeaders []string) string {
 	// Construct the filename and path
 	if err := os.MkdirAll(constants.ReportsDir, os.ModePerm); err != nil {
 		log.Fatalf("Error creating reports directory: %s", err.Error())
@@ -456,7 +457,7 @@ func GenerateCSV(metrics []internal.Metric, tableHeaders []string) string {
 }
 
 // GeneratePDF metrics ServiceMonitorStatus
-func GeneratePDF(metrics []internal.Metric, headers []string) string {
+func GeneratePDF(metrics []mstypes.AgentRepositoryMetric, headers []string) string {
 	// Get current time and format it
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("January 2, 2006 15:04:05")

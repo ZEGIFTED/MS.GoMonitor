@@ -9,11 +9,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/ZEGIFTED/MS.GoMonitor/internal/repository"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 	"github.com/gosnmp/gosnmp"
 )
 
-func (service *SNMPServiceCheckerV3) Check(config ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
+func (service *SNMPServiceCheckerV3) Check(config ServiceMonitorData, _ context.Context, db *sql.DB) (ServiceMonitorStatus, bool) {
 
 	// Define the SNMPv3 connection parameters
 	target := config.Host
@@ -44,18 +46,15 @@ func (service *SNMPServiceCheckerV3) Check(config ServiceMonitorData, _ context.
 		{".1.3.6.1.2.1.1.1.0", "System Description"},
 		{".1.3.6.1.2.1.1.3.0", "Uptime"},
 		{".1.3.6.1.2.1.1.5.0", "System Name"},
+		{".1.3.6.1.2.1.1.6.0", "Location"},
 		{".1.3.6.1.2.1.2.1.0", "Number of Interfaces"},
 		{".1.3.6.1.2.1.25.2.2.0", "Memory"},
 		{".1.3.6.1.2.1.31.1.1.1.6.1", "Inbound traffic"},
 		{".1.3.6.1.2.1.31.1.1.1.10.1", "Outbound traffic"},
 	}
 
-	// const OIDs interface {} = (
-	// 	".1.3.6.1.2.1.1.1.0",
-	// 	".1.3.6.1.2.1.1.3.0" // 4118776 UPTIME
-	// 	".1.3.6.1.2.1.1.5.0", // System Name
-	// 	".1.3.6.1.2.1.1.6.0", // location
-
+	//  OIDs :=
+	//  []{
 	// 	".1.3.6.1.2.1.25.2.3.1.4.1", // OID for physical memory utilization
 	// 	".1.3.6.1.2.1.25.2.3.1.4.2", // OID for physical memory utilization
 	// 	".1.3.6.1.2.1.25.2.3.1.4.3", // OID for physical memory utilization
@@ -87,7 +86,7 @@ func (service *SNMPServiceCheckerV3) Check(config ServiceMonitorData, _ context.
 	// 	// ".1.3.6.1.2.1.25.2.3.1.8.1",
 	// 	".1.3.6.1.2.1.25.2.3.1.7.2",
 	// 	".1.3.6.1.2.1.25.2.3.1.7.5",
-	// );
+	//  };
 
 	//ifInOctetsOID  = "1.3.6.1.2.1.2.2.1.10.1" // Incoming traffic (Replace 1 with your interface index)
 	//ifOutOctetsOID = "1.3.6.1.2.1.2.2.1.16.1" // Outgoing traffic
@@ -102,13 +101,13 @@ func (service *SNMPServiceCheckerV3) Check(config ServiceMonitorData, _ context.
 		Port:          uint16(port),
 		Version:       gosnmp.Version3,
 		Timeout:       time.Duration(35) * time.Second,
-		SecurityModel: gosnmp.UserSecurityModel,
-		MsgFlags:      gosnmp.AuthPriv, // Use AuthPriv for both authentication and privacy
+		SecurityModel: gosnmp.Default.SecurityModel,
+		MsgFlags:      gosnmp.Default.MsgFlags, // Use AuthPriv for both authentication and privacy
 		SecurityParameters: &gosnmp.UsmSecurityParameters{
 			UserName:                 username,
-			AuthenticationProtocol:   gosnmp.SHA, // Use SHA for authentication
+			AuthenticationProtocol:   gosnmp.SHA512, // Use SHA for authentication
 			AuthenticationPassphrase: authPassword,
-			PrivacyProtocol:          gosnmp.AES, // Use AES for privacy
+			PrivacyProtocol:          gosnmp.AES256, // Use AES for privacy
 			PrivacyPassphrase:        privPassword,
 			AuthoritativeEngineTime:  uint32(time.Now().Unix()),
 		},
@@ -139,11 +138,12 @@ func (service *SNMPServiceCheckerV3) Check(config ServiceMonitorData, _ context.
 
 	// Get SNMP metrics
 	fmt.Printf("Device Information for %s: ---------------- \n", config.Host)
+	var metrics []mstypes.NetworkDeviceMetric
 
 	for _, metric := range commonMetrics {
 		result, err := snmp.Get([]string{metric.OID})
 		if err != nil {
-			log.Printf("Error getting %s: %v\n", metric.Description, err)
+			log.Printf("Error getting %s: %v ============= \n", metric.Description, err)
 			continue
 		}
 
@@ -162,6 +162,8 @@ func (service *SNMPServiceCheckerV3) Check(config ServiceMonitorData, _ context.
 			}
 		}
 	}
+
+	repository.SyncNetworkMetrics(db, metrics)
 
 	// Get interface information
 	// interfaces, err := getInterfaces(snmp)
@@ -194,31 +196,31 @@ func (service *SNMPServiceCheckerV3) Check(config ServiceMonitorData, _ context.
 	}, true
 }
 
-func getInterfacesV3(snmp *gosnmp.GoSNMP) ([]string, error) {
-	var interfaces []string
+// func getInterfacesV3(snmp *gosnmp.GoSNMP) ([]string, error) {
+// 	var interfaces []string
 
-	//err_ := snmp.Walk("1.3.6.1.2.1.2.2.1", func(variable gosnmp.SnmpPDU) error {
-	//	fmt.Printf("OID: %s, Value: %v\n", variable.Name, variable.Value)
-	//	return nil
-	//})
-	//if err_ != nil {
-	//	log.Fatalf("Error walking SNMP table: %v", err_)
-	//}
+// 	//err_ := snmp.Walk("1.3.6.1.2.1.2.2.1", func(variable gosnmp.SnmpPDU) error {
+// 	//	fmt.Printf("OID: %s, Value: %v\n", variable.Name, variable.Value)
+// 	//	return nil
+// 	//})
+// 	//if err_ != nil {
+// 	//	log.Fatalf("Error walking SNMP table: %v", err_)
+// 	//}
 
-	// Get interface descriptions
-	// Define the walk function
-	walkFn := func(pdu gosnmp.SnmpPDU) error {
-		if pdu.Type == gosnmp.OctetString {
-			interfaces = append(interfaces, string(pdu.Value.([]byte)))
-		}
-		return nil
-	}
+// 	// Get interface descriptions
+// 	// Define the walk function
+// 	walkFn := func(pdu gosnmp.SnmpPDU) error {
+// 		if pdu.Type == gosnmp.OctetString {
+// 			interfaces = append(interfaces, string(pdu.Value.([]byte)))
+// 		}
+// 		return nil
+// 	}
 
-	// Get interface descriptions using BulkWalk with callback
-	err := snmp.BulkWalk(".1.3.6.1.2.1.2.2.1.2", walkFn)
-	if err != nil {
-		return nil, fmt.Errorf("BulkWalk error: %v", err)
-	}
+// 	// Get interface descriptions using BulkWalk with callback
+// 	err := snmp.BulkWalk(".1.3.6.1.2.1.2.2.1.2", walkFn)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("BulkWalk error: %v", err)
+// 	}
 
-	return interfaces, nil
-}
+// 	return interfaces, nil
+// }
