@@ -26,39 +26,53 @@ func SyncNetworkMetrics(db *sql.DB, Metrics []mstypes.NetworkDeviceMetric) error
 		}
 	}(tx)
 
+	// netSyncQuery := `
+	// 		INSERT INTO network_metrics (device_name, device_ip, metric_name, metric_oid, metric_value, timestamp)
+	// 		VALUES (?, ?, ?, ?, ?, NOW())
+	// 		ON DUPLICATE KEY UPDATE metric_value = VALUES(metric_value), timestamp = NOW()
+	// 	`
+
 	netSyncQuery := `
-		MERGE INTO NetworkMetricData AS target
-		USING (VALUES %s) AS source (DeviceName, Uptime, Interfaces, Description, CPUUsage, MemoryUsage, InboundTraffic, OutboundTraffic, LastPoll, AgentID, AgentHostName, AgentHostAddress, OS, AgentVersion, SDKVersion)
-		ON target.AgentID = source.AgentID
+		MERGE INTO NetworkDeviceMetricData AS target
+		USING (VALUES %s) AS source (SystemMonitorId, DeviceName, MetricName, DeviceIP, MetricDescription, MetricValue, LastPoll)
+		ON target.DeviceIP = source.DeviceIP
 		WHEN MATCHED THEN
 			UPDATE SET 
-				DeviceName = source.DeviceName,
-				Uptime = source.Uptime,
-				Interfaces = source.Interfaces,
-				Description = source.Description,
-				CPUUsage = source.CPUUsage,
-				MemoryUsage = source.MemoryUsage,
-				InboundTraffic = source.InboundTraffic,
-				OutboundTraffic = source.OutboundTraffic,
-				LastPoll = GETDATE()
+			SystemMonitorId = source.SystemMonitorId,
+			DeviceName = source.DeviceName,
+			MetricName = source.MetricName,
+			DeviceIP = source.DeviceIP,
+			MetricDescription = source.MetricDescription,
+			MetricValue = source.MetricValue,
+			LastPoll = source.LastPoll
 		WHEN NOT MATCHED THEN 
-			INSERT (DeviceName, Uptime, Interfaces, Description, CPUUsage, MemoryUsage, InboundTraffic, OutboundTraffic, LastPoll) 
-			VALUES (source.DeviceName, source.Uptime, source.Interfaces, source.Description, source.CPUUsage, source.MemoryUsage, source.InboundTraffic, source.OutboundTraffic, source.LastPoll);
+			INSERT (SystemMonitorId, DeviceName, MetricName, DeviceIP, MetricDescription, MetricValue, LastPoll) 
+			VALUES (
+			source.SystemMonitorId,
+			source.DeviceName,
+			source.MetricName,
+			source.DeviceIP,
+			source.MetricDescription,
+			source.MetricValue,
+			source.LastPoll);
 	`
 
 	// Prepare the metric values for the query
 	var metricValues []string
 	for _, metric := range Metrics {
-		metricValues = append(metricValues, fmt.Sprintf("('%s', '%s', '%s', '%s', %f, %f, %f, %f)",
+		metricValues = append(metricValues, fmt.Sprintf("('%s', '%s', '%s', '%s', '%s', '%s', CAST('%s' AS DATETIME))",
+			metric.SystemMonitorId,
 			metric.DeviceName,
-			metric.Uptime,
-			metric.Interfaces,
-			metric.Description,
-			metric.CPUUsage,
-			metric.MemoryUsage,
-			metric.InboundTraffic,
-			metric.OutboundTraffic,
+			metric.MetricName,
+			metric.DeviceIP,
+			metric.MetricDescription,
+			metric.MetricValue,
+			metric.LastPoll,
 		))
+	}
+
+	for v, i := range metricValues {
+		log.Println(v, i)
 	}
 
 	if len(metricValues) > 0 {

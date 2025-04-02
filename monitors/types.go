@@ -18,15 +18,13 @@ type ServiceType string
 const (
 	ServiceMonitorAgent      ServiceType = "AGENT"
 	ServiceMonitorWebModules ServiceType = "Web Modules"
-	ServiceMonitorSNMP_V2    ServiceType = "NetworkV2"
-	ServiceMonitorSNMP_V3    ServiceType = "NetworkV3"
+	ServiceMonitorSNMP       ServiceType = "Network"
 	ServiceMonitorServer     ServiceType = "Server"
 )
 
 type AgentServiceChecker struct{}
 type WebModulesServiceChecker struct{}
-type SNMPServiceCheckerV2 struct{}
-type SNMPServiceCheckerV3 struct{}
+type SNMPServiceChecker struct{}
 type ServerHealthChecker struct{}
 
 type ServiceMonitorData struct {
@@ -39,7 +37,7 @@ type ServiceMonitorData struct {
 	Device          ServiceType
 	FailureCount    int
 	RetryCount      int
-	Configuration   map[string]interface{} // Settings for this service
+	Configuration   map[string]interface{} // Custom Settings for this service
 	CheckInterval   string                 `json:"check_interval"`
 	SnoozeUntil     sql.NullTime           `json:"snooze_until"`
 	AgentAPIBaseURL string                 `json:"agent_api"`

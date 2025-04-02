@@ -86,10 +86,11 @@ func (a *AgentRepository) GetAgentThresholds(agentURL string) (mstypes.AgentThre
 
 func ServerResourceDetails(baseURL string, limit int) ([]mstypes.ProcessResourceUsage, error) {
 	// Construct URL with query parameter.
-	resp, err := http.Get(baseURL + "/api/v1/agent/resource-usage?limit=" + strconv.Itoa(limit))
+	route := baseURL + "/api/v1/agent/resource-usage?limit=" + strconv.Itoa(limit)
+	resp, err := http.Get(route)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Route: %s. Error >>> %s", route, err.Error())
 	}
 	defer resp.Body.Close()
 

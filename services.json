@@ -5,13 +5,14 @@
     "host": "192.168.100.252",
     "port": 161,
     "vp": true,
-    "device": "NetworkV2",
+    "device": "Network",
     "failure_count": 0,
     "retry_count": 1,
     "configuration": {
       "communityString": "msmonitoring",
       "authUsernameV3": "msmonitoring",
-      "authPasswordV3": "CaMoniLeb"
+      "authPasswordV3": "CaMoniLeb",
+      "snmpVersion": "v2"
     },
     "check_interval": "*/1 * * * *",
     "is_acknowledged": false,

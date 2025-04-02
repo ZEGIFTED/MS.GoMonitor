@@ -1,15 +1,18 @@
 package utils
 
 import (
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
-	"github.com/natefinch/lumberjack"
 	"io"
 	"log"
 	"os"
+
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
+	"github.com/natefinch/lumberjack"
 )
 
 var Logger *log.Logger
 var CronLogger *log.Logger
+
+type MSSVCLogger struct{}
 
 func init() {
 	Logger = log.New(os.Stdout, "MS-SVC_MONITOR: ", log.Ldate|log.Ltime|log.Lshortfile)
@@ -46,5 +49,8 @@ func init() {
 			log.Fatalf("Failed to close log file: %v", err)
 		}
 	}(LogFile)
+}
 
+func (logger *MSSVCLogger) LogHttpErrors(route string, errorS error) {
+	log.Panicf("API Route: %s. Error >>> %s", route, errorS.Error())
 }

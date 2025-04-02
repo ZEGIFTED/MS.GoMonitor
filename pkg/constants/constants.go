@@ -69,7 +69,7 @@ type DBConfig struct {
 }
 
 var DB = DBConfig{
-	Host:     GetEnvWithDefault("DBHOST", "10.109.0.113"),
+	Host:     GetEnvWithDefault("DBHOST", "localhost"),
 	Port:     GetEnvWithDefault("DB_PORT", "1433"),
 	Name:     GetEnvWithDefault("DB_NAME", "MS"),
 	User:     GetEnvWithDefault("DB_USER", "sa"),

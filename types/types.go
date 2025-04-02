@@ -77,16 +77,21 @@ type ServerResource struct {
 
 // NetworkDevice represents the network device bandwidth utilization data
 type NetworkDeviceMetric struct {
-	DeviceName           string
-	Uptime               string
-	Interfaces           string
-	BandwidthUtilization float64
-	Description          string
-	CPUUsage             float64
-	MemoryUsage          float64
-	InboundTraffic       float64
-	OutboundTraffic      float64
-	LastPoll             string
+	SystemMonitorId   string
+	DeviceName        string
+	DeviceIP          string
+	MetricName        string
+	MetricDescription string
+	MetricValue       string
+	LastPoll          string
+	// Uptime               string
+	// Interfaces           string
+	// BandwidthUtilization float64
+	// Description          string
+	// CPUUsage             float64
+	// MemoryUsage          float64
+	// InboundTraffic       float64
+	// OutboundTraffic      float64
 }
 
 // ProcessResourceUsage represents a single process entry returned by the Agent API endpoint.

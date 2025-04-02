@@ -100,10 +100,12 @@ func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 	}
 
 	// Register service type checkers
-	// monitor.Checkers[monitors.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
+	if false {
+		monitor.Checkers[monitors.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
+	}
 	// monitor.Checkers[monitors.ServiceMonitorWebModules] = &monitors.WebModulesServiceChecker{}
 	// monitor.Checkers[monitors.ServiceMonitorSNMP_V3] = &monitors.SNMPServiceCheckerV3{}
-	monitor.Checkers[monitors.ServiceMonitorSNMP_V2] = &monitors.SNMPServiceCheckerV2{}
+	monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
 
 	// monitor.Checkers[monitors.ServiceMonitorServer] = &monitors.ServerHealthChecker{}
 
@@ -117,7 +119,7 @@ func main() {
 		log.Fatalf("Fatal Error loading Env file. %s", envErr.Error())
 	}
 
-	log.Println("Environment Variables Loaded:", os.Environ())
+	log.Println("Environment Variables Loaded:", constants.GetEnvWithDefault("MAILHOST", "..."))
 
 	// Ensure multi-core utilization
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -197,15 +199,15 @@ func main() {
 		}
 	}()
 
-	handler := &monitors.NetworkManager{
-		Community: "public",
-		TrapPort:  162, // Standard SNMP trap port
-	}
+	// handler := &monitors.NetworkManager{
+	// 	Community: "public",
+	// 	TrapPort:  162, // Standard SNMP trap port
+	// }
 
-	trapErr := handler.StartListener()
-	if err != nil {
-		log.Fatalf("Failed to start trap handler: %v", trapErr)
-	}
+	// trapErr := handler.StartListener()
+	// if err != nil {
+	// 	log.Fatalf("Failed to start trap handler: %v", trapErr)
+	// }
 
 	// Create the payload
 	//teamsMessage := messaging.TeamsMessage{
@@ -240,7 +242,7 @@ func main() {
 	// Wait for shutdown signal
 	<-shutdown
 	log.Println("Shutting down...")
-	handler.StopListener()
+	// handler.StopListener()
 
 	// Graceful shutdown
 	monitor.StopService()

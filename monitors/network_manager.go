@@ -20,15 +20,15 @@ type NetworkManager struct {
 	Target       string
 	Community    string
 	TrapPort     int
-	Username     string
+	AuthUser     string
 	AuthPassword string
 	PrivPassword string
 }
 
-func (nm *NetworkManager) NewNM(device string) *NetworkManager {
+func (nm *NetworkManager) SNMPClient(deviceVersion string) *NetworkManager {
 	var snmp gosnmp.GoSNMP
 
-	if strings.EqualFold(string(device), "NetworkV2") {
+	if strings.Contains(deviceVersion, "v2") {
 		log.Println("Using SNMP v2")
 
 		snmp = gosnmp.GoSNMP{
@@ -47,9 +47,9 @@ func (nm *NetworkManager) NewNM(device string) *NetworkManager {
 			Version:       gosnmp.Version3,
 			Timeout:       time.Duration(35) * time.Second,
 			SecurityModel: gosnmp.Default.SecurityModel,
-			MsgFlags:      gosnmp.Default.MsgFlags, // Use AuthPriv for both authentication and privacy
+			MsgFlags:      gosnmp.AuthNoPriv, // Default to AuthNoPriv. Use AuthPriv for both authentication and privacy
 			SecurityParameters: &gosnmp.UsmSecurityParameters{
-				UserName:                 nm.Username,
+				UserName:                 nm.AuthUser,
 				AuthenticationProtocol:   gosnmp.SHA512, // Use SHA for authentication
 				AuthenticationPassphrase: nm.AuthPassword,
 				PrivacyProtocol:          gosnmp.AES256, // Use AES for privacy
@@ -58,6 +58,10 @@ func (nm *NetworkManager) NewNM(device string) *NetworkManager {
 			},
 			Retries: constants.MaxRetries,
 			// Logger:  gosnmp.NewLogger(log.New(os.Stdout, "", 0)),
+		}
+
+		if nm.PrivPassword != "" {
+			snmp.MsgFlags = gosnmp.AuthPriv
 		}
 	}
 
