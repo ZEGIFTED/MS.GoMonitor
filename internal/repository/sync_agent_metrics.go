@@ -1,19 +1,17 @@
 package repository
 
 import (
-	"crypto/tls"
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
-	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 	_ "github.com/microsoft/go-mssqldb"
 )
 
-func SyncAgentMetrics(db *sql.DB, agentMetrics []mstypes.AgentInfo, agentSyncURL string) error {
+func SyncAgentMetrics(db *sql.DB, agentMetrics []mstypes.AgentInfo, agentHttpClient *http.Client, agentSyncURL string) error {
 	// Begin Sync Transaction
 	tx, err := db.Begin()
 
@@ -105,16 +103,8 @@ func SyncAgentMetrics(db *sql.DB, agentMetrics []mstypes.AgentInfo, agentSyncURL
 		}
 	}
 
-	// Create a custom HTTP client with disabled SSL verification
-	client := &http.Client{
-		Timeout: constants.HTTPRequestTimeout,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
-
 	log.Println("Notifying Agent of Sync Completion", agentSyncURL)
-	_, err_ := client.Get(agentSyncURL)
+	_, err_ := agentHttpClient.Get(agentSyncURL)
 	if err_ != nil {
 		return err
 	}

@@ -18,19 +18,20 @@ func SyncNetworkMetrics(db *sql.DB, Metrics []mstypes.NetworkDeviceMetric) error
 		return err
 	}
 
-	defer func(tx *sql.Tx) {
-		if err != nil {
-			tx.Rollback()
-		} else {
-			tx.Commit()
-		}
-	}(tx)
+	defer tx.Rollback()
 
-	// netSyncQuery := `
-	// 		INSERT INTO network_metrics (device_name, device_ip, metric_name, metric_oid, metric_value, timestamp)
+	// defer func(tx *sql.Tx) {
+	// 	if err != nil {
+	// 		tx.Rollback()
+	// 	} else {
+	// 		tx.Commit()
+	// 	}
+	// }(tx)
+
+	//   stmt, err := tx.Prepare(`INSERT INTO NetworkDeviceMetricData (SystemMonitorId, DeviceName, MetricName, DeviceIP, MetricDescription, MetricValue, LastPoll)
 	// 		VALUES (?, ?, ?, ?, ?, NOW())
 	// 		ON DUPLICATE KEY UPDATE metric_value = VALUES(metric_value), timestamp = NOW()
-	// 	`
+	// 	`)
 
 	netSyncQuery := `
 		MERGE INTO NetworkDeviceMetricData AS target
@@ -82,5 +83,5 @@ func SyncNetworkMetrics(db *sql.DB, Metrics []mstypes.NetworkDeviceMetric) error
 		}
 	}
 
-	return nil
+	return tx.Commit()
 }

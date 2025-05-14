@@ -14,12 +14,14 @@ import (
 )
 
 type ServiceType string
+type Engines string
 
 const (
 	ServiceMonitorAgent      ServiceType = "AGENT"
 	ServiceMonitorWebModules ServiceType = "Web Modules"
 	ServiceMonitorSNMP       ServiceType = "Network"
 	ServiceMonitorServer     ServiceType = "Server"
+	DockerEngine             Engines     = "Docker"
 )
 
 type AgentServiceChecker struct{}
@@ -28,19 +30,20 @@ type SNMPServiceChecker struct{}
 type ServerHealthChecker struct{}
 
 type ServiceMonitorData struct {
-	SystemMonitorId uuid.UUID `json:"system_monitor_id"`
+	SystemMonitorId uuid.UUID `json:"systemMonitorId"`
 	Name            string
 	Host            string
 	Port            int
 	VP              bool // Is monitoring active?
 	IsAcknowledged  bool // Is failing service acknowledged?
 	Device          ServiceType
+	Engine          Engines
 	FailureCount    int
 	RetryCount      int
-	Configuration   map[string]interface{} // Custom Settings for this service
-	CheckInterval   string                 `json:"check_interval"`
-	SnoozeUntil     sql.NullTime           `json:"snooze_until"`
-	AgentAPIBaseURL string                 `json:"agent_api"`
+	Configuration   map[string]any // Custom Settings for this service
+	CheckInterval   string         `json:"check_interval"`
+	SnoozeUntil     sql.NullTime   `json:"snooze_until"`
+	AgentAPIBaseURL string         `json:"agent_api"`
 	AgentRepository repository.AgentRepository
 }
 

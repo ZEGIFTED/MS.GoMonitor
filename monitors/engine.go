@@ -443,13 +443,13 @@ func (sm *ServiceMonitor) AlertHandler() {
 				}
 
 				if alert.Device != "Network" && alert.Device != "Database" {
-					agentStatsEndpoint, aErr := alert.AgentRepository.ValidateAgentURL(alert.AgentAPI, "/api/v1/agent/resource-usage?limit=5")
+					agentHttpClient, agentStatsEndpoint, aErr := alert.AgentRepository.ValidateAgentURL(alert.AgentAPI, "/api/v1/agent/resource-usage?limit=5")
 
 					if aErr != nil {
 						log.Println(aErr.Error())
 					}
 
-					stats, statsErr := alert.AgentRepository.GetAgentServiceStats(agentStatsEndpoint)
+					stats, statsErr := alert.AgentRepository.GetAgentServiceStats(agentHttpClient, agentStatsEndpoint)
 
 					if statsErr != nil {
 						log.Println(statsErr.Error())

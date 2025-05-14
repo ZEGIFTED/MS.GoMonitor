@@ -17,19 +17,7 @@ import (
 )
 
 func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Context, _ *sql.DB) (ServiceMonitorStatus, bool) {
-	// Get the URL from configuration
-	//host := agent.Host
-	//protocol, ok := agent.Configuration["protocol"]
-
-	//if !ok || (protocol != "https" && protocol != "http") {
-	//	log.Println("invalid agent protocol in configuration... Using default")
-	//
-	//	protocol = "http"
-	//}
-	//
-	//protocol = protocol.(string)
-
-	agentAddress, err := agent.AgentRepository.ValidateAgentURL(agent.AgentAPIBaseURL, "/api/v1/agent/health")
+	agentHttpClient, agentAddress, err := agent.AgentRepository.ValidateAgentURL(agent.AgentAPIBaseURL, "/api/v1/agent/health")
 
 	if err != nil {
 		return ServiceMonitorStatus{
@@ -42,12 +30,8 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 		}, false
 	}
 
-	client := &http.Client{
-		Timeout: constants.HTTPRequestTimeout,
-	}
-
 	slog.Info("Calling Agent API", "Endpoint", agentAddress)
-	resp, err := client.Get(agentAddress)
+	resp, err := agentHttpClient.Get(agentAddress)
 
 	if err != nil {
 		return ServiceMonitorStatus{
@@ -159,7 +143,7 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 	if len(agents) > 0 {
 		db := utils.DatabaseConnection()
 
-		agentSyncURL, err_ := agent.AgentRepository.ValidateAgentURL(agent.AgentAPIBaseURL, "/api/v1/agent/sync_complete")
+		agentHttpClient, agentSyncURL, err_ := agent.AgentRepository.ValidateAgentURL(agent.AgentAPIBaseURL, "/api/v1/agent/sync_complete")
 
 		if err_ != nil {
 			return ServiceMonitorStatus{
@@ -172,7 +156,7 @@ func (service *AgentServiceChecker) Check(agent ServiceMonitorData, _ context.Co
 			}, false
 		}
 
-		if syncErr := repository.SyncAgentMetrics(db, agents, agentSyncURL); syncErr != nil {
+		if syncErr := repository.SyncAgentMetrics(db, agents, agentHttpClient, agentSyncURL); syncErr != nil {
 			return ServiceMonitorStatus{
 				Name:          agent.Name,
 				Device:        agent.Device,

@@ -3,6 +3,7 @@ package utils
 import (
 	"database/sql"
 	"log"
+	"log/slog"
 
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 )
@@ -12,6 +13,8 @@ func DatabaseConnection() *sql.DB {
 	connString := constants.DatabaseConnString
 
 	db, err := sql.Open("sqlserver", connString)
+	slog.Info(connString)
+
 	if err != nil {
 		log.Println("Error creating connection pool: ", err.Error())
 	}

@@ -82,7 +82,7 @@ type NetworkDeviceMetric struct {
 	DeviceIP          string
 	MetricName        string
 	MetricDescription string
-	MetricValue       string
+	MetricValue       any
 	LastPoll          string
 	// Uptime               string
 	// Interfaces           string
@@ -166,6 +166,9 @@ type Config struct {
 
 type AgentThresholdResponse struct {
 	Config Config `json:"config"`
+}
+
+type AgentContainerResponse struct {
 }
 
 // import (

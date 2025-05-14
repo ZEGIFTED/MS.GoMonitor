@@ -63,11 +63,21 @@ func (service *ServerHealthChecker) Check(server ServiceMonitorData, ctx context
 		agentMetrics[metric.AgentID] = append(agentMetrics[metric.AgentID], metric)
 	}
 
-	//if err := rows.Err(); err != nil {
-	//	log.Println("Error iterating over rows:", err)
-	//	return nil, err
-	//}
-	agentThresholdEndpoint, err := server.AgentRepository.ValidateAgentURL(server.AgentAPIBaseURL, "api/v1/agent/config")
+	if server.Device == "Docker" {
+		agentHttpClient, nt, err := server.AgentRepository.ValidateAgentURL(server.AgentAPIBaseURL, "api/v1/agent/container")
+		if err != nil {
+			return ServiceMonitorStatus{
+				Status: err.Error(),
+			}, false
+		}
+
+		_, tErr := server.AgentRepository.GetAgentContainerStats(agentHttpClient, nt)
+		if tErr != nil {
+			slog.Error(" fetching agent thresholds:", "Error", tErr.Error())
+		}
+	}
+
+	agentHttpClient, agentThresholdEndpoint, err := server.AgentRepository.ValidateAgentURL(server.AgentAPIBaseURL, "api/v1/agent/config")
 	if err != nil {
 		return ServiceMonitorStatus{
 			Status: err.Error(),
@@ -77,7 +87,7 @@ func (service *ServerHealthChecker) Check(server ServiceMonitorData, ctx context
 	//log.Println(agentThresholdEndpoint, len(agentMetrics), agentMetrics)
 
 	for agentID, metrics := range agentMetrics {
-		agentThresholds, tErr := server.AgentRepository.GetAgentThresholds(agentThresholdEndpoint)
+		agentThresholds, tErr := server.AgentRepository.GetAgentThresholds(agentHttpClient, agentThresholdEndpoint)
 		if tErr != nil {
 			slog.Error(" fetching agent thresholds:", "Error", tErr.Error())
 			continue

@@ -6,35 +6,15 @@ import (
 	"os"
 	"strings"
 	"time"
-	// "github.com/joho/godotenv"
+
+	_ "github.com/joho/godotenv/autoload"
 )
-
-func init() {
-	// Load .env file
-	// err := godotenv.Load(".env")
-
-	// if err != nil {
-	// 	log.Fatalf("Warning: Error loading Env file. %s", err.Error())
-	// }
-
-	// Ensure all env vars are uppercase
-	// for _, e := range os.Environ() {
-	// 	pair := strings.SplitN(e, "=", 2)
-	// 	if len(pair) == 2 {
-	// 		upperKey := strings.ToUpper(pair[0])
-	// 		if upperKey != pair[0] {
-	// 			os.Setenv(upperKey, pair[1])
-	// 		}
-	// 	}
-	// }
-	// log.Println("Environment Variables Loaded:", os.Environ())
-}
 
 // GetEnvWithDefault retrieves an environment variable with a fallback default value
 func GetEnvWithDefault(key, defaultValue string) string {
 	// Try exact case first
 	if value := os.Getenv(key); value != "" {
-		log.Printf("Found env %s=%s", key, value)
+		// log.Printf("Found env %s=%s", key, value)
 		return value
 	}
 
@@ -69,11 +49,11 @@ type DBConfig struct {
 }
 
 var DB = DBConfig{
-	Host:     GetEnvWithDefault("DBHOST", "localhost"),
-	Port:     GetEnvWithDefault("DB_PORT", "1433"),
-	Name:     GetEnvWithDefault("DB_NAME", "MS"),
-	User:     GetEnvWithDefault("DB_USER", "sa"),
-	Password: GetEnvWithDefault("DB_PASSWORD", "dbuser123$"),
+	Host:     GetEnvWithDefault("DBHOST", ""),
+	Port:     GetEnvWithDefault("DB_PORT", ""),
+	Name:     GetEnvWithDefault("DB_NAME", ""),
+	User:     GetEnvWithDefault("DB_USER", ""),
+	Password: GetEnvWithDefault("DB_PASSWORD", ""),
 }
 
 var (

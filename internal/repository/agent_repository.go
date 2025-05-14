@@ -16,35 +16,11 @@ import (
 
 type AgentRepository struct{}
 
-func (a *AgentRepository) ValidateAgentURL(AgentAPIBaseURL, endpoint string) (string, error) {
+func (a *AgentRepository) ValidateAgentURL(AgentAPIBaseURL, endpoint string) (*http.Client, string, error) {
 	// Parse the AgentAPIBaseURL
 	parsedURL, err := url.Parse(AgentAPIBaseURL)
 	if err != nil {
-		return "", fmt.Errorf("invalid Agent Base URL")
-	}
-
-	//if parsedURL.Hostname() == AgentAPIBaseURL {
-	return parsedURL.ResolveReference(&url.URL{Path: endpoint}).String(), nil
-	//}
-
-	//if host == "" || port == "" || endpoint == "" {
-	//	return "", fmt.Errorf("invalid Agent URL")
-	//}
-	//
-	//if protocol != "https" && protocol != "http" {
-	//	log.Println("invalid agent protocol in configuration... Using default")
-	//
-	//	protocol = "http"
-	//}
-	//
-	//agentAddress := fmt.Sprintf("%v://%s:%d/%s", protocol, host, port, endpoint)
-	//
-	//return agentAddress, nil
-}
-
-func (a *AgentRepository) GetAgentThresholds(agentURL string) (mstypes.AgentThresholdResponse, error) {
-	if agentURL == "" {
-		return mstypes.AgentThresholdResponse{}, fmt.Errorf("invalid agent Base URL")
+		return nil, "", fmt.Errorf("invalid Agent Base URL")
 	}
 
 	// Create a custom HTTP client with disabled SSL verification
@@ -55,7 +31,15 @@ func (a *AgentRepository) GetAgentThresholds(agentURL string) (mstypes.AgentThre
 		},
 	}
 
-	resp, err := httpClient.Get(agentURL)
+	return httpClient, parsedURL.ResolveReference(&url.URL{Path: endpoint}).String(), nil
+}
+
+func (a *AgentRepository) GetAgentThresholds(agentHttpClient *http.Client, agentURL string) (mstypes.AgentThresholdResponse, error) {
+	if agentURL == "" {
+		return mstypes.AgentThresholdResponse{}, fmt.Errorf("invalid agent Base URL")
+	}
+
+	resp, err := agentHttpClient.Get(agentURL)
 
 	if err != nil {
 		return mstypes.AgentThresholdResponse{}, err
@@ -90,7 +74,7 @@ func ServerResourceDetails(baseURL string, limit int) ([]mstypes.ProcessResource
 	resp, err := http.Get(route)
 
 	if err != nil {
-		return nil, fmt.Errorf("Route: %s. Error >>> %s", route, err.Error())
+		return nil, fmt.Errorf("route: %s. Error >>> %s", route, err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -109,20 +93,13 @@ func ServerResourceDetails(baseURL string, limit int) ([]mstypes.ProcessResource
 	return processes, nil
 }
 
-func (a *AgentRepository) GetAgentServiceStats(agentURL string) (mstypes.ProcessResponse, error) {
+func (a *AgentRepository) GetAgentServiceStats(agentHttpClient *http.Client, agentURL string) (mstypes.ProcessResponse, error) {
 	if agentURL == "" {
 		return nil, fmt.Errorf("invalid agent Base URL")
 	}
 
-	// Create a custom HTTP client with disabled SSL verification
-	// httpClient := &http.Client{
-	// 	Timeout: constants.HTTPRequestTimeout,
-	// 	Transport: &http.Transport{
-	// 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	// 	},
-	// }
 	log.Println("Retrieving Device Processes")
-	resp, err := http.Get(agentURL)
+	resp, err := agentHttpClient.Get(agentURL)
 
 	if err != nil {
 		return nil, err
@@ -143,4 +120,38 @@ func (a *AgentRepository) GetAgentServiceStats(agentURL string) (mstypes.Process
 	}
 
 	return processes, nil
+}
+
+func (a *AgentRepository) GetAgentContainerStats(agentHttpClient *http.Client, agentURL string) (mstypes.AgentContainerResponse, error) {
+	if agentURL == "" {
+		return mstypes.AgentContainerResponse{}, fmt.Errorf("invalid agent Base URL")
+	}
+
+	resp, err := agentHttpClient.Get(agentURL)
+
+	if err != nil {
+		return mstypes.AgentContainerResponse{}, err
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Printf("Error closing response body: %v", err)
+		}
+	}(resp.Body)
+
+	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return mstypes.AgentContainerResponse{}, err
+	}
+
+	var apiResponse mstypes.AgentContainerResponse
+	if err_ := json.Unmarshal(body, &apiResponse); err_ != nil {
+		return mstypes.AgentContainerResponse{}, err
+	}
+
+	log.Println("Agent Threshold API response", apiResponse)
+
+	return apiResponse, nil
 }

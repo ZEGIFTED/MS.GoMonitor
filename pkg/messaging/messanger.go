@@ -328,11 +328,15 @@ func (cfgManager *NotificationManager) SendReportEmail(to []string, pdfAttachmen
 	m.Attach(pdfAttachmentFilePath)
 	m.Attach(csvAttachmentFilePath)
 
-	if err := d.DialAndSend(m); err != nil {
+	err := d.DialAndSend(m)
+
+	if err != nil {
 		slog.Error("Failed to send email.", "Error", err.Error())
 	}
 
-	log.Println("📧Email Report sent successfully with the report attached.")
+	if err == nil {
+		slog.Info("📧Email Report sent successfully with the report attached.")
+	}
 }
 
 // SlackBotClient creates a new SlackClient instance

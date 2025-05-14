@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	// "log/slog"
 	"os"
@@ -22,39 +23,40 @@ import (
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/microsoft/go-mssqldb" // SQL Server driver
 	"github.com/robfig/cron/v3"
 )
 
 // EnvConfig holds all environment variables
-type EnvConfig struct {
-	Port      string
-	Host      string
-	APIKey    string
-	APISecret string
-	GoEnv     string
-	Debug     bool
-}
+// type EnvConfig struct {
+// 	Port      string
+// 	Host      string
+// 	APIKey    string
+// 	APISecret string
+// 	GoEnv     string
+// 	Debug     bool
+// }
 
 // LoadConfig loads environment variables from .env file
-func LoadConfig() (*EnvConfig, error) {
-	// Load .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Printf("Warning: .env file not found. Using system environment variables. %s", err.Error())
-	}
+// func LoadConfig() (*EnvConfig, error) {
+// 	// Load .env file
+// 	err := godotenv.Load()
+// 	if err != nil {
+// 		log.Printf("Warning: .env file not found. Using system environment variables. %s", err.Error())
+// 	}
 
-	config := &EnvConfig{
-		Port:      constants.GetEnvWithDefault("PORT", "8082"),
-		Host:      constants.GetEnvWithDefault("HOST", "localhost"),
-		APIKey:    constants.GetEnvWithDefault("API_KEY", ""),
-		APISecret: constants.GetEnvWithDefault("API_SECRET", ""),
-		GoEnv:     constants.GetEnvWithDefault("GO_ENV", "development"),
-		Debug:     constants.GetEnvWithDefault("DEBUG", "false") == "true",
-	}
+// 	config := &EnvConfig{
+// 		Port:      constants.GetEnvWithDefault("PORT", "8082"),
+// 		Host:      constants.GetEnvWithDefault("HOST", "localhost"),
+// 		APIKey:    constants.GetEnvWithDefault("SLACK_TOKEN", ""),
+// 		APISecret: constants.GetEnvWithDefault("LOG_LEVEL", ""),
+// 		GoEnv:     constants.GetEnvWithDefault("GO_ENV", "development"),
+// 		Debug:     constants.GetEnvWithDefault("DEBUG", "false") == "true",
+// 	}
 
-	return config, nil
-}
+// 	return config, nil
+// }
 
 func NotificationConfigurationManager(db *sql.DB) *messaging.NotificationManager {
 	configManager := messaging.NotificationManager{
@@ -113,13 +115,18 @@ func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 }
 
 func main() {
-	envErr := godotenv.Load(".env")
+	// 	err := godotenv.Load()
+	// 	if err != nil {
+	// 		log.Printf("Warning: .env file not found. Using system environment variables. %s", err.Error())
+	// 	}
+	envErr := godotenv.Load()
 
 	if envErr != nil {
 		log.Fatalf("Fatal Error loading Env file. %s", envErr.Error())
 	}
 
-	log.Println("Environment Variables Loaded:", constants.GetEnvWithDefault("MAILHOST", "..."))
+	// constants
+	log.Println("Environment Variables Loaded")
 
 	// Ensure multi-core utilization
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -127,10 +134,10 @@ func main() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	_, err := LoadConfig()
-	if err != nil {
-		log.Fatal("Error loading config:", err)
-	}
+	// _, err := LoadConfig()
+	// if err != nil {
+	// 	log.Fatal("Error loading config:", err)
+	// }
 
 	// Database configuration
 	db := utils.DatabaseConnection()
@@ -146,26 +153,43 @@ func main() {
 	defer cancel()
 
 	// Test the connection
-	err = db.PingContext(ctx)
+	err := db.PingContext(ctx)
 	if err != nil {
 		log.Printf("Error connecting to the database: %v", err)
 	}
 
 	go func() {
 		http.HandleFunc("/ws/notifer", notifier.ServeNotifierWs)
-		log.Println("Notifer server running on :2345")
-		err := http.ListenAndServe(":2345", nil)
+
+		http.HandleFunc("/ws/synthetic", notifier.ServeSyntheticDashboard)
+
+		wsPortStr := constants.GetEnvWithDefault("WS_PORT", "2345")
+		wsPortInt, err_ := strconv.Atoi(wsPortStr)
+		if err_ != nil {
+			wsPortInt = 1
+			log.Fatalf("invalid report interval: %v", err)
+		}
+
+		log.Printf("Dashboard && Notifer server running on :%v", wsPortInt)
+
+		err := http.ListenAndServe(fmt.Sprintf(":%d", wsPortInt), nil)
 		if err != nil {
 			log.Fatal("WebSocket server error:", err)
 		}
 	}()
 
 	go notifier.Hub_.Run()
-	// go notifier.SendNotifications()
+	go notifier.BroadcastDashboardData(db)
 
 	// Start the report generation in a goroutine
 	go func() {
-		ticker := time.NewTicker(7 * time.Minute)
+		reportStr := constants.GetEnvWithDefault("REPORT_HOUR_INTERVAL", "1")
+		reportInt, err := strconv.Atoi(reportStr)
+		if err != nil {
+			reportInt = 1
+			log.Fatalf("invalid report interval: %v", err)
+		}
+		ticker := time.NewTicker(time.Duration(reportInt) * time.Hour)
 		defer ticker.Stop()
 
 		for {
