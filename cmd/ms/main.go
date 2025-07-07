@@ -20,11 +20,14 @@ import (
 	"github.com/ZEGIFTED/MS.GoMonitor/notifier"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/constants"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/messaging"
+
+	"github.com/ZEGIFTED/MS.GoMonitor/pkg/plugins/http_monitor"
+	sslcheck "github.com/ZEGIFTED/MS.GoMonitor/pkg/plugins/ssl_checker"
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 	"github.com/joho/godotenv"
 	_ "github.com/joho/godotenv/autoload"
-	_ "github.com/microsoft/go-mssqldb" // SQL Server driver
+	_ "github.com/lib/pq" // PostgreSQL driver
 	"github.com/robfig/cron/v3"
 )
 
@@ -68,25 +71,30 @@ func NotificationConfigurationManager(db *sql.DB) *messaging.NotificationManager
 	err := configManager.LoadConfig()
 	if err != nil {
 		log.Printf("Error loading config: %v", err.Error())
-		return nil
 	}
 
-	configManager.Validate()
+	if err := configManager.Validate(); err != nil {
+		log.Fatalf("❌ Notification config validation failed: %v", err)
+	}
 
 	return &configManager
 }
 
 // NewServiceMonitor creates a new service monitor instance
-func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
+func NewServiceMonitor(db *sql.DB) *monitors.MonitoringEngine {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	logger := cron.PrintfLogger(utils.CronLogger)
 
-	monitor := &monitors.ServiceMonitor{
-		Db: db,
-		//StatusTracking:     make(map[string]*monitors.ServiceMonitorStatus),
+	monitor := &monitors.MonitoringEngine{
+		Services: make([]monitors.ServiceMonitorData, 0),
+		Db:       db,
 		//Logger:              utils.Logger,
-		Checkers:            make(map[monitors.ServiceType]monitors.ServiceChecker),
+		//StatusTracking:     make(map[string]*monitors.ServiceMonitorStatus),
+		DefaultHealth:     &monitors.HealthCheck{},
+		Plugins:           make(map[string]monitors.ServiceMonitorPlugin),
+		PluginInitialized: make(map[string]bool),
+
 		NotificationHandler: NotificationConfigurationManager(db),
 		Ctx:                 ctx,
 		Cancel:              cancel,
@@ -96,20 +104,22 @@ func NewServiceMonitor(db *sql.DB) *monitors.ServiceMonitor {
 			),
 			cron.WithLogger(logger),
 		),
-
-		//AlertCache: make(map[string]time.Time),
 		Alerts: make(chan internal.ServiceAlertEvent, 100),
 	}
 
-	// Register service type checkers
-	if false {
-		monitor.Checkers[monitors.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
-	}
+	// Register Default Service checkers
 	// monitor.Checkers[monitors.ServiceMonitorWebModules] = &monitors.WebModulesServiceChecker{}
-	// monitor.Checkers[monitors.ServiceMonitorSNMP_V3] = &monitors.SNMPServiceCheckerV3{}
-	monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
+	// // monitor.Checkers[monitors.ServiceMonitorSNMP_V3] = &monitors.SNMPServiceCheckerV3{}
+	// monitor.Checkers[monitors.ServiceMonitorSNMP] = &monitors.SNMPServiceChecker{}
 
 	// monitor.Checkers[monitors.ServiceMonitorServer] = &monitors.ServerHealthChecker{}
+
+	monitor.Plugins["http_monitor"] = &http_monitor.HTTPMonitorPlugin{}
+	monitor.Plugins["ssl_check"] = &sslcheck.SSLChecker{}
+
+	if false {
+		// monitor.Checkers[monitors.ServiceMonitorAgent] = &monitors.AgentServiceChecker{}
+	}
 
 	return monitor
 }
@@ -119,6 +129,7 @@ func main() {
 	// 	if err != nil {
 	// 		log.Printf("Warning: .env file not found. Using system environment variables. %s", err.Error())
 	// 	}
+
 	envErr := godotenv.Load()
 
 	if envErr != nil {
@@ -161,6 +172,7 @@ func main() {
 	go func() {
 		http.HandleFunc("/ws/notifer", notifier.ServeNotifierWs)
 
+		http.HandleFunc("/ws/management", notifier.ServeManagementInterface)
 		http.HandleFunc("/ws/synthetic", notifier.ServeSyntheticDashboard)
 
 		wsPortStr := constants.GetEnvWithDefault("WS_PORT", "2345")
@@ -179,6 +191,7 @@ func main() {
 	}()
 
 	go notifier.Hub_.Run()
+	go notifier.DashHub.Run()
 	go notifier.BroadcastDashboardData(db)
 
 	// Start the report generation in a goroutine
@@ -259,8 +272,9 @@ func main() {
 
 	// Create and start monitor
 	monitor := NewServiceMonitor(db)
-	if err := monitor.StartService(); err != nil {
-		log.Fatalf("Failed to start monitor: %v", err)
+
+	if err := monitor.StartEngine(); err != nil {
+		log.Fatalf("Failed to Start Monitoring Engine: %v", err)
 	}
 
 	// Wait for shutdown signal
@@ -269,8 +283,8 @@ func main() {
 	// handler.StopListener()
 
 	// Graceful shutdown
-	monitor.StopService()
-	log.Println("Shutdown complete")
+	monitor.StopEngine()
+	log.Println("Monitoring Engine Shutdown complete")
 
 	// Implement graceful shutdown
 	// Give some time for ongoing checks to complete

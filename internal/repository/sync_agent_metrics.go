@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
-	_ "github.com/microsoft/go-mssqldb"
+	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
 func SyncAgentMetrics(db *sql.DB, agentMetrics []mstypes.AgentInfo, agentHttpClient *http.Client, agentSyncURL string) error {

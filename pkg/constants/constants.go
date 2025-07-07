@@ -57,20 +57,30 @@ var DB = DBConfig{
 }
 
 var (
-	LogPath            = "logs/"
-	LogFileName        = LogPath + "ms-svc_monitor.log"
-	DatabaseConnString = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s;", DB.Host, DB.User, DB.Password, DB.Port, DB.Name)
-	SMTPHost           = GetEnvWithDefault("MAILHOST", "localhostgd")
-	SMTPPort           = GetEnvWithDefault("MAILPORT", "2532")
-	SMTPUser           = GetEnvWithDefault("MAILUSER", "test-notification@nibss-plc.com.ng")
-	SMTPPass           = GetEnvWithDefault("MAILPASS", "password123$_")
-	STMP_ADMIN_MAIL    = GetEnvWithDefault("STMPADMIN", "test-notification@nibss-plc.com.ng2")
+	PluginDirs = []string{
+		"./plugins", // Local development
+		// "/etc/ms-monitor/plugins", // System-wide installation
+		// "/app/plugins",            // Docker container default
+	}
+	MaxPluginsPerService = 3
+	LogPath              = "logs/"
+	LogFileName          = LogPath + "ms-svc_monitor.log"
+	DatabaseConnString   = fmt.Sprintf(
+		"host=%s user=%s password=%s port=%s dbname=%s sslmode=disable",
+		DB.Host, DB.User, DB.Password, DB.Port, DB.Name,
+	)
+	SMTPHost        = GetEnvWithDefault("MAILHOST", "localhost")
+	SMTPPort        = GetEnvWithDefault("MAILPORT", "25")
+	SMTPUser        = GetEnvWithDefault("MAILUSER", "")
+	SMTPPass        = GetEnvWithDefault("MAILPASS", "$_")
+	STMP_ADMIN_MAIL = GetEnvWithDefault("STMPADMIN", "")
 )
 
 const (
-	AlertBufferSize   = 100
-	AlertThrottleTime = 5 * time.Minute
-	MaxRetries        = 3
+	DefaultCronExpression = "*/15 * * * *"
+	AlertBufferSize       = 100
+	AlertThrottleTime     = 5 * time.Minute
+	MaxRetries            = 3
 	FailureThresholdCount
 	HTTPRequestTimeout = time.Duration(30) * time.Second
 	ReportsDir         = "reports"
@@ -86,12 +96,76 @@ var (
 	NormalColor = []int{46, 204, 113}  // Green
 )
 
+type StatusInfo struct {
+	Name        string
+	Description string
+	Color       string
+	Flag        int
+}
+
+var StatusMap = map[int]StatusInfo{
+	UnknownStatus: {
+		Name:        "Unknown",
+		Description: "Unknown System Status",
+		Color:       "#6b7280", // Gray
+		Flag:        UnknownStatus,
+	},
+	Healthy: {
+		Name:        "Healthy",
+		Description: "Active System",
+		Color:       "#10B981", // Green
+		Flag:        Healthy,
+	},
+	Escalation: {
+		Name:        "Escalation",
+		Description: "System Requires Attention",
+		Color:       "#f59e0b", // Amber
+		Flag:        Escalation,
+	},
+	Acknowledged: {
+		Name:        "Acknowledged",
+		Description: "Acknowledged Inactive System",
+		Color:       "#3b82f6", // Blue
+		Flag:        Acknowledged,
+	},
+	Degraded: {
+		Name:        "Degraded",
+		Description: "Inactive Systems",
+		Color:       "#ef4444", // Red
+		Flag:        Degraded,
+	},
+	InvalidConfiguration: {
+		Name:        "Unknown",
+		Description: "Invalid Service Configuration",
+		Color:       "#6b7280", // Gray
+		Flag:        InvalidConfiguration,
+	},
+	Scheduled: {
+		Name:        "Scheduled",
+		Description: "Scheduled for Maintenance",
+		Color:       "#8b5cf6", // Purple
+		Flag:        Scheduled,
+	},
+}
+
+func GetStatusInfo(code int, addedMessage string) StatusInfo {
+	if info, ok := StatusMap[code]; ok {
+		if addedMessage != "" {
+			info.Description += " | " + addedMessage
+		}
+		return info
+	}
+
+	return StatusMap[UnknownStatus]
+}
+
 const (
-	Healthy = iota
+	UnknownStatus = iota
+	Healthy
 	Escalation
 	Acknowledged
 	Degraded
-	UnknownStatus
+	InvalidConfiguration
 	Scheduled
 )
 
@@ -101,3 +175,14 @@ var StatusDescriptions = map[int]string{
 	Acknowledged: "Inactive Acknowledged Systems",
 	Scheduled:    "Scheduled for Maintenance",
 }
+
+type ServiceType string
+
+const (
+	HTTPService           ServiceType = "http"
+	DatabaseService       ServiceType = "database"
+	ServiceTypeRedis      ServiceType = "redis"
+	ServiceTypeKafka      ServiceType = "kafka"
+	ServiceTypeElastic    ServiceType = "elasticsearch"
+	ServiceTypeKubernetes ServiceType = "kubernetes"
+)

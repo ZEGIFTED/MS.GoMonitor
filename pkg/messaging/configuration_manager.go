@@ -25,7 +25,15 @@ func (cfgManager *NotificationManager) LoadConfig() error {
 		return fmt.Errorf("configuration Database is not initialized")
 	}
 
-	rows, err := cfgManager.DB.QueryContext(context.Background(), "SELECT [Name],JSON_QUERY([Configuration]) Configuration FROM [MS].[dbo].[NotificationPlatforms]")
+	ctx := context.Background()
+
+	query := `
+	SELECT "Name",
+      "Configuration"::json AS "Configuration"
+	FROM "NotificationPlatforms";
+`
+
+	rows, err := cfgManager.DB.QueryContext(ctx, query)
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -49,7 +57,7 @@ func (cfgManager *NotificationManager) LoadConfig() error {
 		err := rows.Scan(&ConfigName, &Configuration)
 
 		if err != nil {
-			cfgManager.Logger.Printf("error scanning resource row: %v", err)
+			cfgManager.Logger.Printf("⚠️ Load Notification Config failed: %v", err)
 		}
 
 		if strings.Contains(ConfigName, "Email") {
@@ -81,6 +89,10 @@ func (cfgManager *NotificationManager) LoadConfig() error {
 
 // validate checks if the loaded configuration is valid
 func (cfgManager *NotificationManager) Validate() error {
+	if cfgManager.Config.Email == nil && cfgManager.Config.Slack == nil {
+		return fmt.Errorf("❌ Notification config validation failed")
+	}
+
 	// Validate Email configuration if enabled
 	if cfgManager.Config.Email.Enabled {
 		if cfgManager.Config.Email.SMTPServer == "" || cfgManager.Config.Email.SMTPPort == 0 {

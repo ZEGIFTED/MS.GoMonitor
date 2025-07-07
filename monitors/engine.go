@@ -3,10 +3,15 @@ package monitors
 import (
 	"database/sql"
 	"encoding/json"
+	"flag"
 	"fmt"
+	"io/fs"
 	"log"
 	"log/slog"
 	"os"
+	"path/filepath"
+	"plugin"
+	"strconv"
 	"sync"
 	"time"
 
@@ -16,14 +21,89 @@ import (
 	"github.com/ZEGIFTED/MS.GoMonitor/pkg/utils"
 	mstypes "github.com/ZEGIFTED/MS.GoMonitor/types"
 	"github.com/google/uuid"
-	_ "github.com/microsoft/go-mssqldb"
+
+	"github.com/lib/pq" // PostgreSQL driver
 )
 
-func (sm *ServiceMonitor) LoadServicesInventory() error {
+// StartService begins the monitoring process
+func (sm *MonitoringEngine) StartEngine() error {
+	log.Println("Starting MS Monitoring Engine...")
+
+	// Load all plugins
+	if err := sm.LoadPlugins(); err != nil {
+		return fmt.Errorf("failed to load plugins: %v", err)
+	}
+
+	// Load initial services
+	if err := sm.LoadServiceInventory(); err != nil {
+		log.Fatalf("Failed to load initial services: %v", err)
+	}
+
+	// Schedule service checks for each service
+	for _, service := range sm.Services {
+		serviceCopy := service
+		interval := serviceCopy.CheckInterval
+
+		if interval == "" || !utils.IsValidCron(interval) {
+			interval = constants.DefaultCronExpression
+		}
+
+		_, err := sm.Cron.AddFunc(interval, func() {
+			// Check if context is cancelled before running check
+			if sm.Ctx.Err() != nil {
+				return
+			}
+			sm.CheckServices(serviceCopy)
+		})
+
+		if err != nil {
+			log.Printf("Failed to schedule service %s: %v", serviceCopy.Name, err)
+		}
+	}
+
+	sm.Cron.Start()
+	sm.AlertHandler()
+	return nil
+}
+
+// StopService begins the monitoring process
+func (sm *MonitoringEngine) StopEngine() {
+	sm.Cancel() // Cancel context
+
+	log.Printf("Stopping MS-SVC_MONITOR")
+
+	// Stop the cron scheduler
+	ctx := sm.Cron.Stop()
+	close(sm.Alerts)
+
+	// Cleanup all plugins
+	sm.MU.RLock()
+	plugins := make([]ServiceMonitorPlugin, 0)
+	for _, plugin := range sm.Plugins {
+		plugins = append(plugins, plugin)
+	}
+	sm.MU.RUnlock()
+
+	for _, plugin := range plugins {
+		if err := plugin.Cleanup(); err != nil {
+			log.Printf("Error cleaning up plugin %s: %v", plugin.Name(), err)
+		}
+	}
+
+	// Wait for running jobs to complete (with timeout)
+	select {
+	case <-ctx.Done():
+		log.Println("All jobs completed")
+	case <-time.After(15 * time.Second):
+		log.Println("Shutdown timed out waiting for jobs")
+	}
+}
+
+func (sm *MonitoringEngine) LoadServiceInventory() error {
 	log.Println("Fetching Services...")
 
 	// Try to load services from the database first
-	services, err := sm.LoadServicesFromDatabase()
+	services, err := sm.LoadDatabaseMonitoredServices()
 	if err != nil {
 		log.Printf("Failed to load services from database: %v. Falling back to JSON file...", err)
 
@@ -38,13 +118,37 @@ func (sm *ServiceMonitor) LoadServicesInventory() error {
 	sm.Services = services
 	sm.MU.Unlock()
 
+	// Initialize plugins for all services
+	for _, service := range services {
+		if err := sm.initializeServicePlugins(service); err != nil {
+			slog.Error("Failed to initialize plugins for service %s: %v", service.Name, err)
+		}
+	}
+
 	return nil
 }
 
-func (sm *ServiceMonitor) LoadServicesFromDatabase() ([]ServiceMonitorData, error) {
+func (sm *MonitoringEngine) LoadDatabaseMonitoredServices() ([]ServiceMonitorData, error) {
 	log.Println("Fetching Services From Database...")
 
-	rows, err := sm.Db.QueryContext(sm.Ctx, "EXEC ServiceReport @SERVICE_LEVEL = 'MONITOR', @VP = 1;")
+	query := `SELECT "SystemMonitorId",
+       "ServiceName",
+       "IPAddress",
+       "Port",
+       "IsMonitored",
+	   "CurrentHealthCheck",
+       "Device",
+       "FailureCount",
+       "RetryCount",
+	   "Configuration",
+       "CheckInterval",
+       "IsAcknowledged",
+       "SnoozeUntil",
+       "Plugins",
+		"AgentAPI"
+		FROM servicereport('ALL', NULL, TRUE, NULL);`
+
+	rows, err := sm.Db.QueryContext(sm.Ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("error querying services: %v", err)
 	}
@@ -61,13 +165,15 @@ func (sm *ServiceMonitor) LoadServicesFromDatabase() ([]ServiceMonitorData, erro
 		var service ServiceMonitorData
 		var uuidStr string
 		var Configuration string
+		var plugins pq.StringArray // PostgreSQL returns JSON as []byte
 
 		err := rows.Scan(
 			&uuidStr,
 			&service.Name,
 			&service.Host,
 			&service.Port,
-			&service.VP,
+			&service.IsMonitored,
+			&service.CurrentHealthCheck,
 			&service.Device,
 			&service.FailureCount,
 			&service.RetryCount,
@@ -75,6 +181,7 @@ func (sm *ServiceMonitor) LoadServicesFromDatabase() ([]ServiceMonitorData, erro
 			&service.CheckInterval,
 			&service.IsAcknowledged,
 			&service.SnoozeUntil,
+			&plugins,
 			&service.AgentAPIBaseURL,
 		)
 
@@ -86,6 +193,19 @@ func (sm *ServiceMonitor) LoadServicesFromDatabase() ([]ServiceMonitorData, erro
 		if err != nil {
 			slog.Error(err.Error())
 		}
+
+		service.Plugins = plugins
+		// if err := json.Unmarshal(pluginsRaw, &service.Plugins); err != nil {
+		// 	log.Println("Error decoding plugins JSON:", err)
+		// }
+
+		// Parse plugins JSON array
+		// if len(pluginJsonRaw) > 0 {
+		// 	err := json.Unmarshal([]byte(pluginJsonRaw), &service.Plugins)
+		// 	if err != nil {
+		// 		log.Printf("Error unmarshaling plugins: %v", err)
+		// 	}
+		// }
 
 		if Configuration == "" {
 			Configuration = "{}"
@@ -108,7 +228,7 @@ func (sm *ServiceMonitor) LoadServicesFromDatabase() ([]ServiceMonitorData, erro
 	return services, nil
 }
 
-func (sm *ServiceMonitor) loadServicesFromJSON(filename string) ([]ServiceMonitorData, error) {
+func (sm *MonitoringEngine) loadServicesFromJSON(filename string) ([]ServiceMonitorData, error) {
 	file, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, fmt.Errorf("error reading JSON file: %v", err)
@@ -123,149 +243,291 @@ func (sm *ServiceMonitor) loadServicesFromJSON(filename string) ([]ServiceMonito
 	return services, nil
 }
 
-// StartService begins the monitoring process
-func (sm *ServiceMonitor) StartService() error {
-	log.Println("Starting Up MS Monitoring Service...")
+// LoadPlugins loads all compatible plugins from the plugin directory
+func (sm *MonitoringEngine) LoadPlugins() error {
+	var pluginDir string
+	flag.StringVar(&pluginDir, "plugin-dir", "./plugins", "Directory to load plugins from")
+	flag.Parse()
 
-	// Load initial services
-	if err := sm.LoadServicesInventory(); err != nil {
-		log.Fatalf("Failed to load initial services: %v", err)
-	}
+	// Try multiple plugin directories
+	var loadedPlugins int
+	var loadErrors []string
 
-	// Schedule service checks for each service
-	for _, service := range sm.Services {
-		serviceCopy := service
-		interval := serviceCopy.CheckInterval
+	constants.PluginDirs = append(constants.PluginDirs, pluginDir)
 
-		if interval == "" || !utils.IsValidCron(interval) {
-			interval = "*/1 * * * *"
+	for _, dir := range constants.PluginDirs {
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			log.Printf("Plugin directory %s doesn't exist, creating it", dir)
+			if err := os.MkdirAll(dir, 0755); err != nil {
+				return fmt.Errorf("failed to create plugin directory: %v", err)
+			}
+			// return nil // No plugins to load since we just created the directory
+			continue
 		}
 
-		_, err := sm.Cron.AddFunc(interval, func() {
-			// Check if context is cancelled before running check
-			if sm.Ctx.Err() != nil {
-				return
+		err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
 			}
-			sm.CheckService(serviceCopy)
+
+			if d.IsDir() || filepath.Ext(path) != ".so" {
+				return nil
+			}
+
+			plug, err := plugin.Open(path)
+			if err != nil {
+				loadErrors = append(loadErrors, fmt.Sprintf("failed to load %s: %v", path, err))
+				return nil
+			}
+
+			sym, err := plug.Lookup("Plugin")
+			if err != nil {
+				loadErrors = append(loadErrors,
+					fmt.Sprintf("%s doesn't export 'Plugin' symbol: %v", path, err))
+				return nil
+			}
+
+			monitor, ok := sym.(ServiceMonitorPlugin)
+			if !ok {
+				loadErrors = append(loadErrors,
+					fmt.Sprintf("%s doesn't implement Service Monitor Plugin interface", path))
+				return nil
+			}
+
+			if _, exists := sm.Plugins[monitor.Name()]; !exists {
+				sm.Plugins[monitor.Name()] = monitor
+				loadedPlugins++
+				log.Printf("Loaded plugin: %s (%s) from %s",
+					monitor.Name(), monitor.Description(), path)
+			}
+
+			return nil
 		})
 
 		if err != nil {
-			log.Printf("Failed to schedule service %s: %v", serviceCopy.Name, err)
+			loadErrors = append(loadErrors, fmt.Sprintf("error walking %s: %v", dir, err))
 		}
 	}
 
-	sm.Cron.Start()
-	sm.AlertHandler()
+	if loadedPlugins == 0 && len(loadErrors) > 0 {
+		return fmt.Errorf("no plugins loaded, errors: %v", loadErrors)
+	}
+
+	if len(loadErrors) > 0 {
+		log.Printf("Plugin loading completed with some errors: %v", loadErrors)
+	}
+
 	return nil
 }
 
-// StopService begins the monitoring process
-func (sm *ServiceMonitor) StopService() {
-	sm.Cancel() // Cancel context
-
-	log.Printf("Stopping MS-SVC_MONITOR")
-	close(sm.Alerts)
-
-	// Stop the cron scheduler
-	ctx := sm.Cron.Stop()
-
-	// Wait for running jobs to complete (with timeout)
-	select {
-	case <-ctx.Done():
-		log.Println("All jobs completed")
-	case <-time.After(15 * time.Second):
-		log.Println("Shutdown timed out waiting for jobs")
+// initializeServicePlugins sets up plugins for a specific service
+func (sm *MonitoringEngine) initializeServicePlugins(service ServiceMonitorData) error {
+	if len(service.Plugins) > constants.MaxPluginsPerService {
+		return fmt.Errorf("service %s has too many plugins (%d), max is %d",
+			service.Name, len(service.Plugins), constants.MaxPluginsPerService)
 	}
+
+	var missingPlugins []string
+	var initErrors []string
+
+	for _, pluginName := range service.Plugins {
+		plugin, exists := sm.Plugins[pluginName]
+		if !exists {
+			missingPlugins = append(missingPlugins, pluginName)
+			continue
+		}
+
+		// Verify plugin supports this service type
+		supported := false
+		for _, t := range plugin.SupportedTypes() {
+			if t == service.Device {
+				supported = true
+				break
+			}
+		}
+
+		if !supported {
+			initErrors = append(initErrors,
+				fmt.Sprintf("plugin %s doesn't support service type %s",
+					pluginName, service.Device))
+			continue
+		}
+
+		// Initialize with service-specific configuration
+		if err := plugin.Initialize(service.Configuration); err != nil {
+			initErrors = append(initErrors,
+				fmt.Sprintf("failed to initialize plugin %s: %v", pluginName, err))
+		}
+	}
+
+	if len(missingPlugins) > 0 {
+		return fmt.Errorf("missing plugins: %v", missingPlugins)
+	}
+
+	if len(initErrors) > 0 {
+		return fmt.Errorf("initialization errors: %v", initErrors)
+	}
+
+	return nil
 }
 
-// Example: Thread-safe iteration with RWMutex
-//func (sm *ServiceMonitor) GetAllStatuses() []ServiceMonitorStatus {
-//	sm.MU.RLock()
-//	defer sm.MU.RUnlock()
-//
-//	var statuses []ServiceMonitorStatus
-//	for _, status := range sm.StatusTracking {
-//		statuses = append(statuses, *status)
-//	}
-//	return statuses
-//}
-
-// CheckService monitors a single service
-func (sm *ServiceMonitor) CheckService(service ServiceMonitorData) {
-	// Get the appropriate checker for this service type
-	checker, exists := sm.Checkers[service.Device]
-
-	if !exists {
-		sm.handleUnknownServiceType(service)
+func (sm *MonitoringEngine) CheckServices(service ServiceMonitorData) {
+	if service.SnoozeUntil.Valid && time.Now().Before(service.SnoozeUntil.Time) {
+		log.Printf("[SNOOZED] %s is snoozed until %v", service.Name, service.SnoozeUntil.Time)
 		return
 	}
 
-	// Load or initialize service status atomically
-	statusIface, _ := sm.StatusTracking.LoadOrStore(service.Name, &ServiceMonitorStatus{
-		Name:          service.Name,
-		Device:        service.Device,
-		LiveCheckFlag: constants.UnknownStatus,
-		LastCheckTime: time.Now(),
-		FailureCount:  service.FailureCount,
-	})
-	currentStatus := statusIface.(*ServiceMonitorStatus)
+	tx, err := sm.Db.BeginTx(sm.Ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+	if err != nil {
+		log.Printf("[ERROR] Starting transaction: %v", err)
+		return
+	}
+	defer tx.Rollback()
 
-	// Perform the service check
-	message, isHealthy := checker.Check(service, sm.Ctx, sm.Db)
-	//currentStatus.LastCheckTime = time.Now()
-
-	//currentStatus, exists := sm.StatusTracking[service.Name]
-
-	// Handle service health status
-	if !isHealthy {
-		sm.handleServiceFailure(service, currentStatus, message)
-	} else {
-		sm.handleServiceRecovery(service, currentStatus)
+	mainStatus, err := sm.DefaultHealth.Check(sm.Ctx, sm.Db, service)
+	if err != nil {
+		log.Printf("[ERROR] Default check failed for %s: %v", service.Name, err)
+		sm.handleServiceFailure(service, mainStatus, err)
+		return
 	}
 
-	// Implement database logging logic to Update the database
-	sm.updateDatabase(service, currentStatus)
+	var pluginStatuses []MonitoringResult
+	for _, pluginName := range service.Plugins {
+		slog.InfoContext(sm.Ctx, "Service Plugins", "PluginName", pluginName)
+		plugin, ok := sm.Plugins[pluginName]
+		if !ok {
+			sm.handleUnknownServiceType(pluginName, service)
+			continue
+		}
 
-	// Update the service status in sync.Map
-	sm.StatusTracking.Store(service.Name, currentStatus)
+		for _, allowedPluginType := range plugin.SupportedTypes() {
+			if service.Device != allowedPluginType {
+				slog.Info("Checking if Plugin Should Be Used", "Plugin", allowedPluginType, "Device", service.Device)
+				continue
+			}
+		}
 
-	// Call the MetricEngine
-	//monitors.MetricEngine()
+		pluginStatus, err := plugin.Check(sm.Ctx, sm.Db, service)
+		if err != nil {
+			// PLUGIN [%s] CHECK Failed for %s.
+			sm.handleServiceFailure(service, pluginStatus, err)
+		}
+
+		pluginStatuses = append(pluginStatuses, pluginStatus)
+		_ = plugin.Cleanup()
+	}
+
+	finalStatus := sm.mergeStatuses(&mainStatus, pluginStatuses)
+	sm.updateDatabase(tx, uuid.New(), service, finalStatus, pluginStatuses)
+	sm.StatusTracking.Store(service.Name, finalStatus)
 }
 
-func (sm *ServiceMonitor) handleUnknownServiceType(service ServiceMonitorData) {
+func (sm *MonitoringEngine) isFailureStatus(status constants.StatusInfo) bool {
+	slog.Info("Checking if Engine Should Fail Service", "Flag", status.Flag)
+	return status.Flag != 1
+}
+
+func (sm *MonitoringEngine) mergeStatuses(main *MonitoringResult, plugins []MonitoringResult) MonitoringResult {
+	for _, p := range plugins {
+		if sm.isFailureStatus(p.HealthReport) {
+			main.HealthReport = constants.GetStatusInfo(p.HealthReport.Flag, "Plugin Failure Detected")
+			break
+		}
+	}
+	return *main
+}
+
+// CheckService monitors a single service
+// func (sm *MonitoringEngine) CheckService(service ServiceMonitorData) {
+// 	// Skip if service is snoozed
+// 	if service.SnoozeUntil.Valid && time.Now().Before(service.SnoozeUntil.Time) {
+// 		log.Printf("%s is Snoozed", service.Name)
+// 		return
+// 	}
+
+// 	// Start transaction
+// 	tx, err := sm.Db.BeginTx(sm.Ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+// 	if err != nil {
+// 		log.Printf("Error starting transaction: %v", err)
+// 		return
+// 	}
+// 	defer tx.Rollback() // ensure rollback if not committed
+
+// 	// Run default checker first
+// 	mainStatus, err := sm.DefaultHealth.Check(sm.Ctx, sm.Db, service)
+// 	if err != nil {
+// 		log.Printf("Default Health Check failed for %s: %v ------- %v", service.Name, err, mainStatus)
+// 		sm.handleServiceFailure(service, mainStatus, err)
+// 		return
+// 	}
+
+// 	// 2. Prepare to collect plugin statuses
+// 	var pluginStatuses []MonitoringResult
+
+// 	// Run all configured plugins
+// 	for _, pluginName := range service.Plugins {
+// 		plugin, exists := sm.Plugins[pluginName]
+// 		if !exists {
+// 			sm.handleUnknownServiceType(pluginName, service)
+// 			continue
+// 		}
+
+// 		pluginStatus, err := plugin.Check(sm.Ctx, sm.Db, service)
+// 		slog.Info("PLugin S+++++++++++++", "ds", pluginStatus)
+// 		if err != nil {
+// 			sm.handleServiceFailure(service, pluginStatus, err)
+// 			// continue
+// 		} else {
+// 			sm.handleServiceRecovery(service, &pluginStatus)
+// 		}
+// 		// mainStatus = sm.mergeStatuses(mainStatus, pluginStatus)
+
+// 		pluginStatuses = append(pluginStatuses, pluginStatus)
+// 	}
+
+// 	// Database logging logic to Update the database
+// 	sm.updateDatabase(tx, uuid.New(), service, mainStatus, pluginStatuses)
+
+// 	// Update the service status in sync.Map
+// 	sm.StatusTracking.Store(service.Name, mainStatus)
+
+// 	// Call the MetricEngine
+// 	//monitors.MetricEngine()
+// }
+
+func (sm *MonitoringEngine) handleUnknownServiceType(pluginName string, service ServiceMonitorData) {
 	sm.MU.Lock()
 	defer sm.MU.Unlock()
 
-	currentStatus := &ServiceMonitorStatus{
+	log.Printf("PLUGIN [%s] not found for service -> %s", pluginName, service.Name)
+	service.FailureCount++
+
+	currentStatus := &MonitoringResult{
 		Name:          service.Name,
-		Device:        service.Device,
-		Status:        "Failed Monitor Check; No Monitor Impl found for Service type",
-		LiveCheckFlag: constants.UnknownStatus,
+		HealthReport:  constants.GetStatusInfo(constants.InvalidConfiguration, "Failed Monitor Check; No Monitor Impl found for Service type"),
 		LastCheckTime: time.Now(),
 	}
 
-	// Update the service status in sync.Map
-	//sm.StatusTracking[service.Name] = currentStatus
 	sm.StatusTracking.Store(service.Name, currentStatus)
-
-	// log.Printf("Service -> [%s]: No Checker Found For Type %s", service.Name, service.Device)
 }
 
-func (sm *ServiceMonitor) handleServiceFailure(service ServiceMonitorData, currentStatus *ServiceMonitorStatus, message ServiceMonitorStatus) {
+func (sm *MonitoringEngine) handleServiceFailure(service ServiceMonitorData, currentStatus MonitoringResult, err error) {
 	// Log service failure
 	serviceAlertIdentifier := service.SystemMonitorId.String() + "|" + service.Name
-	log.Printf("Service -> [%s] failed. Alert Identifier::: %s", service.Name, serviceAlertIdentifier)
+	slog.Error("Service Check Failed",
+		"service", service.Name,
+		"error", err,
+		"alert_identifier", serviceAlertIdentifier,
+	)
 
 	// Update status
-	currentStatus.Status = message.Status
 	currentStatus.FailureCount++
 
 	// Determine escalation level
 	if currentStatus.FailureCount > 3 {
-		currentStatus.LiveCheckFlag = constants.Degraded
+		currentStatus.HealthReport = constants.GetStatusInfo(constants.Degraded, err.Error())
 	} else if currentStatus.FailureCount > 1 {
-		currentStatus.LiveCheckFlag = constants.Escalation
+		currentStatus.HealthReport = constants.GetStatusInfo(constants.Escalation, err.Error())
 	}
 
 	// Throttle alerts to avoid alert fatigue
@@ -275,20 +537,20 @@ func (sm *ServiceMonitor) handleServiceFailure(service ServiceMonitorData, curre
 	}() {
 		log.Println(serviceAlertIdentifier, currentStatus.FailureCount, constants.FailureThresholdCount, service.IsAcknowledged)
 		if currentStatus.FailureCount > constants.FailureThresholdCount && !service.IsAcknowledged {
-			// sm.Alerts <- internal.ServiceAlertEvent{
-			// 	SystemMonitorId: service.SystemMonitorId,
-			// 	ServiceName:     service.Name,
-			// 	Message:         fmt.Sprintf("%s is down: %s", service.Name, message.Status),
-			// 	Severity:        "critical",
-			// 	Timestamp:       time.Now(),
-			// 	AgentRepository: service.AgentRepository,
-			// 	AgentAPI:        service.AgentAPIBaseURL,
-			// }
+			sm.Alerts <- internal.ServiceAlertEvent{
+				SystemMonitorId: service.SystemMonitorId,
+				ServiceName:     service.Name,
+				Message:         fmt.Sprintf("%s is down: %s", service.Name, err.Error()),
+				Severity:        "critical",
+				Timestamp:       time.Now(),
+				AgentRepository: service.AgentRepository,
+				AgentAPI:        service.AgentAPIBaseURL,
+			}
 
 			serviceAlertMessage := notifier.NotiferEvent{
 				Title:      fmt.Sprintf("%s is down", service.Name),
 				Identifier: serviceAlertIdentifier,
-				Message:    message.Status,
+				Message:    err.Error(),
 				Timestamp:  time.Now().Format(time.RFC3339),
 			}
 
@@ -300,75 +562,106 @@ func (sm *ServiceMonitor) handleServiceFailure(service ServiceMonitorData, curre
 
 		sm.AlertCache.Store(serviceAlertIdentifier, time.Now())
 	}
-
-	//if ok {
-	//	if lastAlertTime, valid := lastAlert.(time.Time); valid {
-	//		// Use lastAlertTime safely here
-	//
-	//		if !ok || time.Since(lastAlertTime) > constants.AlertThrottleTime {
-	//			if currentStatus.FailureCount > constants.FailureThresholdCount && !service.IsAcknowledged {
-	//				log.Printf("Adding Service to Alert Channel: %s", service.Name)
-	//
-	//				sm.Alerts <- internal.ServiceAlertEvent{
-	//					ServiceName: service.Name,
-	//					Message:     fmt.Sprintf("%s is down: %s", service.Name, message.LastErrorLog),
-	//					Severity:    "critical",
-	//					Timestamp:   time.Now(),
-	//				}
-	//			}
-	//
-	//			sm.AlertCache.Store(service.Name, time.Now())
-	//		}
-	//	} else {
-	//		log.Println("Type assertion failed for lastAlert")
-	//	}
-	//} else {
-	//	log.Println("No previous alert found for service:", service.Name)
-	//}
-
-	// Track service failure
-	//sm.TrackServiceFailure(service, currentStatus, "")
 }
 
-func (sm *ServiceMonitor) handleServiceRecovery(service ServiceMonitorData, currentStatus *ServiceMonitorStatus) {
+func (sm *MonitoringEngine) handleServiceRecovery(service ServiceMonitorData, currentStatus *MonitoringResult) *MonitoringResult {
 	// Update status for healthy service
-	currentStatus.LiveCheckFlag = constants.Healthy
-	currentStatus.Status = "Service is healthy."
+	currentStatus.HealthReport = constants.GetStatusInfo(constants.Healthy, "Service is healthy and working optimal")
 	currentStatus.FailureCount = 0
 	currentStatus.LastServiceUpTime = time.Now()
 
 	// Log service recovery
-	log.Printf("Service %s is healthy.", service.Name)
+	log.Printf("Service Check -> %s is healthy.", service.Name)
+
+	return currentStatus
 }
 
-func (sm *ServiceMonitor) updateDatabase(service ServiceMonitorData, currentStatus *ServiceMonitorStatus) {
-	// Update the database with the latest status
-	_, err := sm.Db.Exec(`
-        UPDATE [dbo].[SystemMonitor] 
-        SET 
-            Status = @Status, 
-            LiveCheckFlag = @LiveCheckFlag, 
-            LastServiceUpTime = @LastServiceUpTime, 
-            LastCheckTime = @LastCheckTime, 
-            FailureCount = @FailureCount
-        WHERE 
-            ServiceName = @Name`,
-		sql.Named("Status", currentStatus.Status),
-		sql.Named("LiveCheckFlag", currentStatus.LiveCheckFlag),
-		sql.Named("LastServiceUpTime", currentStatus.LastServiceUpTime),
-		sql.Named("LastCheckTime", currentStatus.LastCheckTime),
-		sql.Named("FailureCount", currentStatus.FailureCount),
-		sql.Named("Name", service.Name),
-	)
+// func (sm *MonitoringEngine) updateDatabase(service ServiceMonitorData, currentStatus ServiceMonitorStatus) {
+// 	// Update the database with the latest status
+// 	_, err := sm.Db.Exec(`
+//         UPDATE [dbo].[SystemMonitor]
+//         SET
+//             Status = @Status,
+//             LiveCheckFlag = @LiveCheckFlag,
+//             LastServiceUpTime = @LastServiceUpTime,
+//             LastCheckTime = @LastCheckTime,
+//             FailureCount = @FailureCount
+//         WHERE
+//             ServiceName = @Name`,
+// 		sql.Named("Status", currentStatus.Status),
+// 		sql.Named("LiveCheckFlag", currentStatus.LiveCheckFlag),
+// 		sql.Named("LastServiceUpTime", currentStatus.LastServiceUpTime),
+// 		sql.Named("LastCheckTime", currentStatus.LastCheckTime),
+// 		sql.Named("FailureCount", currentStatus.FailureCount),
+// 		sql.Named("Name", service.Name),
+// 	)
+
+// 	if err != nil {
+// 		log.Printf("Error updating SystemMonitor for service %s: %v", service.Name, err)
+// 	}
+// }
+
+func (sm *MonitoringEngine) updateDatabase(tx *sql.Tx, resultID uuid.UUID, service ServiceMonitorData, currentStatus MonitoringResult, pluginStatuses []MonitoringResult) error {
+	// Update the database with the latest status using PostgreSQL and quoted identifiers
+	_, err := tx.ExecContext(sm.Ctx, `INSERT INTO "MonitoringResultHistory" ("Id", "SystemMonitorId", "HealthReport", "ExecutionTime", "Status") VALUES ($1, $2, $3, $4, $5)
+	`, resultID, service.SystemMonitorId, currentStatus.HealthReport.Description, currentStatus.LastCheckTime, strconv.Itoa(currentStatus.HealthReport.Flag))
 
 	if err != nil {
+		log.Printf("Error inserting monitoring result: %v", err)
+		return err
+	}
+	_, errc := sm.Db.Exec(`
+        UPDATE "SystemMonitor"
+        SET 
+			"CurrentHealthCheck" = $5,
+            "LastServiceUpTime" = $1, 
+            "LastCheckTime" = $2, 
+            "FailureCount" = $3
+        WHERE 
+            "ServiceName" = $4`,
+		currentStatus.LastServiceUpTime,
+		currentStatus.LastCheckTime,
+		currentStatus.FailureCount,
+		service.Name,
+		service.CurrentHealthCheck,
+	)
+
+	if errc != nil {
 		log.Printf("Error updating SystemMonitor for service %s: %v", service.Name, err)
 	}
+
+	if len(pluginStatuses) > 0 {
+		stmt, err := tx.PrepareContext(sm.Ctx, `
+		INSERT INTO "PluginMonitoringResults" ("Id", "MonitoringResultId", "ServicePluginId", "Status", "HealthReport"
+		) VALUES ($1, $2, $3, $4, $5)
+	`)
+		if err != nil {
+			log.Printf("Prepare statement failed: %v", err)
+			return err
+		}
+		defer stmt.Close()
+
+		for _, ps := range pluginStatuses {
+			_, err := stmt.ExecContext(sm.Ctx, uuid.New(), resultID, ps.ServicePluginID, ps.HealthReport.Name, ps.HealthReport.Description)
+			if err != nil {
+				log.Printf("Failed to insert plugin result (%s): %v", ps.Name, err)
+				return err
+			}
+		}
+
+	}
+
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		slog.ErrorContext(sm.Ctx, "failed to commit transaction: %w", "Error", err)
+	}
+
+	return nil
 }
 
 //
 //// TrackServiceFailure logs the service failure
-//func (sm *ServiceMonitor) TrackServiceFailure(service ServiceMonitorData, status *ServiceMonitorStatus, severity string) {
+//func (sm *MonitoringEngine) TrackServiceFailure(service ServiceMonitorData, status *ServiceMonitorStatus, severity string) {
 //
 //	if !service.IsAcknowledged && status.FailureCount > 2 && utils.IsValidUUID(service.SystemMonitorId.String()) {
 //		log.Printf("Escalating Service -> %s", service.Name)
@@ -390,14 +683,14 @@ func (sm *ServiceMonitor) updateDatabase(service ServiceMonitorData, currentStat
 //	}
 //}
 
-func (sm *ServiceMonitor) GetUnprocessedAlertsCount() int {
+func (sm *MonitoringEngine) GetUnprocessedAlertsCount() int {
 	sm.MU.RLock()         // Lock for read-only access
 	defer sm.MU.RUnlock() // Unlock after function execution
 	return len(sm.Alerts)
 }
 
 // AlertHandler checks if an alert should be sent (rate-limiting) and sends them.
-func (sm *ServiceMonitor) AlertHandler() {
+func (sm *MonitoringEngine) AlertHandler() {
 	go func() {
 		for {
 			select {
@@ -473,7 +766,7 @@ func (sm *ServiceMonitor) AlertHandler() {
 	}()
 }
 
-func (sm *ServiceMonitor) SendDowntimeServiceNotification(event internal.ServiceAlertEvent, recipients mstypes.NotificationRecipients) error {
+func (sm *MonitoringEngine) SendDowntimeServiceNotification(event internal.ServiceAlertEvent, recipients mstypes.NotificationRecipients) error {
 	log.Printf("Processing alert for service: %s", event.ServiceName)
 
 	emailConfig := sm.NotificationHandler.GetEmailConfig()

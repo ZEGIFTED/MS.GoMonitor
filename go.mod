@@ -19,6 +19,7 @@ require (
 	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
+	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.33.0 // indirect
 	golang.org/x/net v0.26.0 // direct
 	golang.org/x/sys v0.30.0 // indirect

@@ -1,83 +1,19 @@
 [
   {
-    "systemMonitorId": "123e4567-e89b-12d3-a456-426614174000",
-    "name": "Network1",
-    "host": "192.168.100.252",
-    "port": 161,
-    "vp": true,
-    "device": "Network",
-    "failure_count": 0,
-    "retry_count": 1,
+    "systemMonitorId": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Main Web Service",
+    "host": "web.example.com",
+    "port": 443,
+    "IsMonitored": true,
+    "device": "Web Modules",
+    "engine": "Docker",
+    "failureCount": 0,
+    "retryCount": 3,
     "configuration": {
-      "communityString": "msmonitoring",
-      "authUsernameV3": "msmonitoring",
-      "authPasswordV3": "CaMoniLeb",
-      "snmpVersion": "v2",
-      "snmpMetrics": [
-        {
-          "oid": ".1.3.6.1.2.1.1.3.0",
-          "description": "Host Name",
-          "metricType": "string"
-        },
-        {
-          "oid": ".1.3.6.1.4.1.9.2.1.4.0",
-          "description": "Domain Name",
-          "metricType": "string"
-        },
-        {
-          "oid": ".1.3.6.1.2.1.1.5.0",
-          "description": "System Name",
-          "metricType": "string"
-        },
-        {
-          "oid": ".1.3.6.1.2.1.197.1.1.3.0",
-          "description": "manufacturer",
-          "metricType": "system"
-        },
-        {
-          "oid": ".1.3.6.1.4.1.9.2.2.1.1.20.1",
-          "description": "Interface Status",
-          "metricType": "string"
-        },
-        {
-          "oid": ".1.3.6.1.2.1.1.3.0",
-          "description": "System Uptime",
-          "metricType": "system"
-        },
-        {
-          "oid": ".1.3.6.1.2.1.31.1.1.1.6.1",
-          "description": "Inbound Traffic",
-          "metricType": "traffic",
-          "isCounter": true,
-          "scale": 1000,
-          "interfaceId": "1"
-        },
-
-        {
-          "oid": ".1.3.6.1.2.1.2.2.1.10.1",
-          "description": "Inbound Octets",
-          "metricType": "counter"
-        },
-        {
-          "oid": ".1.3.6.1.4.1.9.2.1.8.0",
-          "description": "Free Memory",
-          "metricType": "counter"
-        },
-        {
-          "oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
-          "description": "Memory Usage",
-          "metricType": "memory"
-        },
-        {
-          "oid": ".1.3.6.1.4.1.9.2.1.58.0",
-          "description": "CPU Usage",
-          "metricType": "counter"
-        }
-      ]
+      "timeout": 5,
+      "ssl_check": true
     },
-    "check_interval": "*/3 * * * *",
-    "is_acknowledged": false,
-    "snooze_until": null,
-    "agent_api_base_url": ""
+    "checkInterval": "*/30 * * * * *",
+    "plugins": ["http_monitor", "ssl_check"]
   }
 ]
